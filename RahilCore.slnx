@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="RahilCore.Application/RahilCore.Application.csproj" Id="5089fdcc-dc8f-4d32-8f82-52e23b04b244" />
+  <Project Path="rahilcore.client/rahilcore.client.esproj">
+    <Build />
+    <Deploy />
+  </Project>
+  <Project Path="RahilCore.Domain/RahilCore.Domain.csproj" Id="6af290a1-cfd0-47c9-897a-a5cbf039c082" />
+  <Project Path="RahilCore.Infrastructure/RahilCore.Infrastructure.csproj" Id="ff22c065-1cde-4ae5-b83d-1b8bda203647" />
+  <Project Path="RahilCore.Server/RahilCore.Server.csproj" />
+</Solution>

@@ -1,0 +1,14 @@
+Component: PascalCase.tsx
+Hook: useCamelCase.ts
+Utility: camelCase.ts
+Types: camelCase.ts untuk nama file, PascalCase untuk interface/type.
+Folder: camelCase atau kebab-case, pilih satu dan konsisten. Saya sarankan kebab-case untuk folder shared.
+
+Jenis file	Konvensi	Contoh
+React component	PascalCase	CustomerList.tsx
+React component	PascalCase	CustomerFilterContent.tsx
+Custom hook	camelCase dengan awalan use	useCustomers.ts
+Utility function	camelCase	formatCurrency.ts
+Konfigurasi kolom	camelCase	customerColumns.tsx
+Type / interface	PascalCase	Customer.ts
+Constant	camelCase atau UPPER_SNAKE_CASE	customerStatus.ts

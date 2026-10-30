@@ -1,0 +1,205 @@
+
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * RahilCore Theme
+ * Branding: FAST Inspection
+ * Primary: Navy Blue
+ * Accent: Gold
+ */
+
+:root {
+    color-scheme: light;
+    /* Base */
+    --background: #f8fafc;
+    --foreground: #102746;
+    --card: #ffffff;
+    --card-foreground: #102746;
+    --popover: #ffffff;
+    --popover-foreground: #102746;
+    /* FAST Inspection: Navy & Gold */
+    --primary: #0b2d5c;
+    --primary-foreground: #ffffff;
+    --secondary: #eaf1fa;
+    --secondary-foreground: #0b2d5c;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --accent: #fff5d6;
+    --accent-foreground: #0b2d5c;
+    /* Status */
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
+    /* Form & borders */
+    --border: #dbe4ef;
+    --input: #dbe4ef;
+    --ring: #f5b51b;
+    /* Charts */
+    --chart-1: #0b2d5c;
+    --chart-2: #f5b51b;
+    --chart-3: #2563eb;
+    --chart-4: #0d9488;
+    --chart-5: #d97706;
+    /* Radius */
+    --radius: 0.625rem;
+    /* Sidebar */
+    --sidebar: #ffffff;
+    --sidebar-foreground: #102746;
+    --sidebar-primary: #0b2d5c;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #fff5d6;
+    --sidebar-accent-foreground: #0b2d5c;
+    --sidebar-border: #dbe4ef;
+    --sidebar-ring: #f5b51b;
+    /* Typography */
+    --font-sans: "Geist Variable", sans-serif;
+    --font-heading: "Geist Variable", sans-serif;
+    --font-mono: ui-monospace, Consolas, monospace;
+}
+
+.dark {
+    color-scheme: dark;
+    /* Base */
+    --background: #08172c;
+    --foreground: #f1f5f9;
+    --card: #102746;
+    --card-foreground: #f1f5f9;
+    --popover: #102746;
+    --popover-foreground: #f1f5f9;
+    /* FAST Inspection */
+    --primary: #f5b51b;
+    --primary-foreground: #102746;
+    --secondary: #193657;
+    --secondary-foreground: #eaf1fa;
+    --muted: #172b45;
+    --muted-foreground: #a8b8cc;
+    --accent: #263b51;
+    --accent-foreground: #ffda75;
+    /* Status */
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    /* Form & borders */
+    --border: #29415e;
+    --input: #29415e;
+    --ring: #f5b51b;
+    /* Charts */
+    --chart-1: #f5b51b;
+    --chart-2: #60a5fa;
+    --chart-3: #34d399;
+    --chart-4: #fb923c;
+    --chart-5: #c084fc;
+    /* Sidebar */
+    --sidebar: #0b1e36;
+    --sidebar-foreground: #f1f5f9;
+    --sidebar-primary: #f5b51b;
+    --sidebar-primary-foreground: #102746;
+    --sidebar-accent: #193657;
+    --sidebar-accent-foreground: #ffda75;
+    --sidebar-border: #29415e;
+    --sidebar-ring: #f5b51b;
+}
+
+/*
+ * Tailwind CSS v4 Theme Mapping
+ * Maps CSS variables to Tailwind utility classes.
+ */
+
+@theme inline {
+    --font-heading: var(--font-sans);
+    --font-sans: "Geist Variable", sans-serif;
+    --font-mono: ui-monospace, Consolas, monospace;
+    /* Sidebar */
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    /* Charts */
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    /* General colors */
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    /* Radius */
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/*
+ * Base Styles
+ */
+
+@layer base {
+    * {
+        border-color: var(--border);
+        outline-color: var(--ring);
+    }
+
+    html {
+        @apply font-sans;
+        min-height: 100%;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        font-family: var(--font-sans);
+    }
+
+    #root {
+        min-height: 100vh;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+        font: inherit;
+    }
+
+        button,
+        [role="button"],
+        label[for],
+        input[type="checkbox"],
+        input[type="radio"] {
+            cursor: pointer;
+        }
+
+            button:disabled,
+            [role="button"][aria-disabled="true"] {
+                cursor: not-allowed;
+            }
+}

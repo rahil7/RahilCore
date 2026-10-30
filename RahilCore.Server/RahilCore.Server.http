@@ -1,0 +1,6 @@
+@RahilCore.Server_HostAddress = http://localhost:5099
+
+GET {{RahilCore.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
