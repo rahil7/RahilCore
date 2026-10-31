@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     Search,
     SlidersHorizontal,
@@ -22,10 +22,12 @@ export interface CustomerListQuery {
 }
 
 interface CustomerListToolbarProps {
+    filterOptions: CustomerFilterOptions;
     onQueryChange: (query: CustomerListQuery) => void;
 }
 
 export default function CustomerListToolbar({
+    filterOptions,
     onQueryChange,
 }: CustomerListToolbarProps) {
     const [searchKey, setSearchKey] = useState("");
@@ -41,29 +43,38 @@ export default function CustomerListToolbar({
 
     const [appliedFilters, setAppliedFilters] = useState<CustomerFilters>(initialFilters);
 
-    const [, setDraftFilters] = useState<CustomerFilters>(initialFilters);
+    const latestQueryRef = useRef<CustomerListQuery>({
+        searchBy,
+        searchKey,
+        sortBy,
+        sortDirection,
+        filters: appliedFilters,
+    });
 
-    const filterOptions: CustomerFilterOptions = {
-        cities: [
-            { id: 1, name: "Tangerang" },
-            { id: 2, name: "Jakarta" },
-            { id: 3, name: "Bandung" },
-            { id: 4, name: "Padang" },
-            { id: 5, name: "Pekanbaru" },
-            { id: 6, name: "Banten" },
-            { id: 7, name: "Bengkulu" },
-        ],
-        customerTypes: [
-            { id: 1, name: "Dealer" },
-            { id: 2, name: "Workshop" },
-        ],
-        statuses: [
-            { value: true, label: "Active" },
-            { value: false, label: "Inactive" },
-        ],
-        searchFields: [],
-        sortFields: [],
+    latestQueryRef.current = {
+        searchBy,
+        searchKey,
+        sortBy,
+        sortDirection,
+        filters: appliedFilters,
     };
+
+    const isInitialSearch = useRef(true);
+
+    useEffect(() => {
+        if (isInitialSearch.current) {
+            isInitialSearch.current = false;
+            return;
+        }
+
+        const timeout = setTimeout(() => {
+            onQueryChange(latestQueryRef.current);
+        }, 500);
+
+        return () => clearTimeout(timeout);
+    }, [searchKey, onQueryChange]);
+
+    const [, setDraftFilters] = useState<CustomerFilters>(initialFilters);
 
     function handleOpenFilter() {
         setDraftFilters({
@@ -159,12 +170,10 @@ export default function CustomerListToolbar({
                     }}
                     ariaLabel="Cari berdasarkan"
                     className="w-full min-w-0 @md:order-1 @[64rem]:order-none @[64rem]:w-44 @[64rem]:shrink-0"
-                    options={[
-                        { value: "custCode", label: "Customer Code" },
-                        { value: "custName", label: "Customer Name" },
-                        { value: "custTypeName", label: "Customer Type" },
-                        { value: "cityName", label: "City" },
-                    ]}
+                    options={filterOptions.searchFields.map((item) => ({
+                        value: item.value,
+                        label: item.label,
+                    }))}
                 />
 
                 {/* Search keyword */}
@@ -178,9 +187,7 @@ export default function CustomerListToolbar({
                         type="text"
                         value={searchKey}
                         onChange={(event) => {
-                            const value = event.target.value;
-                            setSearchKey(value);
-                            notifyQueryChange({ searchKey: value });
+                            setSearchKey(event.target.value);
                         }}
                         placeholder="Cari Customer..."
                         aria-label="Kata kunci pencarian"
@@ -198,14 +205,10 @@ export default function CustomerListToolbar({
                         }}
                         ariaLabel="Cari berdasarkan"
                         className="w-full min-w-0"
-                        options={[
-                            { value: "custCode", label: "Customer Code" },
-                            { value: "custName", label: "Customer Name" },
-                            { value: "custTypeName", label: "Customer Type" },
-                            { value: "cityName", label: "Kota" },
-                            { value: "createdAt", label: "Created" },
-                            { value: "lastActivityAt", label: "Last Activity" },
-                        ]}
+                        options={filterOptions.sortFields.map((item) => ({
+                            value: item.value,
+                            label: item.label,
+                        }))}
                     />
                 </div>
 
@@ -224,13 +227,10 @@ export default function CustomerListToolbar({
                                 : "Descending — klik untuk ascending"
                         }
                         onClick={() => {
-                            setSortDirection((current) => {
-                                const next = current === "asc" ? "desc" : "asc";
+                            const next = sortDirection === "asc" ? "desc" : "asc";
 
-                                notifyQueryChange({ sortDirection: next });
-
-                                return next;
-                            });
+                            setSortDirection(next);
+                            notifyQueryChange({ sortDirection: next });
                         }}
                         className="inline-flex size-10 w-10 shrink-0 items-center justify-center rounded-md border hover:bg-muted"
                     >

@@ -1,119 +1,120 @@
-import DataTable from "../../components/shared/data-table/DataTable";
+import { useMemo, useState, useEffect } from "react";
 import {
-    customerColumns,
-    type Customer,
-} from "../../features/customers/components/customerColumns";
-import CustomerMobileCard from "../../features/customers/components/CustomerMobileCard";
-import { useState } from "react";
-import CustomerListToolbar, {
-    type CustomerListQuery,
-} from "../../features/customers/components/CustomerListToolbar";
+    Search,
+    ArrowUp,
+    ArrowDown,
+    SlidersHorizontal
+} from "lucide-react";
+
+import SelectField from "../../components/shared/SelectField";
+import FilterDialog from "../../components/shared/FilterDialog";
+import CustomerFilterContent, { type CustomerFilters } from "../../features/customers/components/CustomerFilterContent"
+import type { CustomerFilterOptions } from "../../types/customer";
+import { customerService } from "../../services/customer-service";
 
 export default function CustomerList() {
-    const customerNames = [
-        "PT Maju Jaya",
-        "CV Berkah Abadi",
-        "PT Sinar Mandiri",
-        "CV Cipta Karya",
-        "PT Nusantara Sejahtera",
-        "UD Sumber Rezeki",
-        "PT Global Teknologi",
-        "CV Mitra Usaha",
-        "PT Cahaya Abadi",
-        "PT Sentosa Makmur",
-        "CV Bintang Timur",
-        "PT Indo Persada",
-        "PT Karya Utama",
-        "CV Anugerah Jaya",
-        "PT Mega Pratama",
-        "PT Solusi Digital Indonesia",
-        "CV Mitra Sejahtera Abadi",
-        "PT Teknologi Nusantara International",
-        "UD Berkah Mandiri",
-        "PT Cipta Solusi Global",
-    ];
+    console.log("CustomerList render");
 
-    const cities = [
-        "Jakarta",
-        "Bandung",
-        "Tangerang",
-        "Surabaya",
-        "Medan",
-        "Semarang",
-        "Padang",
-        "Pekanbaru",
-    ];
+    const [searchBy, setSearchBy] = useState("custName");
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [sortBy, setSortBy] = useState("lastActivityAt");
+    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
-    const customers: Customer[] = customerNames.map((name, index) => {
-        const id = index + 1;
-        const customerNumber = String(id).padStart(3, "0");
+    const searchOptions = useMemo(() => {
+        console.log("searchOptions dibuat");
+        return [
+            { value: "custCode", label: "Customer Code" },
+            { value: "custName", label: "Customer Name" },
+            { value: "custTypeName", label: "Customer Type" },
+            { value: "cityName", label: "City" },
+        ];
+    }, []);
 
-        const createdDate = new Date(2026, 5 + (index % 5), 10 + (index % 18), 9, 0);
+    const sortOptions = useMemo(() => {
+        console.log("sortOptions dibuat");
+        return [
+            { value: "custCode", label: "Customer Code" },
+            { value: "custName", label: "Customer Name" },
+            { value: "custTypeName", label: "Customer Type" },
+            { value: "cityName", label: "City" },
+            { value: "createdAt", label: "Created Date" },
+            { value: "lastActivityAt", label: "Last Activity" },
+        ];
+    }, []);
 
-        const activityDate = new Date(
-            2026,
-            9,
-            28 - (index % 20),
-            14 + (index % 8),
-            15
-        );
+    const [filterOptions, setFilterOptions] =
+        useState<CustomerFilterOptions>({
+            customerTypes: [],
+            cities: [],
+            statuses: [],
+            searchFields: [],
+            sortFields: []
+        });
 
-        return {
-            id,
-            custCode: `CUST-${customerNumber}`,
-            custName: name,
-            phone: `628981728${String(29 + index).padStart(2, "0")}`,
-            email: `customer${id}@example.com`,
-            cityName: cities[index % cities.length],
-            status: index % 3 === 0 ? "Inactive" : "Active",
-            createdAt: createdDate.toISOString(),
-            lastActivityAt: activityDate.toISOString(),
-            lastActivityBy: [
-                "Rahmad Ilahi",
-                "Admin",
-                "System",
-                "Operator",
-            ][index % 4],
-        };
-    });
+    useEffect(() => {
+        const fetchFilterOptions = async () => {
+            try {
+                const response = await customerService.getFilterOptions();
 
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(5);
+                if (!response.success || !response.data) {
+                    throw new Error(
+                        response.message || "Gagal memuat opsi filter."
+                    );
+                }
 
-    const totalItems = customers.length;
+                console.log(response.data);
 
-    const totalPages = Math.ceil(totalItems / pageSize);
+                setFilterOptions(response.data);
+            } catch (error) {
+                console.error("Failed to load customer filter options:", error);
+            }
+        }
 
-    const paginatedCustomers = customers.slice(
-        (page - 1) * pageSize,
-        page * pageSize
-    );
+        fetchFilterOptions();
+    },[]);
 
-    function handlePageChange(newPage: number) {
-        setPage(newPage);
-    }
 
-    function handlePageSizeChange(newPageSize: number) {
-        setPageSize(newPageSize);
-        setPage(1);
-    }
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-    const [,setQuery] = useState<CustomerListQuery>({
-        searchBy: "custName",
-        searchKey: "",
-        sortBy: "lastActivityAt",
-        sortDirection: "desc",
-        filters: {
+    const [draftFilters, setDraftFilters] =
+        useState<CustomerFilters>({
             custTypeIds: [],
             cityIds: [],
             status: [],
-        },
-    });
+        });
 
-    function handleQueryChange(nextQuery: CustomerListQuery) {
-        setQuery(nextQuery);
-        setPage(1);
-    }
+    const [appliedFilters, setAppliedFilters] =
+        useState<CustomerFilters>({
+            custTypeIds: [],
+            cityIds: [],
+            status: [],
+        });
+
+    const handleOpenFilter = () => {
+        setIsFilterOpen(true);
+    };
+
+    const handleApplyFilter = () => {
+        setAppliedFilters(draftFilters);
+        setIsFilterOpen(false);
+    };
+
+    const handleCancelFilter = () => {
+        setIsFilterOpen(false);
+    };
+
+    const handleResetFilter = () => {
+        setDraftFilters({
+            custTypeIds: [],
+            cityIds: [],
+            status: [],
+        });
+    };
+
+    const hasDraftFilters =
+        draftFilters.custTypeIds.length > 0 ||
+        draftFilters.cityIds.length > 0 ||
+        draftFilters.status.length > 0;
 
     return (
         <div className="w-full min-w-0 space-y-3">
@@ -126,24 +127,100 @@ export default function CustomerList() {
                 </p>
             </div>
 
-            <CustomerListToolbar onQueryChange={handleQueryChange} />
+            {/* Toolbar */}
+            <div className="@container w-full min-w-0 space-y-2">
+                <div className="grid w-full min-w-0 grid-cols-1 gap-3 rounded-lg border bg-card p-3 @md:grid-cols-2 @[64rem]:flex @[64rem]:items-center">
+                    {/* Search field */}
+                    <SelectField
+                        value={searchBy}
+                        onChange={setSearchBy}
+                        ariaLabel="Cari berdasarkan"
+                        className="w-full min-w-0 @md:order-1 @[64rem]:order-none @[64rem]:w-44 @[64rem]:shrink-0"
+                        options={searchOptions}
+                    />
 
-            <DataTable
-                columns={customerColumns}
-                data={paginatedCustomers}
-                getRowId={(row) => row.id}
-                renderMobile={(row) => (
-                    <CustomerMobileCard customer={row} />
-                )}
-                pagination={{
-                    page,
-                    pageSize,
-                    totalItems,
-                    totalPages,
-                }}
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSizeChange}
-            />
+                    {/* Search keyword */}
+                    <div className="flex h-10 w-full min-w-0 items-center gap-2 rounded-md border bg-background px-3 @md:order-3 @md:col-span-2 @[64rem]:order-none @[64rem]:flex-1">
+                        <Search
+                            size={16}
+                            className="shrink-0 text-muted-foreground"
+                        />
+
+                        <input
+                            type="text"
+                            value={searchKeyword}
+                            onChange={(e) => setSearchKeyword(e.target.value)}
+                            placeholder="Cari Customer..."
+                            aria-label="Kata kunci pencarian"
+                            className="box-border h-10 min-h-10 w-full min-w-0 flex-1 border-0 bg-transparent p-0 text-sm leading-5 outline-none focus:outline-none focus:ring-0"
+                        />
+                    </div>
+
+                    {/* Sort field */}
+                    <div className="relative w-full min-w-0 @md:order-2 @[64rem]:order-none @[64rem]:w-44 @[64rem]:shrink-0">
+                        <SelectField
+                            value={sortBy}
+                            onChange={setSortBy}
+                            ariaLabel="Cari berdasarkan"
+                            className="w-full min-w-0"
+                            options={sortOptions}
+                        />
+                    </div>
+
+                    {/* Sort direction & Filter */}
+                    <div className="flex w-full min-w-0 items-center justify-end gap-2 @md:order-4 @md:col-span-2 @[64rem]:order-none @[64rem]:w-auto @[64rem]:shrink-0">
+                        <button
+                            type="button"
+                            aria-label={
+                                sortDirection === "asc"
+                                    ? "Ubah ke descending"
+                                    : "Ubah ke ascending"
+                            }
+                            title={
+                                sortDirection === "asc"
+                                    ? "Ascending — klik untuk descending"
+                                    : "Descending — klik untuk ascending"
+                            }
+                            onClick={() => {
+                                setSortDirection((current) => current === "asc" ? "desc" : "asc");
+                            }}
+                            className="inline-flex size-10 w-10 shrink-0 items-center justify-center rounded-md border hover:bg-muted"
+                        >
+                            {sortDirection === "asc" ? (
+                                <ArrowUp size={16} />
+                            ) : (
+                                <ArrowDown size={16} />
+                            )}
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={handleOpenFilter}
+                            className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-md border px-4 text-sm font-medium hover:bg-muted md:flex-none"
+                        >
+                            <SlidersHorizontal size={16} />
+                            Filter
+                        </button>
+
+                        <FilterDialog
+                            open={isFilterOpen}
+                            title="Filter Customers"
+                            onClose={handleCancelFilter}
+                            onApply={handleApplyFilter}
+                            onReset={handleResetFilter}
+                            hasDraftFilters={hasDraftFilters}
+                        >
+                            <CustomerFilterContent
+                                options={filterOptions}
+                                draftFilters={draftFilters}
+                                onChange={setDraftFilters}
+                            />
+                        </FilterDialog>
+                    </div>
+
+                    {/* Active Filters Section */}
+                </div>
+            </div>
         </div>
     );
 }

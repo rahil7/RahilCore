@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { X } from "lucide-react";
 
@@ -6,43 +5,25 @@ interface FilterDialogProps {
     open: boolean;
     title: string;
     children?: ReactNode;
+    hasDraftFilters: boolean;
     onClose: () => void;
     onApply: () => void;
+    onReset: () => void;
 }
 
 export default function FilterDialog({
     open,
     title,
     children,
+    hasDraftFilters,
     onClose,
     onApply,
+    onReset
 }: FilterDialogProps) {
-    useEffect(() => {
-        if (!open) return;
-
-        function handleKeyDown(event: KeyboardEvent) {
-            if (event.key === "Escape") {
-                onClose();
-            }
-        }
-
-        window.addEventListener("keydown", handleKeyDown);
-
-        return () => {
-            window.removeEventListener("keydown", handleKeyDown);
-        };
-    }, [open, onClose]);
-
-    // Dialog tidak dirender jika tertutup
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-            onMouseDown={(event) => {
-                if (event.target === event.currentTarget) {
-                    onClose();
-                }
-            }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
             <div
                 role="dialog"
                 aria-modal="true"
@@ -69,27 +50,38 @@ export default function FilterDialog({
                 </div>
 
                 {/* Content */}
-                <div className="max-h-[65vh] overflow-y-auto p-5">
+                <div className="min-h-0 p-5">
                     {children}
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-end gap-2 border-t px-5 py-4">
+                <div className="flex items-center justify-between gap-3 border-t bg-muted/20 px-5 py-4">
                     <button
                         type="button"
-                        onClick={onClose}
-                        className="h-9 rounded-md border px-4 text-sm font-medium hover:bg-muted"
+                        onClick={onReset}
+                        disabled={!hasDraftFilters}
+                        className="text-sm font-medium text-muted-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:text-muted-foreground"
                     >
-                        Batal
+                        Reset pilihan
                     </button>
 
-                    <button
-                        type="button"
-                        onClick={onApply}
-                        className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
-                    >
-                        Terapkan
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="h-9 rounded-md border px-4 text-sm font-medium hover:bg-muted"
+                        >
+                            Batal
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={onApply}
+                            className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90"
+                        >
+                            Terapkan
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
