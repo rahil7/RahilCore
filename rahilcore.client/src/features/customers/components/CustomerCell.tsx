@@ -1,15 +1,19 @@
-
+import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 
 interface CustomerCellProps {
+    customerId: number;
     name: string;
     code: string;
 }
 
 export default function CustomerCell({
+    customerId,
     name,
     code,
 }: CustomerCellProps) {
+    const navigate = useNavigate();
+
     const initials = name
         .split(" ")
         .filter(Boolean)
@@ -27,12 +31,14 @@ export default function CustomerCell({
             </Avatar>
 
             <div className="min-w-0 flex-1 space-y-1">
-                <p
-                    className="truncate text-sm font-medium text-foreground"
+                <button
+                    type="button"
+                    className="truncate text-left text-sm font-medium text-foreground hover:underline"
                     title={name}
+                    onClick={() => navigate(`/customers/${customerId}`)}
                 >
                     {name}
-                </p>
+                </button>
 
                 <p className="truncate text-xs text-muted-foreground">
                     {code}

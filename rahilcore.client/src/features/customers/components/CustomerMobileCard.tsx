@@ -1,7 +1,7 @@
 
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Badge } from "../../../components/ui/badge";
-
+import { useNavigate } from "react-router-dom";
 import CustomerActions from "./CustomerActions";
 import CustomerActivityCell from "./CustomerActivityCell";
 import type { CustomerListItem } from "../../../types/customer";
@@ -13,6 +13,8 @@ interface CustomerMobileCardProps {
 export default function CustomerMobileCard({
     customer,
 }: CustomerMobileCardProps) {
+    const navigate = useNavigate();
+
     const initials = customer.custName
         .split(" ")
         .filter(Boolean)
@@ -32,12 +34,14 @@ export default function CustomerMobileCard({
                 </Avatar>
 
                 <div className="min-w-0 flex-1 space-y-1">
-                    <p
-                        className="truncate text-sm font-semibold"
+                    <button
+                        type="button"
+                        className="truncate text-left text-sm font-semibold hover:underline"
                         title={customer.custName}
+                        onClick={() => navigate(`/customers/${customer.id}`)}
                     >
                         {customer.custName}
-                    </p>
+                    </button>
 
                     <p className="text-xs text-muted-foreground">
                         {customer.custCode}
@@ -58,7 +62,7 @@ export default function CustomerMobileCard({
             <div className="mt-3 grid grid-cols-2 gap-x-3 gap-y-3 border-t pt-3">
                 <div className="min-w-0 space-y-1">
                     <p className="text-xs text-muted-foreground">Phone</p>
-                    <p className="truncate text-sm" title={customer.phone}>
+                    <p className="truncate text-sm" title={customer.phone ?? "-"}>
                         {customer.phone}
                     </p>
                 </div>

@@ -17,6 +17,7 @@ export interface DataTablePagination {
 }
 
 export interface DataTableProps<T> {
+    actions?: ReactNode;
     columns: DataTableColumn<T>[];
     data: T[];
     getRowId: (row: T) => string | number;

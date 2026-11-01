@@ -1,5 +1,5 @@
-import { MoreHorizontal } from "lucide-react";
-
+import { MoreHorizontal, Eye, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import {
     DropdownMenu,
@@ -7,7 +7,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "../../../components/ui/dropdown-menu";
-import { Separator } from "../../../components/ui/separator";
 
 interface CustomerActionsProps {
     customerId: number;
@@ -16,6 +15,7 @@ interface CustomerActionsProps {
 export default function CustomerActions({
     customerId,
 }: CustomerActionsProps) {
+    const navigate = useNavigate();
     return (
         <DropdownMenu>
             <DropdownMenuTrigger
@@ -23,7 +23,8 @@ export default function CustomerActions({
                     <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-md text-muted-foreground hover:text-foreground"
+                        aria-label="Customer actions"
+                        className="h-8 w-8 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
                     >
                         <MoreHorizontal className="h-4 w-4" />
                     </Button>
@@ -36,23 +37,17 @@ export default function CustomerActions({
                 className="min-w-40"
             >
                 <DropdownMenuItem
-                    onClick={() => console.log("Detail:", customerId)}
+                    onClick={() => navigate(`/customers/${customerId}`)}
                 >
+                    <Eye className="mr-2 h-4 w-4" />
                     Detail
                 </DropdownMenuItem>
-
-                <DropdownMenuItem
-                    onClick={() => console.log("Edit:", customerId)}
-                >
-                    Edit
-                </DropdownMenuItem>
-
-                <Separator className="my-1"/>
 
                 <DropdownMenuItem
                     variant="destructive"
                     onClick={() => console.log("Delete:", customerId)}
                 >
+                    <Trash2 className="mr-2 h-4 w-4" />
                     Delete
                 </DropdownMenuItem>
             </DropdownMenuContent>

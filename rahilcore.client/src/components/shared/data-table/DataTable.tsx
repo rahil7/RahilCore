@@ -13,6 +13,7 @@ import type { DataTableProps } from "./types";
 import DataTablePagination from "./DataTablePagination";
 
 export default function DataTable<T>({
+    actions,
     columns,
     data,
     getRowId,
@@ -24,6 +25,12 @@ export default function DataTable<T>({
 }: DataTableProps<T>) {
     return (
         <div className="w-full min-w-0 overflow-hidden rounded-lg border bg-card shadow-sm">
+
+            {toolbar && (
+                <div className="flex justify-end border-b px-4 py-2.5">
+                    {actions}
+                </div>
+            )}
 
             {/* Mobile Layout */}
             {renderMobile && (

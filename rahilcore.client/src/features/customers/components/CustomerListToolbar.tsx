@@ -39,6 +39,7 @@ interface CustomerListToolbarProps {
     onDraftFiltersChange: (filters: CustomerFilters) => void;
 
     activeFilterCount: number;
+    disabled: boolean
 }
 
 export default function CustomerListToolbar({
@@ -62,6 +63,7 @@ export default function CustomerListToolbar({
     onResetFilter,
     onDraftFiltersChange,
     activeFilterCount,
+    disabled
 }: CustomerListToolbarProps) {
     return (
         <div className="@container w-full min-w-0 space-y-2">
@@ -70,6 +72,7 @@ export default function CustomerListToolbar({
                 <SelectField
                     value={searchBy}
                     onChange={onSearchByChange}
+                    disabled={disabled}
                     ariaLabel="Cari berdasarkan"
                     className="w-full min-w-0 @md:order-1 @[64rem]:order-none @[64rem]:w-44 @[64rem]:shrink-0"
                     options={searchOptions}
@@ -84,6 +87,7 @@ export default function CustomerListToolbar({
 
                     <input
                         type="text"
+                        disabled={disabled}
                         value={searchKeyword}
                         onChange={(e) => onSearchKeywordChange(e.target.value)}
                         placeholder="Cari Customer..."
@@ -97,6 +101,7 @@ export default function CustomerListToolbar({
                     <SelectField
                         value={sortBy}
                         onChange={onSortByChange}
+                        disabled={disabled}
                         ariaLabel="Cari berdasarkan"
                         className="w-full min-w-0"
                         options={sortOptions}
@@ -107,6 +112,7 @@ export default function CustomerListToolbar({
                 <div className="flex w-full min-w-0 items-center justify-end gap-2 @md:order-4 @md:col-span-2 @[64rem]:order-none @[64rem]:w-auto @[64rem]:shrink-0">
                     <button
                         type="button"
+                        disabled={disabled}
                         aria-label={
                             sortDirection === "asc"
                                 ? "Ubah ke descending"
@@ -118,7 +124,7 @@ export default function CustomerListToolbar({
                                 : "Descending — klik untuk ascending"
                         }
                         onClick={onSortDirectionChange}
-                        className="inline-flex size-10 w-10 shrink-0 items-center justify-center rounded-md border hover:bg-muted"
+                        className="inline-flex size-10 w-10 shrink-0 items-center justify-center rounded-md border hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
                     >
                         {sortDirection === "asc" ? (
                             <ArrowUp size={16} />
@@ -129,8 +135,9 @@ export default function CustomerListToolbar({
 
                     <button
                         type="button"
+                        disabled={disabled}
                         onClick={onOpenFilter}
-                        className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-md border px-4 text-sm font-medium hover:bg-muted md:flex-none"
+                        className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-md border px-4 text-sm font-medium hover:bg-muted md:flex-none disabled:pointer-events-none disabled:opacity-50"
                     >
                         <SlidersHorizontal size={16} />
                         Filter

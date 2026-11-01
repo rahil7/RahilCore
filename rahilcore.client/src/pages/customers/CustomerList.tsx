@@ -2,16 +2,16 @@ import { useMemo, useState, useEffect } from "react";
 import CustomerListToolbar from "../../features/customers/components/CustomerListToolbar";
 import type { CustomerFilters } from "../../features/customers/components/CustomerFilterContent"
 import type {
-    CustomerFilterOptions,
     GetCustomersParams,
     CustomerListItem,
 } from "../../types/customer";
 import { customerService } from "../../services/customer-service";
 import CustomerActiveFilters from "../../features/customers/components/CustomerActiveFilters";
-import type { PaginationMetadata } from "../../types/pagination";
 import DataTable from "../../components/shared/data-table/DataTable";
 import CustomerMobileCard from "../../features/customers/components/CustomerMobileCard";
 import { customerColumns } from "../../features/customers/components/customerColumns";
+import CustomerListActions from "../../features/customers/components/CustomerListActions";
+import { useCustomerContext } from "../../contexts/customers/useCustomerContext";
 
 // Initial state
 const emptyFilters: CustomerFilters = {
@@ -21,33 +21,42 @@ const emptyFilters: CustomerFilters = {
 };
 
 export default function CustomerList() {
-    console.log("CustomerList render");
+    console.log("render CustomerList")
 
-    const [searchBy, setSearchBy] = useState("custName");
-    const [searchKeyword, setSearchKeyword] = useState("");
-    const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState("");
-    const [sortBy, setSortBy] = useState("lastActivityAt");
-    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-    const [customers, setCustomers] = useState<CustomerListItem[]>([]);
+    const {
+        lastFetchedQueryKey,
+        setLastFetchedQueryKey,
+        searchBy,
+        setSearchBy,
+        searchKeyword,
+        setSearchKeyword,
+        debouncedSearchKeyword,
+        setDebouncedSearchKeyword,
+        sortBy,
+        setSortBy,
+        sortDirection,
+        setSortDirection,
+        customers,
+        setCustomers,
+        filterOptions,
+        setFilterOptions,
+        pagination,
+        setPagination,
+        appliedFilters,
+        setAppliedFilters,
+        refreshKey,
+        setRefreshKey,
+        shouldRefresh,
+        setShouldRefresh,
+    } = useCustomerContext();
+
     const [isLoading, setIsLoading] = useState(false);
 
-    const [filterOptions, setFilterOptions] =
-        useState<CustomerFilterOptions>({
-            customerTypes: [],
-            cities: [],
-            statuses: [],
-            searchFields: [],
-            sortFields: []
-        });
-
-    const [pagination, setPagination] = useState<PaginationMetadata>({
-        page: 1,
-        pageSize: 10,
-        totalItems: 0,
-        totalPages: 0,
-    });
-
     useEffect(() => {
+        if (filterOptions.cities.length > 0) {
+            return;
+        }
+
         const fetchFilterOptions = async () => {
             try {
                 const response = await customerService.getFilterOptions();
@@ -62,10 +71,10 @@ export default function CustomerList() {
             } catch (error) {
                 console.error("Failed to load customer filter options:", error);
             }
-        }
+        };
 
         fetchFilterOptions();
-    }, []);
+    }, [filterOptions.cities.length, setFilterOptions]);
 
     const searchOptions = filterOptions.searchFields;
 
@@ -74,8 +83,6 @@ export default function CustomerList() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const [draftFilters, setDraftFilters] = useState<CustomerFilters>({ ...emptyFilters });
-
-    const [appliedFilters, setAppliedFilters] = useState<CustomerFilters>({ ...emptyFilters });
 
     const handleOpenFilter = () => {
         setDraftFilters({
@@ -150,23 +157,34 @@ export default function CustomerList() {
         activeStatuses.length +
         activeCities.length;
 
+    const handleRefresh = () => {
+        setRefreshKey((current) => current + 1);
+    };
+
     useEffect(() => {
+        const params: GetCustomersParams = {
+            page: pagination.page,
+            pageSize: pagination.pageSize,
+            searchBy,
+            searchKey: debouncedSearchKeyword,
+            sortBy,
+            sortDirection,
+            status: appliedFilters.status,
+            custTypeIds: appliedFilters.custTypeIds,
+            cityIds: appliedFilters.cityIds,
+        };
+
+        const queryKey = JSON.stringify(params);
+
+        // Cek apakah GET diperlukan
+        if (lastFetchedQueryKey === queryKey && !shouldRefresh) {
+            return;
+        }
+
         const fetchCustomers = async () => {
             try {
                 setIsLoading(true);
-                await new Promise((resolve) => setTimeout(resolve, 1500));
-
-                const params: GetCustomersParams = {
-                    page: pagination.page,
-                    pageSize: pagination.pageSize,
-                    searchBy,
-                    searchKey: debouncedSearchKeyword,
-                    sortBy,
-                    sortDirection,
-                    status: appliedFilters.status,
-                    custTypeIds: appliedFilters.custTypeIds,
-                    cityIds: appliedFilters.cityIds,
-                };
+                await new Promise((resolve) => setTimeout(resolve, 500));
 
                 const response = await customerService.getList(params);
 
@@ -176,11 +194,12 @@ export default function CustomerList() {
                     );
                 }
 
-                console.log(response);
-
                 setCustomers(response.data);
 
                 setPagination(response.pagination);
+
+                setLastFetchedQueryKey(queryKey);
+                setShouldRefresh(false);
             } catch (error) {
                 console.error("Failed to load customers:", error);
             } finally {
@@ -197,6 +216,13 @@ export default function CustomerList() {
         appliedFilters,
         pagination.page,
         pagination.pageSize,
+        refreshKey,
+        lastFetchedQueryKey,
+        shouldRefresh,
+        setCustomers,
+        setLastFetchedQueryKey,
+        setPagination,
+        setShouldRefresh,
     ]);
 
     type FilterKey = keyof CustomerFilters;
@@ -241,7 +267,7 @@ export default function CustomerList() {
         return () => {
             clearTimeout(timer);
         };
-    }, [searchKeyword]);
+    }, [searchKeyword, setDebouncedSearchKeyword]);
 
     return (
         <div className="w-full min-w-0 space-y-3">
@@ -280,6 +306,7 @@ export default function CustomerList() {
                 onResetFilter={handleResetFilter}
                 onDraftFiltersChange={setDraftFilters}
                 activeFilterCount={activeFilterCount}
+                disabled={ isLoading }
             />
 
             <CustomerActiveFilters
@@ -295,6 +322,14 @@ export default function CustomerList() {
             />
 
             <DataTable<CustomerListItem>
+                actions={
+                    <CustomerListActions
+                        onRefresh={handleRefresh}
+                        onExport={() => console.log("export") }
+                        onAdd={() => console.log("Add Customer")}
+                        isLoading={isLoading}
+                    />
+                }
                 columns={customerColumns}
                 data={customers}
                 getRowId={(row) => row.id}

@@ -11,6 +11,7 @@ export const customerColumns: DataTableColumn<CustomerListItem>[] = [
         header: "Customer",
         cell: (row) => (
             <CustomerCell
+                customerId={row.id}
                 name={row.custName}
                 code={row.custCode}
             />
