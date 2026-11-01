@@ -15,7 +15,6 @@ export interface CustomerFilters {
     cityIds: number[];
     status: boolean[];
 }
-
 interface CustomerFilterContentProps {
     options: CustomerFilterOptions;
     draftFilters: CustomerFilters;

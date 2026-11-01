@@ -1,4 +1,5 @@
 //component utama yang mengatur keseluruhan tabel.
+import { Skeleton } from "../../../components/ui/skeleton";
 
 import {
     Table,
@@ -19,6 +20,7 @@ export default function DataTable<T>({
     pagination,
     onPageChange,
     onPageSizeChange,
+    isLoading = false,
 }: DataTableProps<T>) {
     return (
         <div className="w-full min-w-0 overflow-hidden rounded-lg border bg-card shadow-sm">
@@ -26,7 +28,16 @@ export default function DataTable<T>({
             {/* Mobile Layout */}
             {renderMobile && (
                 <div className="space-y-3 p-3 md:hidden">
-                    {data.length > 0 ? (
+                    {isLoading ? (
+                        Array.from({ length: 3 }).map((_, index) => (
+                            <div key={index} className="rounded-lg border p-4 space-y-3">
+                                <Skeleton className="h-5 w-2/3" />
+                                <Skeleton className="h-4 w-1/2" />
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-3/4" />
+                            </div>
+                        ))
+                    ) : data.length > 0 ? (
                         data.map((row) => (
                             <div key={getRowId(row)}>
                                 {renderMobile(row)}
@@ -58,7 +69,9 @@ export default function DataTable<T>({
                         </TableHeader>
 
                         <TableBody>
-                            {data.length > 0 ? (
+                            {isLoading ? (
+                                <TableSkeleton columns={columns.length} />
+                            ) : data.length > 0 ? (
                                 data.map((row) => (
                                     <TableRow
                                         key={getRowId(row)}
@@ -101,5 +114,19 @@ export default function DataTable<T>({
             />
         </div>
     );
-
+}
+function TableSkeleton({ columns }: { columns: number }) {
+    return (
+        <>
+            {Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                    {Array.from({ length: columns }).map((_, cellIndex) => (
+                        <TableCell key={cellIndex} className="px-4 py-3">
+                            <Skeleton className="h-4 w-full" />
+                        </TableCell>
+                    ))}
+                </TableRow>
+            ))}
+        </>
+    );
 }

@@ -3,21 +3,9 @@ import type { DataTableColumn } from "../../../components/shared/data-table/type
 import CustomerActions from "./CustomerActions";
 import CustomerCell from "./CustomerCell";
 import CustomerActivityCell from "./CustomerActivityCell";
+import type { CustomerListItem } from "../../../types/customer";
 
-export interface Customer {
-    id: number;
-    custCode: string;
-    custName: string;
-    phone: string;
-    email: string;
-    cityName: string;
-    status: string;
-    createdAt: string;
-    lastActivityAt: string;
-    lastActivityBy: string;
-}
-
-export const customerColumns: DataTableColumn<Customer>[] = [
+export const customerColumns: DataTableColumn<CustomerListItem>[] = [
     {
         id: "customer",
         header: "Customer",
@@ -49,12 +37,12 @@ export const customerColumns: DataTableColumn<Customer>[] = [
         cell: (row) => (
             <span
                 className={
-                    row.status === "Active"
+                    row.isActive
                         ? "text-green-600"
                         : "text-muted-foreground"
                 }
             >
-                {row.status}
+                {row.isActive ? "Active" : "Inactive"}
             </span>
         ),
     },

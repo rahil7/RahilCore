@@ -11,10 +11,13 @@ export interface CustomerListItem {
     custCode: string;
     custName: string;
     custTypeName: string;
+    email: string | null;
+    phone: string | null;
     cityName: string | null;
     isActive: boolean;
     createdAt: string;
-    lastActivityAt: string | null;
+    lastActivityBy: string;
+    lastActivityAt: string;
 }
 
 export interface CustomerDetail {

@@ -24,6 +24,7 @@ export interface DataTableProps<T> {
     pagination: DataTablePagination;
     onPageChange: (page: number) => void;
     onPageSizeChange: (pageSize: number) => void;
+    isLoading?: boolean;
 }
 
 export interface DataTablePaginationProps {

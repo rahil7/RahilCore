@@ -4,10 +4,10 @@ import { Badge } from "../../../components/ui/badge";
 
 import CustomerActions from "./CustomerActions";
 import CustomerActivityCell from "./CustomerActivityCell";
-import type { Customer } from "./customerColumns";
+import type { CustomerListItem } from "../../../types/customer";
 
 interface CustomerMobileCardProps {
-    customer: Customer;
+    customer: CustomerListItem;
 }
 
 export default function CustomerMobileCard({
@@ -20,8 +20,6 @@ export default function CustomerMobileCard({
         .map((word) => word[0])
         .join("")
         .toUpperCase();
-
-    const isActive = customer.status === "Active";
 
     return (
         <div className="rounded-lg border bg-card p-3 shadow-sm">
@@ -47,10 +45,10 @@ export default function CustomerMobileCard({
                 </div>
 
                 <Badge
-                    variant={isActive ? "default" : "secondary"}
+                    variant={customer.isActive ? "default" : "secondary"}
                     className="shrink-0"
                 >
-                    {customer.status}
+                    {customer.isActive ? "Active" : "Inactive"}
                 </Badge>
 
                 <CustomerActions customerId={customer.id} />
@@ -67,14 +65,14 @@ export default function CustomerMobileCard({
 
                 <div className="min-w-0 space-y-1">
                     <p className="text-xs text-muted-foreground">City</p>
-                    <p className="truncate text-sm" title={customer.cityName}>
-                        {customer.cityName}
+                    <p className="truncate text-sm" title={customer.cityName ?? "-"}>
+                        {customer.cityName ?? "-"}
                     </p>
                 </div>
 
                 <div className="col-span-2 min-w-0 space-y-1">
                     <p className="text-xs text-muted-foreground">Email</p>
-                    <p className="truncate text-sm" title={customer.email}>
+                    <p className="truncate text-sm" title={customer.email ?? "-"}>
                         {customer.email}
                     </p>
                 </div>
