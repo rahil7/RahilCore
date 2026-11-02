@@ -5,6 +5,7 @@ import type {
     StatusFilterOption,
     QueryFieldOption,
 } from "./common";
+import type { BaseAudit } from "./base";
 
 export interface CustomerListItem {
     id: number;
@@ -20,8 +21,7 @@ export interface CustomerListItem {
     lastActivityAt: string;
 }
 
-export interface CustomerDetail {
-    id: number;
+export interface CustomerDetail extends BaseAudit {
     custTypeId: number;
     custTypeName: string;
     custCode: string;
@@ -31,13 +31,6 @@ export interface CustomerDetail {
     cityId: number | null;
     cityName: string | null;
     address: string | null;
-    isActive: boolean;
-    createdAt: string;
-    createdBy: string | null;
-    updatedAt: string | null;
-    updatedBy: string | null;
-    createdNote: string | null;
-    updatedNote: string | null;
 }
 
 export interface CustomerFilterOptions {
@@ -72,4 +65,14 @@ export interface UpdateCustomerRequest {
     cityId?: number | null;
     address?: string | null;
     note: string;
+}
+
+export interface CustomerEmail extends BaseAudit {
+    email: string;
+    isPrimary: boolean;
+}
+
+export interface CustomerPhone extends BaseAudit {
+    phone: string;
+    isPrimary: boolean;
 }

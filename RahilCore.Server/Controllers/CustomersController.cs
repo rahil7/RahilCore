@@ -105,7 +105,6 @@ namespace RahilCore.Server.Controllers
                     Data: customerPhones));
         }
 
-
         [HttpPost]
         public async Task<ActionResult<ApiResponse<object>>> Create([FromBody] CreateCustomerRequest request,CancellationToken ct)
         {
