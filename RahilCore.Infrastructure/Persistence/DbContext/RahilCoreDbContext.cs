@@ -10,6 +10,8 @@ namespace RahilCore.Infrastructure.Persistence.DbContext
         public DbSet<UserEn> Users => Set<UserEn>();
         public DbSet<CityEn> Cities => Set<CityEn>();
         public DbSet<CustomerEn> Customers => Set<CustomerEn>();
+        public DbSet<CustomerEmailEn> CustomerEmails => Set<CustomerEmailEn>();
+        public DbSet<CustomerPhoneEn> CustomerPhones => Set<CustomerPhoneEn>();
         public DbSet<MasterParameterEn> MasterParameters => Set<MasterParameterEn>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

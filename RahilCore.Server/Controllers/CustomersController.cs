@@ -63,6 +63,49 @@ namespace RahilCore.Server.Controllers
                     Data: customer));
         }
 
+        [HttpGet("{id:long}/emails")]
+        public async Task<ActionResult<ApiResponse<List<CustomerEmailDto>>>> GetCustomerEmails(long id, CancellationToken ct)
+        {
+            var customerEmails = await _customerService.GetCustomerEmails(id, ct);
+
+            if (customerEmails is null)
+            {
+                return NotFound(
+                    new ApiResponse<List<CustomerEmailDto>>(
+                        Success: false,
+                        Message: "Customer tidak ditemukan.",
+                        Data: null));
+            }
+
+            return Ok(
+                new ApiResponse<List<CustomerEmailDto>>(
+                    Success: true,
+                    Message: "Customer retrieved successfully.",
+                    Data: customerEmails));
+        }
+
+        [HttpGet("{id:long}/phones")]
+        public async Task<ActionResult<ApiResponse<List<CustomerPhoneDto>>>> GetCustomerPhones(long id, CancellationToken ct)
+        {
+            var customerPhones = await _customerService.GetCustomerPhones(id, ct);
+
+            if (customerPhones is null)
+            {
+                return NotFound(
+                    new ApiResponse<List<CustomerPhoneDto>>(
+                        Success: false,
+                        Message: "Customer tidak ditemukan.",
+                        Data: null));
+            }
+
+            return Ok(
+                new ApiResponse<List<CustomerPhoneDto>>(
+                    Success: true,
+                    Message: "Customer retrieved successfully.",
+                    Data: customerPhones));
+        }
+
+
         [HttpPost]
         public async Task<ActionResult<ApiResponse<object>>> Create([FromBody] CreateCustomerRequest request,CancellationToken ct)
         {

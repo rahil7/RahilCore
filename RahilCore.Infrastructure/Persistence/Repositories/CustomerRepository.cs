@@ -21,20 +21,20 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
         public async Task AddAsync(CustomerEn customer, CancellationToken ct = default)
         {
             await _context.Customers.AddAsync(customer, ct);
+        }
 
-            try
-            {
-                await _context.SaveChangesAsync(ct);
-            }
-            catch (DbUpdateException ex)
-                when (ex.InnerException is PostgresException pgEx &&
-                      pgEx.SqlState == PostgresErrorCodes.UniqueViolation &&
-                      pgEx.ConstraintName == "uq_customers_cust_code")
-            {
-                throw new BusinessException(
-                    409,
-                    $"Customer code '{customer.CustCode}' already exists.");
-            }
+        public async Task AddEmailAsync(CustomerEmailEn email, long id, CancellationToken ct = default)
+        {
+            email.CustomerId = id;
+
+            await _context.CustomerEmails.AddAsync(email, ct);
+        }
+
+        public async Task AddPhoneAsync(CustomerPhoneEn phone, long id, CancellationToken ct = default)
+        {
+            phone.CustomerId = id;
+
+            await _context.CustomerPhones.AddAsync(phone, ct);
         }
 
         public async Task<bool> ExistsByCodeAsync(string custCode, CancellationToken ct = default)
@@ -74,6 +74,25 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                     UpdatedNote = x.UpdatedNote
                 })
                 .FirstOrDefaultAsync(ct);
+        }
+
+        public async Task<List<CustomerEmailDto>?> GetEmailsAsync(long id, CancellationToken ct)
+        {
+            return await _context
+                .CustomerEmails
+                .Where(x => x.CustomerId == id)
+                .Select(x => new CustomerEmailDto
+                {
+                    Id = x.Id,
+                    Email = x.Email,
+                    CustomerId = x.CustomerId,
+                    IsActive = x.IsActive,
+                    CreatedAt = x.CreatedAt,
+                    LastActivityAt = x.UpdatedAt ?? x.CreatedAt,
+                    LastActivityBy = x.UpdatedBy ?? x.CreatedBy ?? string.Empty,
+                    LastActivityNote = x.UpdatedNote ?? x.CreatedNote
+                })
+                .ToListAsync(ct);
         }
 
         public async Task<CustomerEn?> GetEntityByIdAsync(long id, CancellationToken ct = default)
@@ -223,6 +242,25 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 .ToListAsync(ct);
 
             return (items, totalItems);
+        }
+
+        public async Task<List<CustomerPhoneDto>?> GetPhonesAsync(long id, CancellationToken ct)
+        {
+            return await _context
+                .CustomerPhones
+                .Where(x => x.CustomerId == id)
+                .Select(x => new CustomerPhoneDto
+                {
+                    Id = x.Id,
+                    Phone = x.Phone,
+                    CustomerId = x.CustomerId,
+                    IsActive = x.IsActive,
+                    CreatedAt = x.CreatedAt,
+                    LastActivityAt = x.UpdatedAt ?? x.CreatedAt,
+                    LastActivityBy = x.UpdatedBy ?? x.CreatedBy ?? string.Empty,
+                    LastActivityNote = x.UpdatedNote ?? x.CreatedNote
+                })
+                .ToListAsync(ct);
         }
 
         public async Task UpdateAsync(CustomerEn customer, CancellationToken ct = default)

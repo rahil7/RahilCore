@@ -15,5 +15,7 @@ namespace RahilCore.Application.Features.Customers
         Task UpdateAsync(long id,UpdateCustomerRequest request,string updatedBy,CancellationToken ct = default);
 
         Task<CustomerFilterOptions> GetFilterOptionsAsync(CancellationToken ct = default);
+        Task<List<CustomerEmailDto>?> GetCustomerEmails(long id, CancellationToken ct = default);
+        Task<List<CustomerPhoneDto>?> GetCustomerPhones(long id, CancellationToken ct = default);
     }
 }

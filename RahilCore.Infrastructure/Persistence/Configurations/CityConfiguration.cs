@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RahilCore.Domain.Entities;
 using RahilCore.Infrastructure.Persistence.Configurations.Common;
 
-namespace RahilCore.Infrastructure.Persistence.Configurations.Customers
+namespace RahilCore.Infrastructure.Persistence.Configurations
 {
     public sealed class CityConfiguration : BaseEntityConfiguration<CityEn>
     {

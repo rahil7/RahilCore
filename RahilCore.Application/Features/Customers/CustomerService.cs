@@ -1,4 +1,5 @@
-﻿using RahilCore.Application.Common.DTOs;
+﻿using RahilCore.Application.Abstractions.Persistence;
+using RahilCore.Application.Common.DTOs;
 using RahilCore.Application.Common.Exceptions;
 using RahilCore.Application.Features.City;
 using RahilCore.Application.Features.Customers.DTOs;
@@ -12,15 +13,24 @@ namespace RahilCore.Application.Features.Customers
     public sealed class CustomerService(
         ICustomerRepository custRepo,
         IMasterParameterRepository masterParameterRepo,
-        ICityRepository cityRepo) : ICustomerService
+        ICityRepository cityRepo,
+        IUnitOfWork uow) : ICustomerService
     {
-        public async Task<long> CreateAsync(CreateCustomerRequest request, string createdBy, CancellationToken ct = default)
+        public async Task<long> CreateAsync(
+        CreateCustomerRequest request,
+        string createdBy,
+        CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(request);
 
-            if (await custRepo.ExistsByCodeAsync(request.CustCode.Trim(), ct))
+            var custCode = request.CustCode.Trim();
+
+            // Validation
+            if (await custRepo.ExistsByCodeAsync(custCode, ct))
             {
-                throw new BusinessException(409, $"Customer code '{request.CustCode.Trim()}' already exists.");
+                throw new BusinessException(
+                    409,
+                    $"Customer code '{custCode}' already exists.");
             }
 
             if (!await masterParameterRepo.ExistsAsync(request.CustTypeId, ct))
@@ -28,30 +38,77 @@ namespace RahilCore.Application.Features.Customers
                 throw new BusinessException(400, "Customer type tidak valid.");
             }
 
-            if (request.CityId.HasValue && !await cityRepo.ExistsAsync(request.CityId.Value, ct))
+            if (request.CityId.HasValue &&
+                !await cityRepo.ExistsAsync(request.CityId.Value, ct))
             {
                 throw new BusinessException(400, "City tidak valid.");
             }
 
+            var now = DateTime.UtcNow;
+            var note = request.Note?.Trim();
+
+            // Prepare entities
             var customer = new CustomerEn
             {
                 CustTypeId = request.CustTypeId,
-                CustCode = request.CustCode.Trim(),
+                CustCode = custCode,
                 CustName = request.CustName.Trim(),
-                Email = string.IsNullOrWhiteSpace(request.Email) ? null : request.Email.Trim(),
-                Phone = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone.Trim(),
+                Email = request.Email.Trim(),
+                Phone = request.Phone.Trim(),
                 CityId = request.CityId,
-                Address = string.IsNullOrWhiteSpace(request.Address) ? null : request.Address.Trim(),
+                Address = string.IsNullOrWhiteSpace(request.Address)
+                    ? null
+                    : request.Address.Trim(),
                 IsActive = true,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = now,
                 CreatedBy = createdBy,
-                CreatedNote = request.Note?.Trim()
+                CreatedNote = note
             };
 
-            await custRepo.AddAsync(customer, ct);
+            var email = new CustomerEmailEn
+            {
+                Email = customer.Email,
+                IsPrimary = true,
+                IsActive = true,
+                CreatedNote = note,
+                CreatedAt = now,
+                CreatedBy = createdBy
+            };
 
-            return customer.Id;
+            var phone = new CustomerPhoneEn
+            {
+                Phone = customer.Phone,
+                IsPrimary = true,
+                IsActive = true,
+                CreatedNote = note,
+                CreatedAt = now,
+                CreatedBy = createdBy
+            };
 
+            // Transaction
+            await uow.BeginTransactionAsync(ct);
+
+            try
+            {
+                await custRepo.AddAsync(customer, ct);
+
+                // Generate Customer ID
+                await uow.SaveChangesAsync(ct);
+
+                // Insert contacts
+                await custRepo.AddEmailAsync(email, customer.Id, ct);
+                await custRepo.AddPhoneAsync(phone, customer.Id, ct);
+
+                // Commit all changes
+                await uow.CommitAsync(ct);
+
+                return customer.Id;
+            }
+            catch
+            {
+                await uow.RollbackAsync(CancellationToken.None);
+                throw;
+            }
         }
 
         public async Task<CustomerDetailDto?> GetByIdAsync(long id, CancellationToken ct = default)
@@ -62,6 +119,26 @@ namespace RahilCore.Application.Features.Customers
             }
 
             return await custRepo.GetByIdAsync(id, ct);
+        }
+
+        public async Task<List<CustomerEmailDto>?> GetCustomerEmails(long id, CancellationToken ct = default)
+        {
+            if (id <= 0)
+            {
+                return null;
+            }
+
+            return await custRepo.GetEmailsAsync(id, ct);
+        }
+
+        public async Task<List<CustomerPhoneDto>?> GetCustomerPhones(long id, CancellationToken ct = default)
+        {
+            if (id <= 0)
+            {
+                return null;
+            }
+
+            return await custRepo.GetPhonesAsync(id, ct);
         }
 
         public async Task<CustomerFilterOptions> GetFilterOptionsAsync(CancellationToken ct = default)

@@ -15,13 +15,15 @@ namespace RahilCore.Application.Features.Customers.Requests
         [StringLength(150)]
         public string CustName { get; set; } = string.Empty;
 
+        [Required]
         [EmailAddress]
         [StringLength(254)]
-        public string? Email { get; set; }
-
+        public string Email { get; set; } = string.Empty;
+        
+        [Required]
         [RegularExpression(@"^628[0-9]{7,12}$", ErrorMessage = "Phone harus diawali 628 dan terdiri dari 10–15 digit.")]
         [StringLength(15)]
-        public string? Phone { get; set; }
+        public string Phone { get; set; } = string.Empty;
 
         public long? CityId { get; set; }
 
