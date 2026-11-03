@@ -7,7 +7,7 @@ import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from "./layouts/ProtectedRoute";
 import CustomerList from "./pages/customers/CustomerList";
 import CustomerDetail from "./pages/customers/CustomerDetail";
-import CustomerForm from "./pages/customers/CustomerForm";
+//import CustomerForm from "./pages/customers/CustomerForm";
 import { CustomerProvider } from "./contexts/customers/CustomerProvider";
 
 export default function App() {
@@ -22,7 +22,7 @@ export default function App() {
                     <Route element={<CustomerProvider />}>
                         <Route path="/customers" element={<CustomerList />} />
                         <Route path="/customers/:id" element={<CustomerDetail />} />
-                        <Route path="/customers/:id/edit" element={<CustomerForm />} />
+                        {/* <Route path="/customers/:id/edit" element={<CustomerForm />} /> */}
                     </Route>
                 </Route>
             </Route>

@@ -12,6 +12,7 @@ import CustomerMobileCard from "../../features/customers/components/CustomerMobi
 import { customerColumns } from "../../features/customers/components/customerColumns";
 import CustomerListActions from "../../features/customers/components/CustomerListActions";
 import { useCustomerContext } from "../../contexts/customers/useCustomerContext";
+import { CustomerFormDialog } from "./CustomerFormDialog";
 
 // Initial state
 const emptyFilters: CustomerFilters = {
@@ -51,6 +52,7 @@ export default function CustomerList() {
     } = useCustomerContext();
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isCustomerFormOpen, setIsCustomerFormOpen] = useState(false);
 
     useEffect(() => {
         if (filterOptions.cities.length > 0) {
@@ -325,8 +327,8 @@ export default function CustomerList() {
                 actions={
                     <CustomerListActions
                         onRefresh={handleRefresh}
-                        onExport={() => console.log("export") }
-                        onAdd={() => console.log("Add Customer")}
+                        onExport={() => console.log("export")}
+                        onAdd={() => setIsCustomerFormOpen(true)}
                         isLoading={isLoading}
                     />
                 }
@@ -340,6 +342,14 @@ export default function CustomerList() {
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
                 isLoading = {isLoading}
+            />
+
+            <CustomerFormDialog
+                open={isCustomerFormOpen}
+                onOpenChange={setIsCustomerFormOpen}
+                mode="create"
+                filterOptions={filterOptions}
+                onSuccess={handleRefresh}
             />
         </div>
     );

@@ -11,6 +11,8 @@ import type {
     GetCustomersParams,
     CreateCustomerRequest,
     UpdateCustomerRequest,
+    CustomerEmail,
+    CustomerPhone,
 } from "../types/customer";
 
 function buildQueryString(params: GetCustomersParams): string {
@@ -68,6 +70,18 @@ export const customerService = {
     getById(id: number) {
         return apiClient.get<ApiResponse<CustomerDetail>>(
             `/api/customers/${id}`,
+        );
+    },
+
+    getEmails(id: number) {
+        return apiClient.get<ApiResponse<CustomerEmail[]>>(
+            `/api/customers/${id}/emails`,
+        );
+    },
+
+    getPhones(id: number) {
+        return apiClient.get<ApiResponse<CustomerPhone[]>>(
+            `/api/customers/${id}/phones`,
         );
     },
 

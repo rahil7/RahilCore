@@ -33,3 +33,19 @@ export interface DataTablePaginationProps {
     onPageChange: (page: number) => void;
     onPageSizeChange: (pageSize: number) => void;
 }
+
+export interface SimpleDataTableColumn<T> {
+    id: string;
+    header: string;
+    className?: string;
+    cellClassName?: string;
+    render: (item: T) => ReactNode;
+}
+
+export interface SimpleDataTableProps<T> {
+    columns: SimpleDataTableColumn<T>[];
+    data: T[];
+    getRowId: (item: T) => string | number;
+    emptyMessage?: string;
+    maxHeight?: string;
+}

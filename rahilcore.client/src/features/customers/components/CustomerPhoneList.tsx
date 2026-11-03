@@ -7,17 +7,11 @@ import {
 } from "../../../components/ui/dropdown-menu";
 import { Button } from "../../../components/ui/button";
 import { Badge } from "../../../components/ui/badge";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "../../../components/ui/table";
 
 import { formatDateTime } from "../../../utils/date-utils";
 import type { CustomerPhone } from "../../../types/customer";
+import type { SimpleDataTableColumn } from "../../../components/shared/data-table/types";
+import { SimpleDataTable } from "../../../components/shared/data-table/SimpleDataTable";
 
 interface CustomerPhoneListProps {
     phones: CustomerPhone[];
@@ -32,6 +26,78 @@ export function CustomerPhoneList({
     onSetPrimary,
     onDelete,
 }: CustomerPhoneListProps) {
+    const columns: SimpleDataTableColumn<CustomerPhone>[] = [
+        {
+            id: "phone",
+            header: "Phone",
+            render: (item) => (
+                <div className="flex items-center gap-2">
+                    <span className="font-medium">{item.phone}</span>
+                    {item.isPrimary && (
+                        <Badge variant="secondary">Primary</Badge>
+                    )}
+                </div>
+            ),
+        },
+        {
+            id: "created",
+            header: "Dibuat",
+            render: (item) => (
+                <div className="space-y-1">
+                    <p className="text-xs">{formatDateTime(item.createdAt)}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {item.createdBy || "-"}
+                    </p>
+                </div>
+            ),
+        },
+        {
+            id: "updated",
+            header: "Diperbarui",
+            render: (item) => (
+                <div className="space-y-1">
+                    <p className="text-xs">{formatDateTime(item.updatedAt)}</p>
+                    <p className="text-xs text-muted-foreground">
+                        {item.updatedBy || "-"}
+                    </p>
+                </div>
+            ),
+        },
+        {
+            id: "actions",
+            header: "",
+            className: "w-10",
+            render: (item) => (
+                <DropdownMenu>
+                    <DropdownMenuTrigger
+                        render={
+                            <Button variant="ghost" size="icon" className="h-8 w-8" />
+                        }
+                    >
+                        <MoreHorizontal className="h-4 w-4" />
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="end">
+                        {!item.isPrimary && (
+                            <DropdownMenuItem onClick={() => onSetPrimary(item.id)}>
+                                <Star className="mr-2 h-4 w-4" />
+                                Jadikan Primary
+                            </DropdownMenuItem>
+                        )}
+
+                        <DropdownMenuItem
+                            className="text-destructive focus:text-destructive"
+                            onClick={() => onDelete(item.id)}
+                        >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Hapus
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ),
+        },
+    ];
+
     return (
         <div className="rounded-xl border bg-card">
             <div className="flex items-center justify-between border-b px-5 py-4">
@@ -43,107 +109,13 @@ export function CustomerPhoneList({
                 </Button>
             </div>
 
-            <Table containerClassName="max-h-[200px] overflow-y-auto">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="sticky top-0 z-10 bg-muted">
-                            Phone
-                        </TableHead>
-                        <TableHead className="sticky top-0 z-10 bg-muted">
-                            Dibuat
-                        </TableHead>
-                        <TableHead className="sticky top-0 z-10 bg-muted">
-                            Diperbarui
-                        </TableHead>
-                        <TableHead className="sticky top-0 z-10 w-10 bg-muted" />
-                    </TableRow>
-                </TableHeader>
-
-                <TableBody>
-                    {phones.length === 0 ? (
-                        <TableRow>
-                            <TableCell
-                                colSpan={4}
-                                className="h-24 text-center text-muted-foreground"
-                            >
-                                Belum ada telepon.
-                            </TableCell>
-                        </TableRow>
-                    ) : (
-                        phones.map((item) => (
-                            <TableRow key={item.id}>
-                                <TableCell>
-                                    <div className="flex items-center gap-2">
-                                        <span className="font-medium">{item.phone}</span>
-
-                                        {item.isPrimary && (
-                                            <Badge variant="secondary">
-                                                Primary
-                                            </Badge>
-                                        )}
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    <div className="space-y-1">
-                                        <p className="text-xs">
-                                            {formatDateTime(item.createdAt)}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            {item.createdBy || "-"}
-                                        </p>
-                                    </div>
-                                </TableCell>
-
-                                <TableCell>
-                                    <div className="space-y-1">
-                                        <p className="text-xs">
-                                            {formatDateTime(item.updatedAt)}
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            {item.updatedBy || "-"}
-                                        </p>
-                                    </div>
-                                </TableCell>
-
-                                <TableCell>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger
-                                            render={
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8"
-                                                />
-                                            }
-                                        >
-                                            <MoreHorizontal className="h-4 w-4" />
-                                        </DropdownMenuTrigger>
-
-                                        <DropdownMenuContent align="end">
-                                            {!item.isPrimary && (
-                                                <DropdownMenuItem
-                                                    onClick={() => onSetPrimary(item.id)}
-                                                >
-                                                    <Star className="mr-2 h-4 w-4" />
-                                                    Jadikan Primary
-                                                </DropdownMenuItem>
-                                            )}
-
-                                            <DropdownMenuItem
-                                                className="text-destructive focus:text-destructive"
-                                                onClick={() => onDelete(item.id)}
-                                            >
-                                                <Trash2 className="mr-2 h-4 w-4" />
-                                                Hapus
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </TableCell>
-                            </TableRow>
-                        ))
-                    )}
-                </TableBody>
-            </Table>
+            <SimpleDataTable
+                columns={columns}
+                data={phones}
+                getRowId={(item) => item.id}
+                emptyMessage="Belum ada email."
+                maxHeight="200px"
+            />
         </div>
     );
 }

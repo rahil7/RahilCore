@@ -123,14 +123,12 @@ export function CustomerInformation({
                             </span>
                         </div>
 
-                        {customer.createdNote && (
-                            <div className="flex items-start gap-2">
-                                <MessageSquareText className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                                <span className="text-xs">
-                                    {customer.createdNote}
-                                </span>
-                            </div>
-                        )}
+                        <div className="flex items-start gap-2">
+                            <MessageSquareText className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                            <span className="text-xs">
+                                {customer.createdNote || "-"}
+                            </span>
+                        </div>
                     </div>
 
                     <div className="space-y-1">
@@ -150,14 +148,12 @@ export function CustomerInformation({
                             </span>
                         </div>
 
-                        {customer.updatedNote && (
-                            <div className="flex items-start gap-2">
-                                <MessageSquareText className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                                <span className="text-xs">
-                                    {customer.updatedNote}
-                                </span>
-                            </div>
-                        )}
+                        <div className="flex items-start gap-2">
+                            <MessageSquareText className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                            <span className="text-xs">
+                                {customer.updatedNote || "-"}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>

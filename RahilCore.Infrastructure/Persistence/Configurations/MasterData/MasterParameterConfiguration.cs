@@ -23,10 +23,13 @@ namespace RahilCore.Infrastructure.Persistence.Configurations.MasterData
                 .HasMaxLength(50)
                 .IsRequired();
 
+            builder.Property(x => x.ParamValue)
+                .HasColumnName("param_value")
+                .HasMaxLength(250);
+
             builder.Property(x => x.ParamName)
                 .HasColumnName("param_name")
-                .HasMaxLength(100)
-                .IsRequired();
+                .HasMaxLength(100);
 
             builder.Property(x => x.Description)
                 .HasColumnName("description");

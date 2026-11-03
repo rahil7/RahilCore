@@ -1,173 +1,121 @@
 
-import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Building2 } from "lucide-react";
-
-import { Button } from "../../components/ui/button";
+import { useParams } from "react-router-dom";
+import { Building2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Badge } from "../../components/ui/badge";
-
+import { customerService } from "../../services/customer-service";
 import { CustomerInformation } from "../../features/customers/components/CustomerInformation";
 import { CustomerEmailList } from "../../features/customers/components/CustomerEmailList";
 import { CustomerPhoneList } from "../../features/customers/components/CustomerPhoneList";
-import type { CustomerEmail } from "../../types/customer";
-import type { CustomerPhone } from "../../types/customer";
+import type {
+    CustomerDetail as CustomerDetailType,
+    CustomerEmail,
+    CustomerPhone,
+} from "../../types/customer";
+import { PageDetailHeader } from "../../components/layout/PageDetailHeader";
+import { ContentLoading } from "../../components/feedback/ContentLoading";
 
 export default function CustomerDetail() {
     const { id } = useParams<{ id: string }>();
-    const navigate = useNavigate();
 
-    // Temporary data
-    const customer = {
-        id: Number(id),
-        custTypeId: 1,
-        custTypeName: "Showroom",
-        custCode: "CUST-00001",
-        custName: "PT Contoh Customer",
-        email: "info@example.com",
-        phone: "08123456789",
-        cityId: 156,
-        cityName: "Jakarta Selatan",
-        address: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since",
-        isActive: true,
-        createdAt: "2026-11-02T08:00:00",
-        createdBy: "admin",
-        updatedAt: "2026-11-02T10:00:00",
-        updatedBy: "admin",
-        createdNote: "Initial customer registration",
-        updatedNote: "Customer information updated",
-    };
+    const [customer, setCustomer] = useState<CustomerDetailType | null>(null);
+    const [emails, setEmails] = useState<CustomerEmail[]>([]);
+    const [phones, setPhones] = useState<CustomerPhone[]>([]);
 
-const emails: CustomerEmail[] = [
-    {
-        id: 1,
-        email: "info@example.com",
-        isPrimary: true,
-        isActive: true,
-        createdAt: "2026-11-02T08:00:00",
-        createdBy: "admin",
-        updatedAt: "2026-11-02T10:00:00",
-        updatedBy: "admin",
-        createdNote: "Initial email registration",
-        updatedNote: "Email verified",
-    },
-    {
-        id: 2,
-        email: "finance@example.com",
-        isPrimary: false,
-        isActive: true,
-        createdAt: "2026-11-02T09:00:00",
-        createdBy: "admin",
-        updatedAt: null,
-        updatedBy: null,
-        createdNote: null,
-        updatedNote: null,
-    },
-    {
-        id: 3,
-        email: "support@example.com",
-        isPrimary: false,
-        isActive: false,
-        createdAt: "2026-11-02T09:30:00",
-        createdBy: "admin",
-        updatedAt: null,
-        updatedBy: null,
-        createdNote: "Old contact",
-        updatedNote: null,
-    },
-    {
-        id: 4,
-        email: "support@example.com",
-        isPrimary: false,
-        isActive: false,
-        createdAt: "2026-11-02T09:30:00",
-        createdBy: "admin",
-        updatedAt: null,
-        updatedBy: null,
-        createdNote: "Old contact",
-        updatedNote: null,
-    },
-];
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-const phones: CustomerPhone[] = [
-    {
-        id: 1,
-        phone: "08123456789",
-        isPrimary: true,
-        isActive: true,
-        createdAt: "2026-11-02T08:00:00",
-        createdBy: "admin",
-        updatedAt: "2026-11-02T10:00:00",
-        updatedBy: "admin",
-        createdNote: "Initial phone registration",
-        updatedNote: "Phone verified",
-    },
-    {
-        id: 2,
-        phone: "08234567890",
-        isPrimary: false,
-        isActive: true,
-        createdAt: "2026-11-02T09:00:00",
-        createdBy: "admin",
-        updatedAt: null,
-        updatedBy: null,
-        createdNote: null,
-        updatedNote: null,
-    },
-    {
-        id: 3,
-        phone: "08234567890",
-        isPrimary: false,
-        isActive: true,
-        createdAt: "2026-11-02T09:00:00",
-        createdBy: "admin",
-        updatedAt: null,
-        updatedBy: null,
-        createdNote: null,
-        updatedNote: null,
-    },
-    {
-        id: 4,
-        phone: "08234567890",
-        isPrimary: false,
-        isActive: true,
-        createdAt: "2026-11-02T09:00:00",
-        createdBy: "admin",
-        updatedAt: null,
-        updatedBy: null,
-        createdNote: null,
-        updatedNote: null,
-    },
-    {
-        id: 5,
-        phone: "08234567890",
-        isPrimary: false,
-        isActive: true,
-        createdAt: "2026-11-02T09:00:00",
-        createdBy: "admin",
-        updatedAt: null,
-        updatedBy: null,
-        createdNote: null,
-        updatedNote: null,
-    },
-];
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadData() {
+            try {
+                setIsLoading(true);
+                setError(null);
+
+                await new Promise((resolve) => setTimeout(resolve, 1500));
+
+                const customerId = Number(id);
+
+                if (!Number.isSafeInteger(customerId) || customerId <= 0) {
+                    throw new Error("ID Customer tidak valid.");
+                }
+
+                const [customerRes, emailsRes, phonesRes] =
+                    await Promise.all([
+                        customerService.getById(customerId),
+                        customerService.getEmails(customerId),
+                        customerService.getPhones(customerId),
+                    ]);
+
+                if (cancelled) return;
+
+                setCustomer(customerRes.data);
+                setEmails(emailsRes.data ?? []);
+                setPhones(phonesRes.data ?? []);
+            } catch (err) {
+                if (cancelled) return;
+
+                console.error("Failed to load customer detail:", err);
+
+                setError(
+                    err instanceof Error
+                        ? err.message
+                        : "Gagal memuat detail customer."
+                );
+            } finally {
+                if (!cancelled) {
+                    setIsLoading(false);
+                }
+            }
+        }
+
+        loadData();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [id]);
+
+    if (isLoading) {
+        return (
+            <div className="space-y-3">
+                <PageDetailHeader
+                    title="Detail Customer"
+                    backTo="/customers"
+                />
+
+                <ContentLoading
+                    message="Memuat data customer..."
+                    description="Sedang mengambil informasi customer."
+                />
+            </div>
+        );
+    }
+
+    if (error || !customer) {
+        return (
+            <div className="space-y-5">
+                <PageDetailHeader
+                    title="Detail Customer"
+                    backTo="/customers"
+                />
+
+                <div className="rounded-xl border bg-card p-5">
+                    <p className="text-sm text-destructive">
+                        {error ?? "Customer tidak ditemukan."}
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="space-y-5">
-            {/* Page Header */}
-            <div className="space-y-2">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    className="-ml-3 h-8 text-muted-foreground"
-                    onClick={() => navigate("/customers")}
-                >
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Kembali ke Daftar Customer
-                </Button>
-
-                <h1 className="text-xl font-semibold tracking-tight">
-                    Detail Customer
-                </h1>
-            </div>
+        <div className="space-y-3">
+            <PageDetailHeader
+                title="Detail Customer"
+                backTo="/customers"
+            />
 
             {/* Customer Summary */}
             <div className="rounded-xl border bg-card px-5 py-4">
