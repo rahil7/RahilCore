@@ -1,15 +1,17 @@
 import { useId } from "react";
 import { Input } from "../ui/input";
+import { FormLabel } from "./FormLabel";
 
-interface FormInputProps
-    extends React.ComponentProps<typeof Input> {
+interface FormInputProps extends React.ComponentProps<typeof Input> {
     label: string;
     error?: string;
+    info?: string;
 }
 
 export function FormInput({
     label,
     error,
+    info,
     id,
     ...props
 }: FormInputProps) {
@@ -18,12 +20,14 @@ export function FormInput({
 
     return (
         <div className="space-y-2">
-            <label
-                htmlFor={inputId}
-                className="mb-2 block text-sm font-medium"
-            >
-                {label}
-            </label>
+            <div className="flex items-center gap-1.5">
+                <FormLabel
+                    label={label}
+                    htmlFor={inputId}
+                    info={info}
+                    required={props.required}
+                />
+            </div>
 
             <Input
                 id={inputId}

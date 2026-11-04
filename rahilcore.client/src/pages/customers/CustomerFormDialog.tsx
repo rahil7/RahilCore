@@ -50,19 +50,16 @@ export function CustomerFormDialog({
             setIsSubmitting(true);
             setError(null);
 
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
             if (isEdit) {
                 if (!customer) {
                     throw new Error("Data customer tidak ditemukan.");
                 }
 
-                await customerService.update(
-                    customer.id,
-                    data as UpdateCustomerRequest
-                );
+                await customerService.update(customer.id, data as UpdateCustomerRequest);
             } else {
-                await customerService.create(
-                    data as CreateCustomerRequest
-                );
+                await customerService.create(data as CreateCustomerRequest);
             }
 
             onOpenChange(false);
@@ -106,17 +103,7 @@ export function CustomerFormDialog({
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent
-                className="
-        flex
-        max-h-[90dvh]
-        w-[calc(100%-2rem)]
-        flex-col
-        gap-0
-        overflow-hidden
-        p-0
-        sm:max-w-xl
-    "
-            >
+                className="flex max-h-[90dvh] w-[calc(100%-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-xl">
                 {/* Header - Fixed */}
                 <DialogHeader className="shrink-0 border-b px-5 py-4">
                     <DialogTitle>
@@ -160,8 +147,8 @@ export function CustomerFormDialog({
                         {isSubmitting
                             ? "Menyimpan..."
                             : isEdit
-                                ? "Simpan Perubahan"
-                                : "Simpan Customer"}
+                                ? "Simpan"
+                                : "Simpan"}
                     </Button>
                 </DialogFooter>
             </DialogContent>

@@ -20,13 +20,13 @@ import { formatDateTime } from "../../../utils/date-utils";
 
 interface CustomerInformationProps {
     customer: CustomerDetailType;
+    onEdit: () => void;
 }
 
 export function CustomerInformation({
     customer,
+    onEdit
 }: CustomerInformationProps) {
-    const navigate = useNavigate();
-
     const items = [
         {
             label: "Kode Customer",
@@ -68,9 +68,9 @@ export function CustomerInformation({
                 <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => navigate(`/customers/${customer.id}/edit`)}
+                    onClick={onEdit}
                 >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="mr-2 h-4 w-4" />
                     Edit
                 </Button>
             </div>

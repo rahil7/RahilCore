@@ -11,9 +11,12 @@ import type {
     CustomerDetail as CustomerDetailType,
     CustomerEmail,
     CustomerPhone,
+    CustomerFilterOptions,
 } from "../../types/customer";
 import { PageDetailHeader } from "../../components/layout/PageDetailHeader";
 import { ContentLoading } from "../../components/feedback/ContentLoading";
+import { CustomerFormDialog } from "./CustomerFormDialog";
+import { useCustomerContext } from "../../contexts/customers/useCustomerContext";
 
 export default function CustomerDetail() {
     const { id } = useParams<{ id: string }>();
@@ -25,6 +28,12 @@ export default function CustomerDetail() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const [isEditOpen, setIsEditOpen] = useState(false);
+
+    const [filterOptions, setFilterOptions] = useState<CustomerFilterOptions | null>(null);
+
+    const { setShouldRefresh } = useCustomerContext();
+
     useEffect(() => {
         let cancelled = false;
 
@@ -33,7 +42,7 @@ export default function CustomerDetail() {
                 setIsLoading(true);
                 setError(null);
 
-                await new Promise((resolve) => setTimeout(resolve, 1500));
+                //await new Promise((resolve) => setTimeout(resolve, 1500));
 
                 const customerId = Number(id);
 
@@ -41,11 +50,12 @@ export default function CustomerDetail() {
                     throw new Error("ID Customer tidak valid.");
                 }
 
-                const [customerRes, emailsRes, phonesRes] =
+                const [customerRes, emailsRes, phonesRes, filterOptionsRes] =
                     await Promise.all([
                         customerService.getById(customerId),
                         customerService.getEmails(customerId),
                         customerService.getPhones(customerId),
+                        customerService.getFilterOptions(),
                     ]);
 
                 if (cancelled) return;
@@ -53,6 +63,7 @@ export default function CustomerDetail() {
                 setCustomer(customerRes.data);
                 setEmails(emailsRes.data ?? []);
                 setPhones(phonesRes.data ?? []);
+                setFilterOptions(filterOptionsRes.data);
             } catch (err) {
                 if (cancelled) return;
 
@@ -76,6 +87,26 @@ export default function CustomerDetail() {
             cancelled = true;
         };
     }, [id]);
+
+    async function handleEditSuccess() {
+        if (!id) return;
+
+        setShouldRefresh(true);
+
+        try {
+            const response = await customerService.getById(Number(id));
+
+            if (!response.success || !response.data) {
+                throw new Error(
+                    response.message || "Gagal memperbarui detail customer."
+                );
+            }
+
+            setCustomer(response.data);
+        } catch (error) {
+            console.error("Failed to refresh customer detail:", error);
+        }
+    }
 
     if (isLoading) {
         return (
@@ -148,7 +179,10 @@ export default function CustomerDetail() {
             </div>
 
             {/* Customer Information */}
-            <CustomerInformation customer={customer} />
+            <CustomerInformation
+                customer={customer}
+                onEdit={() => setIsEditOpen(true)}
+            />
 
             <div className="grid gap-5 lg:grid-cols-2">
                 <CustomerEmailList
@@ -165,6 +199,18 @@ export default function CustomerDetail() {
                     onDelete={(id) => console.log("Delete phone", id)}
                 />
             </div>
+
+            {filterOptions && (
+                <CustomerFormDialog
+                    key={customer.id}
+                    open={isEditOpen}
+                    onOpenChange={setIsEditOpen}
+                    mode="edit"
+                    customer={customer}
+                    filterOptions={filterOptions}
+                    onSuccess={handleEditSuccess}
+                />
+            )}
         </div>
     );
 }

@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { Combobox } from "@base-ui/react/combobox";
+import { FormLabel } from "./FormLabel";
 
 import {
     Select,
@@ -16,6 +17,8 @@ export interface FormSelectOption {
 
 interface FormSelectProps {
     label: string;
+    info?: string;
+    required?: boolean;
     options: FormSelectOption[];
     value: string | null;
     onValueChange: (value: string | null) => void;
@@ -28,7 +31,9 @@ interface FormSelectProps {
 
 export function FormSelect({
     label,
+    info,
     options,
+    required = false,
     value,
     onValueChange,
     placeholder = "Pilih pilihan",
@@ -42,12 +47,12 @@ export function FormSelect({
 
     return (
         <div className="space-y-2">
-            <label
+            <FormLabel
+                label={label}
                 htmlFor={inputId}
-                className="mb-2 block text-sm font-medium"
-            >
-                {label}
-            </label>
+                info={info}
+                required={required}
+            />
 
             {!searchable ? (
                 <Select

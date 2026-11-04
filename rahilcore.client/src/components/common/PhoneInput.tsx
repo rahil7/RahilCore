@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { Input } from "../ui/input";
+import { FormLabel } from "./FormLabel";
 
 interface PhoneInputProps
     extends Omit<
@@ -10,12 +11,14 @@ interface PhoneInputProps
     value: string;
     onChange: (value: string) => void;
     error?: string;
+    info?: string;
 }
 
 const PHONE_PREFIX = "628";
 
 export function PhoneInput({
     label,
+    info,
     value,
     onChange,
     error,
@@ -44,12 +47,12 @@ export function PhoneInput({
 
     return (
         <div className="space-y-2">
-            <label
+            <FormLabel
+                label={label}
                 htmlFor={inputId}
-                className="mb-2 block text-sm font-medium"
-            >
-                {label}
-            </label>
+                info={info}
+                required={props.required}
+            />
 
             <div className="flex w-full">
                 <div className="flex h-9 min-w-[60px] shrink-0 items-center justify-center rounded-l-lg border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">

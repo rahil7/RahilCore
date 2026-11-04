@@ -45,8 +45,6 @@ export default function CustomerList() {
         setPagination,
         appliedFilters,
         setAppliedFilters,
-        refreshKey,
-        setRefreshKey,
         shouldRefresh,
         setShouldRefresh,
     } = useCustomerContext();
@@ -160,7 +158,7 @@ export default function CustomerList() {
         activeCities.length;
 
     const handleRefresh = () => {
-        setRefreshKey((current) => current + 1);
+        setShouldRefresh(true);
     };
 
     useEffect(() => {
@@ -218,7 +216,6 @@ export default function CustomerList() {
         appliedFilters,
         pagination.page,
         pagination.pageSize,
-        refreshKey,
         lastFetchedQueryKey,
         shouldRefresh,
         setCustomers,
