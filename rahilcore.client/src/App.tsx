@@ -14,6 +14,7 @@ import Leasing from "./pages/leasings/Leasing";
 import InspectionList from "./pages/inspections/InspectionList";
 import Reports from "./pages/reports/Reports";
 import UserList from "./pages/users/UserList";
+import Profile from "./pages/profile/Profile";
 
 export default function App() {
     return (
@@ -35,6 +36,7 @@ export default function App() {
                     <Route path="/reports" element={<Reports />} />
                     <Route path="/users" element={<UserList />} />
                     <Route path="/masters" element={<Masters />} />
+                    <Route path="/profile" element={<Profile />} />
                 </Route>
             </Route>
 

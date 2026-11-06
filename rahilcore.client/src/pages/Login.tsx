@@ -1,38 +1,42 @@
 
 import { useState, type ComponentProps } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../contexts/useAuth";
 import {
     ArrowRight,
     Eye,
     EyeOff,
-    Layers3,
     LockKeyhole,
     UserRound,
     ShieldCheck,
-    CircleAlert
+    CircleAlert,
 } from "lucide-react";
+
+import { useAuth } from "../contexts/useAuth";
+import { useLoading } from "../contexts/LoadingContext";
 
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+
 import { branding } from "../config/branding";
-import { useLoading } from "../contexts/LoadingContext";
+import fastLogo from "../assets/images/fast-logo.png";
 
 export default function Login() {
     const [username, setUsername] = useState("admin");
     const [password, setPassword] = useState("FastInsp2026");
     const [showPassword, setShowPassword] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false);
     const [message, setMessage] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const navigate = useNavigate();
     const location = useLocation();
+
     const { login } = useAuth();
     const { withLoading } = useLoading();
 
-    const from = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ?? "/dashboard";
-
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const from =
+        (location.state as { from?: { pathname?: string } } | null)
+            ?.from?.pathname ?? "/dashboard";
 
     async function handleSubmit(
         event: Parameters<
@@ -41,11 +45,17 @@ export default function Login() {
     ) {
         event.preventDefault();
         setMessage("");
-        setIsSubmitting(true);
+
+        if (!username.trim() || !password) {
+            setMessage("Username dan password wajib diisi.");
+            return;
+        }
 
         try {
+            setIsSubmitting(true);
+
             await withLoading(
-                () => login(username, password),
+                () => login(username.trim(), password),
                 "Memverifikasi akun",
             );
 
@@ -65,87 +75,72 @@ export default function Login() {
     }
 
     return (
-        <main className="grid min-h-screen bg-background lg:grid-cols-2">
+        <main className="flex min-h-screen items-center justify-center bg-[#F5F7FB] px-4 py-10">
+            <div className="w-full max-w-md">
 
-            {/* Brand panel */}
-            <section className="relative hidden flex-col justify-between overflow-hidden bg-[#0B2D5C] p-10 text-white lg:flex xl:p-14">
-                <div className="absolute -right-24 -top-24 size-96 rounded-full border border-white/10" />
-                <div className="absolute -bottom-40 -left-20 size-[30rem] rounded-full border border-white/10" />
-                <div className="absolute right-20 top-1/3 size-52 rounded-full bg-indigo-500/20 blur-3xl" />
+                {/* Login Card */}
+                <div className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm sm:p-9">
 
-                <div className="relative z-10 flex items-center gap-3">
-                    <div className="flex size-11 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
-                        <Layers3 size={24} />
-                    </div>
-                    <div>
-                        <p className="text-lg font-semibold tracking-tight">
+                    {/* Brand */}
+                    <div className="mb-9 flex flex-col items-center text-center">
+                        <img
+                            src={branding.logo}
+                            alt="FAST"
+                            className="h-auto w-44 object-contain"
+                        />
+
+                        <h1 className="mt-3 text-lg font-semibold tracking-tight text-[#0B2D5C]">
                             {branding.appName}
+                        </h1>
+
+                        <p className="mt-0.5 text-sm text-muted-foreground">
+                            { branding.appDescription}
                         </p>
-                        <p className="text-sm text-indigo-200">
-                            {branding.appDescription}
-                        </p>
-                    </div>
-                </div>
-
-                <div className="relative z-10 max-w-xl py-12">
-                    <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
-                        <ShieldCheck size={30} />
                     </div>
 
-                    <h1 className="text-4xl font-semibold leading-tight tracking-tight xl:text-5xl">
-                        One workspace.
-                        <br />
-                        Everything in control.
-                    </h1>
-
-                    <p className="mt-6 max-w-md text-base leading-7 text-indigo-200">
-                        Access your business workspace with a simple,
-                        secure, and consistent experience.
-                    </p>
-
-                    <div className="mt-10 flex items-center gap-3 text-sm text-indigo-100">
-                        <span className="flex size-8 items-center justify-center rounded-full bg-white/10">
-                            <ShieldCheck size={16} />
-                        </span>
-                        Designed for your business workspace
-                    </div>
-                </div>
-
-                <p className="relative z-10 text-xs text-indigo-200/80">
-                    {branding.footerText}
-                </p>
-            </section>
-
-            {/* Login form */}
-            <section className="flex min-h-screen flex-col justify-center px-6 py-10 sm:px-10 lg:px-12 xl:px-20">
-                <div className="mx-auto w-full max-w-md">
-                    <div className="mb-10 flex items-center gap-3 lg:hidden">
-                        <div className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                            <Layers3 size={22} />
-                        </div>
-                        <div>
-                            <p className="font-semibold">{branding.appName}</p>
-                            <p className="text-xs text-muted-foreground">
-                                {branding.appDescription}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="mb-8">
-                        <p className="mb-3 text-sm font-medium text-primary">
-                            ACCOUNT ACCESS
-                        </p>
-                        <h2 className="text-3xl font-semibold tracking-tight">
+                    {/* Heading */}
+                    <div className="mb-7">
+                        <h2 className="text-2xl font-semibold tracking-tight text-[#0B2D5C]">
                             {branding.loginTitle}
                         </h2>
+
                         <p className="mt-2 text-sm leading-6 text-muted-foreground">
                             {branding.loginDescription}
                         </p>
                     </div>
 
+                    {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-5">
+
+                        {/* Error Message */}
+                        {message && (
+                            <div
+                                role="alert"
+                                aria-live="assertive"
+                                className="flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 p-3.5 text-sm text-red-800"
+                            >
+                                <CircleAlert
+                                    size={19}
+                                    className="mt-0.5 shrink-0 text-red-600"
+                                />
+
+                                <div className="min-w-0">
+                                    <p className="font-semibold">
+                                        Login gagal
+                                    </p>
+
+                                    <p className="mt-0.5 leading-5">
+                                        {message}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Username */}
                         <div className="space-y-2">
-                            <Label htmlFor="username">Username</Label>
+                            <Label htmlFor="username">
+                                Username
+                            </Label>
 
                             <div className="relative">
                                 <UserRound
@@ -158,39 +153,32 @@ export default function Login() {
                                     name="username"
                                     type="text"
                                     autoComplete="username"
-                                    placeholder="Masukkan username"
+                                    placeholder="Enter your username"
                                     value={username}
                                     onChange={(event) => {
                                         setUsername(event.target.value);
                                         setMessage("");
                                     }}
                                     className="h-11 pl-10"
+                                    disabled={isSubmitting}
                                     required
+                                    autoFocus
                                 />
                             </div>
                         </div>
 
+                        {/* Password */}
                         <div className="space-y-2">
-                            <div className="flex items-center justify-between gap-3">
-                                <Label htmlFor="password">Password</Label>
-                                <button
-                                    type="button"
-                                    className="text-xs font-medium text-primary hover:underline"
-                                    onClick={() =>
-                                        setMessage(
-                                            "Fitur reset password akan tersedia setelah backend dihubungkan."
-                                        )
-                                    }
-                                >
-                                    Forgot password?
-                                </button>
-                            </div>
+                            <Label htmlFor="password">
+                                Password
+                            </Label>
 
                             <div className="relative">
                                 <LockKeyhole
                                     size={18}
                                     className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                                 />
+
                                 <Input
                                     id="password"
                                     name="password"
@@ -203,15 +191,22 @@ export default function Login() {
                                         setMessage("");
                                     }}
                                     className="h-11 pl-10 pr-11"
+                                    disabled={isSubmitting}
                                     required
                                 />
+
                                 <button
                                     type="button"
                                     aria-label={
-                                        showPassword ? "Hide password" : "Show password"
+                                        showPassword
+                                            ? "Hide password"
+                                            : "Show password"
                                     }
-                                    onClick={() => setShowPassword((value) => !value)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                    disabled={isSubmitting}
+                                    onClick={() =>
+                                        setShowPassword((value) => !value)
+                                    }
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
                                 >
                                     {showPassword ? (
                                         <EyeOff size={18} />
@@ -222,62 +217,42 @@ export default function Login() {
                             </div>
                         </div>
 
-                        <label className="flex cursor-pointer items-center gap-2.5 text-sm text-muted-foreground">
-                            <input
-                                type="checkbox"
-                                checked={rememberMe}
-                                onChange={(event) => setRememberMe(event.target.checked)}
-                                className="size-4 rounded border-border accent-primary"
-                            />
-                            Remember me
-                        </label>
-
+                        {/* Submit */}
                         <Button
                             type="submit"
-                            className="h-11 w-full gap-2 bg-[#F5B51B] text-[#0B2D5C] hover:bg-[#E5A610]"
                             disabled={isSubmitting}
+                            className="h-11 w-full gap-2 bg-[#0B2D5C] text-white hover:bg-[#09244A]"
                         >
-                            {isSubmitting ? "Signing in..." : "Sign in"}
-                            {!isSubmitting && <ArrowRight size={17} />}
+                            {isSubmitting
+                                ? "Signing in..."
+                                : "Sign In"
+                            }
+
+                            {!isSubmitting && (
+                                <ArrowRight size={17} />
+                            )}
                         </Button>
-
-
-                        {message && (
-                            <div
-                                role="alert"
-                                aria-live="assertive"
-                                className="flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 p-3.5 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
-                            >
-                                <CircleAlert
-                                    size={20}
-                                    className="mt-0.5 shrink-0 text-red-600 dark:text-red-400"
-                                />
-
-                                <div className="min-w-0">
-                                    <p className="font-semibold">Login gagal</p>
-                                    <p className="mt-0.5 leading-5">{message}</p>
-                                </div>
-                            </div>
-                        )}
-
                     </form>
 
-                    <div className="mt-8 flex items-start gap-3 rounded-xl border bg-card p-4">
+                    {/* Security Notice */}
+                    <div className="mt-7 flex items-start gap-3 rounded-lg border bg-[#F8FAFC] p-3.5">
                         <ShieldCheck
                             size={19}
-                            className="mt-0.5 shrink-0 text-primary"
+                            className="mt-0.5 shrink-0 text-[#0B2D5C]"
                         />
+
                         <p className="text-xs leading-5 text-muted-foreground">
-                            Your account access is intended for authorized users.
-                            Keep your login credentials private.
+                            Your account access is intended for authorized
+                            users. Keep your login credentials private.
                         </p>
                     </div>
-
-                    <p className="mt-8 text-center text-xs text-muted-foreground lg:hidden">
-                        {branding.footerText}
-                    </p>
                 </div>
-            </section>
+
+                {/* Footer */}
+                <p className="mt-6 text-center text-xs text-muted-foreground">
+                    {branding.footerText}
+                </p>
+            </div>
         </main>
     );
 }

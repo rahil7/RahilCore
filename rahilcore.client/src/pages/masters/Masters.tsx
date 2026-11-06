@@ -5,6 +5,7 @@ import {
     SlidersHorizontal,
     Construction,
 } from "lucide-react";
+import { PageHeader } from "../../components/layout/PageHeader";
 
 const masterCategories = [
     {
@@ -27,14 +28,10 @@ const masterCategories = [
 export default function Masters() {
     return (
         <div className="w-full min-w-0 space-y-3">
-            <div className="px-1">
-                <h1 className="text-xl font-semibold tracking-tight">
-                    Masters
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                    Kelola data referensi untuk kebutuhan operasional.
-                </p>
-            </div>
+            <PageHeader
+                title="Masters"
+                description="Kelola data referensi untuk kebutuhan operasional."
+            />
 
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {masterCategories.map((item) => {

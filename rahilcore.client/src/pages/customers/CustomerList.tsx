@@ -13,6 +13,7 @@ import { customerColumns } from "../../features/customers/components/customerCol
 import CustomerListActions from "../../features/customers/components/CustomerListActions";
 import { useCustomerContext } from "../../contexts/customers/useCustomerContext";
 import { CustomerFormDialog } from "./CustomerFormDialog";
+import { PageHeader } from "../../components/layout/PageHeader";
 
 // Initial state
 const emptyFilters: CustomerFilters = {
@@ -22,8 +23,6 @@ const emptyFilters: CustomerFilters = {
 };
 
 export default function CustomerList() {
-    console.log("render CustomerList")
-
     const {
         lastFetchedQueryKey,
         setLastFetchedQueryKey,
@@ -270,14 +269,10 @@ export default function CustomerList() {
 
     return (
         <div className="w-full min-w-0 space-y-3">
-            <div className="px-1">
-                <h1 className="text-xl font-semibold tracking-tight">
-                    Customers
-                </h1>
-                <p className="text-sm text-muted-foreground">
-                    Kelola data customer.
-                </p>
-            </div>
+            <PageHeader
+                title="Customers"
+                description="Kelola data customer"
+            />
 
             {/* Toolbar */}
             <CustomerListToolbar

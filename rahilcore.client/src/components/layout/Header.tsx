@@ -11,6 +11,10 @@ import {
 } from "lucide-react";
 
 import { useAuth } from "../../contexts/useAuth";
+import {
+    ChangePasswordDialog,
+    type ChangePasswordRequest,
+} from "../../features/account/components/ChangePasswordDialog";
 
 interface BreadcrumbItem {
     label: string;
@@ -44,6 +48,10 @@ function getBreadcrumb(pathname: string): BreadcrumbItem[] {
         return items;
     }
 
+    if (pathname === "/profile") {
+        return [{ label: "My Profile" }];
+    }
+
     const routes: Record<string, string> = {
         "/leasing": "Leasing",
         "/orders": "Orders",
@@ -64,6 +72,7 @@ export default function Header() {
     const [isLogoutOpen, setIsLogoutOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const [logoutError, setLogoutError] = useState<string | null>(null);
+    const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
     const profileRef = useRef<HTMLDivElement>(null);
 
@@ -112,6 +121,13 @@ export default function Header() {
         } finally {
             setIsLoggingOut(false);
         }
+    };
+
+    const handleChangePassword = async (
+        _data: ChangePasswordRequest
+    ) => {
+        console.log(_data);
+        throw new Error("Fitur Change Password belum terhubung ke API.");
     };
 
     return (
@@ -208,27 +224,28 @@ export default function Header() {
                         <div className="my-1 border-t" />
 
                         {/* My Profile */}
-                        <button
-                            type="button"
+                        <Link
+                            to="/profile"
                             role="menuitem"
-                            disabled
-                            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground opacity-60"
+                            onClick={() => setIsProfileOpen(false)}
+                            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-muted"
                         >
                             <UserRoundPen size={17} />
-                            <span className="flex-1 text-left">My Profile</span>
-                            <span className="text-[10px]">Soon</span>
-                        </button>
+                            My Profile
+                        </Link>
 
                         {/* Change Password */}
                         <button
                             type="button"
                             role="menuitem"
-                            disabled
-                            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground opacity-60"
+                            onClick={() => {
+                                setIsProfileOpen(false);
+                                setIsChangePasswordOpen(true);
+                            }}
+                            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm hover:bg-muted"
                         >
                             <KeyRound size={17} />
-                            <span className="flex-1 text-left">Change Password</span>
-                            <span className="text-[10px]">Soon</span>
+                            Change Password
                         </button>
 
                         <div className="my-1 border-t" />
@@ -317,6 +334,12 @@ export default function Header() {
                     </div>
                 </div>
             )}
+
+            <ChangePasswordDialog
+                open={isChangePasswordOpen}
+                onOpenChange={setIsChangePasswordOpen}
+                onSubmit={handleChangePassword}
+            />
         </div>
     );
 }

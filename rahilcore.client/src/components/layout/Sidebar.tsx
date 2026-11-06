@@ -9,7 +9,6 @@ import {
     ChartNoAxesCombined,
     Database,
     UsersRound,
-    CarFront,
     X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -128,10 +127,14 @@ export default function Sidebar({
                 ].join(" ")}
             >
                 <div
-                    className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#0B2D5C] text-white ring-1 ring-[#F5B51B]/40"
+                    className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#0B2D5C] text-white"
                     title={branding.appName}
                 >
-                    <CarFront size={21} />
+                    <img
+                        src={branding.favicon}
+                        alt={branding.appName}
+                        className="size-9 object-contain"
+                    />
                 </div>
 
                 {!iconOnly && (
@@ -140,7 +143,7 @@ export default function Sidebar({
                             {branding.appName}
                         </p>
                         <p className="truncate text-[11px] text-muted-foreground">
-                            Vehicle Services
+                            {branding.appDescription}
                         </p>
                     </div>
                 )}
