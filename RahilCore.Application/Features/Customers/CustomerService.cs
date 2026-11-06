@@ -1,6 +1,7 @@
 ﻿using RahilCore.Application.Abstractions.Persistence;
 using RahilCore.Application.Common.DTOs;
 using RahilCore.Application.Common.Exceptions;
+using RahilCore.Application.Common.Helpers;
 using RahilCore.Application.Features.City;
 using RahilCore.Application.Features.Customers.DTOs;
 using RahilCore.Application.Features.Customers.Queries;
@@ -16,22 +17,29 @@ namespace RahilCore.Application.Features.Customers
         ICityRepository cityRepo,
         IUnitOfWork uow) : ICustomerService
     {
-        public async Task<long> CreateAsync(
-        CreateCustomerRequest request,
-        string createdBy,
-        CancellationToken ct = default)
+        public async Task<long> CreateAsync(CreateCustomerRequest request, string createdBy, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(request);
 
-            var custCode = request.CustCode.Trim();
+            var custCode = request.CustCode.Trim().ToUpperInvariant();
+            var email = request.Email.Trim().ToLowerInvariant();
+            var phone = PhoneNumberHelper.Normalize(request.Phone, "ID");
+            var address = string.IsNullOrWhiteSpace(request.Address) ? null : request.Address.Trim();
 
             // Validation
             if (await custRepo.ExistsByCodeAsync(custCode, ct))
             {
-                throw new BusinessException(
-                    409,
-                    $"Customer code '{custCode}' already exists.");
+                throw new BusinessException(409,$"Customer code '{custCode}' already exists.");
             }
+
+            if (await custRepo.ExistsByCodeAsync(custCode, ct))
+                throw new BusinessException(409, "Customer code already exists.");
+
+            if (await custRepo.ExistsByEmailAsync(email, ct))
+                throw new BusinessException(409, "Email already exists.");
+
+            if (await custRepo.ExistsByPhoneAsync(phone, ct))
+                throw new BusinessException(409, "Phone already exists.");
 
             if (!await masterParameterRepo.ExistsAsync(request.CustTypeId, ct))
             {
@@ -53,19 +61,17 @@ namespace RahilCore.Application.Features.Customers
                 CustTypeId = request.CustTypeId,
                 CustCode = custCode,
                 CustName = request.CustName.Trim(),
-                Email = request.Email.Trim(),
-                Phone = request.Phone.Trim(),
+                Email = email,
+                Phone = phone,
                 CityId = request.CityId,
-                Address = string.IsNullOrWhiteSpace(request.Address)
-                    ? null
-                    : request.Address.Trim(),
+                Address = address,
                 IsActive = true,
                 CreatedAt = now,
                 CreatedBy = createdBy,
                 CreatedNote = note
             };
 
-            var email = new CustomerEmailEn
+            var custEmail = new CustomerEmailEn
             {
                 Email = customer.Email,
                 IsPrimary = true,
@@ -75,7 +81,7 @@ namespace RahilCore.Application.Features.Customers
                 CreatedBy = createdBy
             };
 
-            var phone = new CustomerPhoneEn
+            var custPhone = new CustomerPhoneEn
             {
                 Phone = customer.Phone,
                 IsPrimary = true,
@@ -96,8 +102,8 @@ namespace RahilCore.Application.Features.Customers
                 await uow.SaveChangesAsync(ct);
 
                 // Insert contacts
-                await custRepo.AddEmailAsync(email, customer.Id, ct);
-                await custRepo.AddPhoneAsync(phone, customer.Id, ct);
+                await custRepo.AddEmailAsync(custEmail, customer.Id, ct);
+                await custRepo.AddPhoneAsync(custPhone, customer.Id, ct);
 
                 // Commit all changes
                 await uow.CommitAsync(ct);

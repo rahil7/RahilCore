@@ -42,6 +42,16 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             return await _context.Customers.AnyAsync(x => x.CustCode == custCode, ct);
         }
 
+        public async Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default)
+        {
+            return await _context.Customers.AnyAsync(x => x.Email == email, ct);
+        }
+
+        public async Task<bool> ExistsByPhoneAsync(string phone, CancellationToken ct = default)
+        {
+            return await _context.Customers.AnyAsync(x => x.Phone == phone, ct);
+        }
+
         public async Task<CustomerDetailDto?> GetByIdAsync(long id, CancellationToken ct = default)
         {
             return await _context.Customers

@@ -5,12 +5,8 @@ import { useEffect, useState } from "react";
 import { Badge } from "../../components/ui/badge";
 import { customerService } from "../../services/customer-service";
 import { CustomerInformation } from "../../features/customers/components/CustomerInformation";
-import { CustomerEmailList } from "../../features/customers/components/CustomerEmailList";
-import { CustomerPhoneList } from "../../features/customers/components/CustomerPhoneList";
 import type {
     CustomerDetail as CustomerDetailType,
-    CustomerEmail,
-    CustomerPhone,
     CustomerFilterOptions,
 } from "../../types/customer";
 import { PageDetailHeader } from "../../components/layout/PageDetailHeader";
@@ -22,9 +18,6 @@ export default function CustomerDetail() {
     const { id } = useParams<{ id: string }>();
 
     const [customer, setCustomer] = useState<CustomerDetailType | null>(null);
-    const [emails, setEmails] = useState<CustomerEmail[]>([]);
-    const [phones, setPhones] = useState<CustomerPhone[]>([]);
-
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -50,19 +43,15 @@ export default function CustomerDetail() {
                     throw new Error("ID Customer tidak valid.");
                 }
 
-                const [customerRes, emailsRes, phonesRes, filterOptionsRes] =
+                const [customerRes,filterOptionsRes] =
                     await Promise.all([
                         customerService.getById(customerId),
-                        customerService.getEmails(customerId),
-                        customerService.getPhones(customerId),
                         customerService.getFilterOptions(),
                     ]);
 
                 if (cancelled) return;
 
                 setCustomer(customerRes.data);
-                setEmails(emailsRes.data ?? []);
-                setPhones(phonesRes.data ?? []);
                 setFilterOptions(filterOptionsRes.data);
             } catch (err) {
                 if (cancelled) return;
@@ -183,22 +172,6 @@ export default function CustomerDetail() {
                 customer={customer}
                 onEdit={() => setIsEditOpen(true)}
             />
-
-            <div className="grid gap-5 lg:grid-cols-2">
-                <CustomerEmailList
-                    emails={emails}
-                    onAdd={() => console.log("Add email")}
-                    onSetPrimary={(id) => console.log("Set primary email", id)}
-                    onDelete={(id) => console.log("Delete email", id)}
-                />
-
-                <CustomerPhoneList
-                    phones={phones}
-                    onAdd={() => console.log("Add phone")}
-                    onSetPrimary={(id) => console.log("Set primary phone", id)}
-                    onDelete={(id) => console.log("Delete phone", id)}
-                />
-            </div>
 
             {filterOptions && (
                 <CustomerFormDialog

@@ -1,12 +1,26 @@
 
 import type { ApiResponse } from "../types/api";
 
+export class ApiError extends Error {
+    public readonly status: number;
+
+    constructor(message: string, status: number) {
+        super(message);
+
+        this.name = "ApiError";
+        this.status = status;
+    }
+}
+
 async function readError(response: Response): Promise<string> {
     const body = await response.json().catch(() => null) as {
         message?: string;
+        Message?: string;
     } | null;
 
-    return body?.message ?? `Request gagal (${response.status}).`;
+    return body?.message
+        ?? body?.Message
+        ?? `Request gagal (${response.status}).`;
 }
 
 async function request<T>(
@@ -25,7 +39,10 @@ async function request<T>(
     });
 
     if (!response.ok) {
-        throw new Error(await readError(response));
+        throw new ApiError(
+            await readError(response),
+            response.status
+        );
     }
 
     if (response.status === 204) {

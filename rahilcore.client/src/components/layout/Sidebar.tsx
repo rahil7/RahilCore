@@ -2,14 +2,19 @@
 import { NavLink } from "react-router-dom";
 import {
     LayoutDashboard,
+    Users,
+    Landmark,
+    ClipboardList,
+    ClipboardCheck,
+    ChartNoAxesCombined,
+    Database,
+    UsersRound,
     CarFront,
-    LogOut,
-    ShieldCheck,
     X,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import { branding } from "../../config/branding";
-import { useAuth } from "../../contexts/useAuth";
 
 type SidebarProps = {
     collapsed: boolean;
@@ -17,13 +22,90 @@ type SidebarProps = {
     onCloseMobile: () => void;
 };
 
+type MenuItem = {
+    label: string;
+    path: string;
+    icon: LucideIcon;
+};
+
+type MenuGroup = {
+    title: string;
+    items: MenuItem[];
+};
+
+const menuGroups: MenuGroup[] = [
+    {
+        title: "Workspace",
+        items: [
+            {
+                label: "Dashboard",
+                path: "/dashboard",
+                icon: LayoutDashboard,
+            },
+        ],
+    },
+    {
+        title: "Business",
+        items: [
+            {
+                label: "Customers",
+                path: "/customers",
+                icon: Users,
+            },
+            {
+                label: "Leasing",
+                path: "/leasing",
+                icon: Landmark,
+            },
+        ],
+    },
+    {
+        title: "Operations",
+        items: [
+            {
+                label: "Orders",
+                path: "/orders",
+                icon: ClipboardList,
+            },
+            {
+                label: "Inspections",
+                path: "/inspections",
+                icon: ClipboardCheck,
+            },
+        ],
+    },
+    {
+        title: "Analytics",
+        items: [
+            {
+                label: "Reports",
+                path: "/reports",
+                icon: ChartNoAxesCombined,
+            },
+        ],
+    },
+    {
+        title: "Configuration",
+        items: [
+            {
+                label: "Masters",
+                path: "/masters",
+                icon: Database,
+            },
+            {
+                label: "User Management",
+                path: "/users",
+                icon: UsersRound,
+            },
+        ],
+    },
+];
+
 export default function Sidebar({
     collapsed,
     onNavigate,
     onCloseMobile,
 }: SidebarProps) {
-    const { logout } = useAuth();
-
     const iconOnly = collapsed;
 
     const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -77,93 +159,53 @@ export default function Sidebar({
 
             {/* Navigation */}
             <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-                {!iconOnly && (
-                    <p className="px-3 pb-2 pt-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        Workspace
-                    </p>
-                )}
+                {menuGroups.map((group, groupIndex) => (
+                    <div key={group.title}>
+                        {/* Group heading */}
+                        {!iconOnly ? (
+                            <p
+                                className={[
+                                    "px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground",
+                                    groupIndex === 0 ? "pt-3" : "pt-5",
+                                ].join(" ")}
+                            >
+                                {group.title}
+                            </p>
+                        ) : groupIndex > 0 ? (
+                            <div className="my-3 border-t" />
+                        ) : null}
 
-                <NavLink
-                    to="/dashboard"
-                    end
-                    title={iconOnly ? "Dashboard" : undefined}
-                    onClick={onNavigate}
-                    className={navLinkClass}
-                >
-                    <LayoutDashboard size={18} className="shrink-0" />
-                    {!iconOnly && <span>Dashboard</span>}
-                </NavLink>
+                        {/* Menu items */}
+                        <div className="space-y-1">
+                            {group.items.map((item) => {
+                                const Icon = item.icon;
 
-                {!iconOnly && (
-                    <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        Services
-                    </p>
-                )}
+                                return (
+                                    <NavLink
+                                        key={item.path}
+                                        to={item.path}
+                                        end={item.path === "/dashboard"}
+                                        title={iconOnly ? item.label : undefined}
+                                        onClick={onNavigate}
+                                        className={navLinkClass}
+                                    >
+                                        <Icon
+                                            size={18}
+                                            className="shrink-0"
+                                        />
 
-                {iconOnly && (
-                    <div className="my-3 border-t" />
-                )}
-
-                <div
-                    title={iconOnly ? "Vehicle Inspection (Coming soon)" : undefined}
-                    aria-disabled="true"
-                    className={[
-                        "flex cursor-not-allowed items-center rounded-lg py-2.5 text-sm text-muted-foreground/60",
-                        iconOnly ? "justify-center px-0" : "gap-3 px-3",
-                    ].join(" ")}
-                >
-                    <CarFront size={18} className="shrink-0" />
-                    {!iconOnly && (
-                        <>
-                            <span className="min-w-0 flex-1">Vehicle Inspection</span>
-                            <span className="text-[10px]">Soon</span>
-                        </>
-                    )}
-                </div>
-
-                <div
-                    title={iconOnly ? "Warranty (Coming soon)" : undefined}
-                    aria-disabled="true"
-                    className={[
-                        "flex cursor-not-allowed items-center rounded-lg py-2.5 text-sm text-muted-foreground/60",
-                        iconOnly ? "justify-center px-0" : "gap-3 px-3",
-                    ].join(" ")}
-                >
-                    <ShieldCheck size={18} className="shrink-0" />
-                    {!iconOnly && (
-                        <>
-                            <span className="min-w-0 flex-1">Warranty</span>
-                            <span className="text-[10px]">Soon</span>
-                        </>
-                    )}
-                </div>
+                                        {!iconOnly && (
+                                            <span className="min-w-0 truncate">
+                                                {item.label}
+                                            </span>
+                                        )}
+                                    </NavLink>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))}
             </nav>
-
-            {/* Sign out */}
-            <div
-                className={[
-                    "shrink-0 border-t p-3",
-                    iconOnly ? "flex justify-center" : "",
-                ].join(" ")}
-            >
-                <button
-                    type="button"
-                    title={iconOnly ? "Sign out" : undefined}
-                    onClick={() => {
-                        void logout();
-                        onNavigate();
-                    }}
-                    className={[
-                        "flex items-center rounded-lg py-2.5 text-sm text-muted-foreground",
-                        "transition-colors hover:bg-red-50 hover:text-red-700",
-                        "dark:hover:bg-red-950/30 dark:hover:text-red-300",
-                        iconOnly ? "justify-center px-0 w-full" : "gap-3 px-3 w-full",
-                    ].join(" ")}
-                >
-                    <LogOut size={18} className="shrink-0" />
-                    {!iconOnly && <span>Sign out</span>}
-                </button>
-            </div>
         </aside>
     );
 }

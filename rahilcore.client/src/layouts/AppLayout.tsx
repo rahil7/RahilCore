@@ -83,7 +83,7 @@ export default function AppLayout() {
                         type="button"
                         aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                         title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                        className="ml-3 hidden size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground md:inline-flex"
+                        className="ml-3 mr-1 hidden size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground md:inline-flex"
                         onClick={() => setIsCollapsed((value) => !value)}
                     >
                         {sidebarCollapsed
