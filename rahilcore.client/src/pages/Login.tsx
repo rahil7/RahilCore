@@ -19,7 +19,6 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 
 import { branding } from "../config/branding";
-import fastLogo from "../assets/images/fast-logo.png";
 
 export default function Login() {
     const [username, setUsername] = useState("admin");
