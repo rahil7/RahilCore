@@ -1,0 +1,48 @@
+
+name: RahilCore CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build RahilCore
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: rahilcore.client/package-lock.json
+
+      - name: Restore .NET
+        run: dotnet restore RahilCore.slnx
+
+      - name: Install frontend dependencies
+        working-directory: rahilcore.client
+        run: npm ci
+
+      - name: Publish application
+        run: dotnet publish RahilCore.Server/RahilCore.Server.csproj -c Release -r linux-x64 --self-contained false -o ./publish
+
+      - name: Upload publish artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rahilcore-linux-x64
+          path: publish/
+          retention-days: 7
