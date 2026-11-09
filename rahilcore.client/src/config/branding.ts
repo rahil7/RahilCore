@@ -3,9 +3,9 @@ export const branding = {
     appDescription: "Business Portal",
 
     logoText: "FAST",
-    logo: "/src/assets/images/fast-logo.png",
-    icon: "/src/assets/images/fast-icon.png",
-    favicon: "/src/assets/images/fast-favicon.png",
+    logo: "/images/fast-logo.png",
+    icon: "/images/fast-icon.png",
+    favicon: "/images/fast-favicon.png",
 
     primaryColor: "#0B2D5C",
     accentColor: "#F5B51B",

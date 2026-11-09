@@ -103,11 +103,7 @@ app.UseStatusCodePages(async context =>
     {
         response.ContentType = "application/json";
 
-        await response.WriteAsJsonAsync(
-            new ApiResponse<object>(
-                false,
-                "Endpoint tidak ditemukan.",
-                null));
+        await response.WriteAsJsonAsync(new ApiResponse<object>(false,"Endpoint tidak ditemukan.",null));
     }
 });
 

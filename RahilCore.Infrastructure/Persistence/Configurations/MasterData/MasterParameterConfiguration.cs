@@ -37,10 +37,6 @@ namespace RahilCore.Infrastructure.Persistence.Configurations.MasterData
             builder.Property(x => x.SortOrder)
                 .HasColumnName("sort_order")
                 .IsRequired();
-
-            builder.HasIndex(x => new { x.ParamType, x.ParamCode })
-                .IsUnique()
-                .HasDatabaseName("uq_master_parameters_type_code");
         }
 
     }
