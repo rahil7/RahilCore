@@ -12,7 +12,10 @@ namespace RahilCore.Infrastructure.Persistence.Configurations
             base.Configure(builder);
             
             builder.ToTable("vehicles", "public");
-            
+
+            builder.Property(x => x.CustomerId)
+                .HasColumnName("cust_id");
+
             builder.Property(x => x.PlateNo)
                 .HasColumnName("plate_no");
 

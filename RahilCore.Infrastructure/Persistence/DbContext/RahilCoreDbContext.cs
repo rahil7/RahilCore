@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RahilCore.Domain.Entities;
 using RahilCore.Domain.Entities.Customers;
+using RahilCore.Domain.Entities.Inspections;
 using RahilCore.Domain.Entities.MasterData;
 
 namespace RahilCore.Infrastructure.Persistence.DbContext
@@ -10,11 +11,23 @@ namespace RahilCore.Infrastructure.Persistence.DbContext
         ) : Microsoft.EntityFrameworkCore.DbContext(options)
     {
         public DbSet<UserEn> Users => Set<UserEn>();
-        public DbSet<CityEn> Cities => Set<CityEn>();
         public DbSet<CustomerEn> Customers => Set<CustomerEn>();
         public DbSet<CustomerEmailEn> CustomerEmails => Set<CustomerEmailEn>();
         public DbSet<CustomerPhoneEn> CustomerPhones => Set<CustomerPhoneEn>();
+
+        public DbSet<VehicleEn> Vehicles => Set<VehicleEn>();
+
+        public DbSet<InspectionOrderEn> InspectionOrders => Set<InspectionOrderEn>();
+        public DbSet<InspectionOrderItemEn> InspectionOrderItems => Set<InspectionOrderItemEn>();
+        public DbSet<InspectionEn> Inspections => Set<InspectionEn>();
+
+        public DbSet<CityEn> Cities => Set<CityEn>();
         public DbSet<MasterParameterEn> MasterParameters => Set<MasterParameterEn>();
+        public DbSet<MasterBrandEn> MasterBrands => Set<MasterBrandEn>();
+        public DbSet<MasterModelEn> MasterModels => Set<MasterModelEn>();
+        public DbSet<MasterVariantEn> MasterVariants => Set<MasterVariantEn>();
+        public DbSet<MasterColorEn> MasterColors => Set<MasterColorEn>();
+        public DbSet<MasterInspectionFormEn> MasterInspectionForms => Set<MasterInspectionFormEn>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

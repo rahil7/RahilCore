@@ -1,12 +1,36 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using RahilCore.Application;
 using RahilCore.Infrastructure.DependencyInjection;
-using System.Text.Json;
 using RahilCore.Server.Contracts.Common;
 using RahilCore.Server.Exceptions;
+using Serilog;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var logPath = builder.Configuration["LogFilePath"] ?? "logs/fast-.log";
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("Application", "RahilCore")
+        .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
+        .WriteTo.Console()
+        .WriteTo.File(
+            path: logPath,
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 30,
+            fileSizeLimitBytes: 10 * 1024 * 1024,
+            rollOnFileSizeLimit: true,
+            shared: true,
+            outputTemplate:
+                "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] [{TraceId}] {Message:lj}{NewLine}{Exception}"
+        );
+});
 
 builder.Services.AddControllers();
 
@@ -88,6 +112,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();

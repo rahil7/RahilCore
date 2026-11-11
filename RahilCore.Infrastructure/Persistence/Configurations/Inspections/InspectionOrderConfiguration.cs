@@ -38,6 +38,17 @@ namespace RahilCore.Infrastructure.Persistence.Configurations.Inspections
                 .HasForeignKey(x => x.PaymentStatusId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Property(x => x.TotalUnit)
+                .HasColumnName("total_unit");
+
+            builder.Property(x => x.CustPresent)
+                .HasColumnName("cust_present");
+
+            builder.Property(x => x.PicName)
+                .HasColumnName("pic_name");
+
+            builder.Property(x => x.PicPhone)
+                .HasColumnName("pic_phone");
         }
     }
 }

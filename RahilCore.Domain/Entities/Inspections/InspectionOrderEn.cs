@@ -1,11 +1,12 @@
 ﻿using RahilCore.Domain.Entities.Common;
 using RahilCore.Domain.Entities.Customers;
+using System.Globalization;
 
 namespace RahilCore.Domain.Entities.Inspections
 {
     public sealed class InspectionOrderEn : BaseTransactionEntity
     {
-        public long OrderNo { get; set; }
+        public string OrderNo { get; set; } = null!;
 
         public long CustomerId { get; set; }
         public CustomerEn? Customer { get; set; }
@@ -15,5 +16,12 @@ namespace RahilCore.Domain.Entities.Inspections
 
         public long PaymentStatusId { get; set; }
         public MasterParameterEn? PaymentStatus { get; set; }
+
+        public long TotalUnit { get; set; }
+
+        public bool CustPresent { get; set; }
+
+        public string? PicName { get; set; }
+        public string? PicPhone { get; set; }
     }
 }

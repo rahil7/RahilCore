@@ -5,6 +5,8 @@ using RahilCore.Application.Abstractions.Persistence;
 using RahilCore.Application.Features.City;
 using RahilCore.Application.Features.Customers;
 using RahilCore.Application.Features.MasterParameters;
+using RahilCore.Application.Features.Orders;
+using RahilCore.Application.Features.Vehicles;
 using RahilCore.Infrastructure.Persistence;
 using RahilCore.Infrastructure.Persistence.DbContext;
 using RahilCore.Infrastructure.Persistence.Repositories;
@@ -30,6 +32,9 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IMasterParameterRepository, MasterParameterRepository>();
         services.AddScoped<ICityRepository, CityRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IVehicleRepository, VehicleRepository>();
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;

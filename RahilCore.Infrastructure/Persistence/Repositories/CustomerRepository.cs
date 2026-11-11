@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Npgsql;
-using RahilCore.Application.Common.Exceptions;
 using RahilCore.Application.Features.Customers;
 using RahilCore.Application.Features.Customers.DTOs;
 using RahilCore.Application.Features.Customers.Queries;
@@ -45,6 +43,11 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
         public async Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default)
         {
             return await _context.Customers.AnyAsync(x => x.Email == email, ct);
+        }
+
+        public async Task<bool> ExistsByIdAsync(long id, CancellationToken ct = default)
+        {
+            return await _context.Customers.AnyAsync(x => x.Id == id, ct);
         }
 
         public async Task<bool> ExistsByPhoneAsync(string phone, CancellationToken ct = default)

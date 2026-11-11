@@ -49,6 +49,6 @@ namespace RahilCore.Domain.Entities
         public long? OwnershipTypeId { get; set; }
         public MasterParameterEn? OwnershipType { get; set; }
 
-        public bool FirstOwnership { get; set; }
+        public bool? FirstOwnership { get; set; }
     }
 }

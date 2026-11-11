@@ -10,6 +10,7 @@ namespace RahilCore.Application.Features.Customers
 
         Task<CustomerDetailDto?> GetByIdAsync(long id, CancellationToken ct = default);
 
+        Task<bool> ExistsByIdAsync(long id,CancellationToken ct = default);
         Task<bool> ExistsByCodeAsync(string custCode,CancellationToken ct = default);
 
         Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default);
