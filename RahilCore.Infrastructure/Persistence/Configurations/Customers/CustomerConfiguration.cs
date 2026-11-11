@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RahilCore.Domain.Entities;
+using RahilCore.Domain.Entities.Customers;
 using RahilCore.Infrastructure.Persistence.Configurations.Common;
 
 namespace RahilCore.Infrastructure.Persistence.Configurations.Customers
 {
-    public sealed class CustomerConfiguration : BaseEntityConfiguration<CustomerEn>
+    public sealed class CustomerConfiguration : BaseMasterEntityConfiguration<CustomerEn>
     {
         public override void Configure(EntityTypeBuilder<CustomerEn> builder)
         {

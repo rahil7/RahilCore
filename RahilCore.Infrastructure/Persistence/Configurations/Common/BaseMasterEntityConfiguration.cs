@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RahilCore.Domain.Entities;
+using RahilCore.Domain.Entities.Common;
 
 namespace RahilCore.Infrastructure.Persistence.Configurations.Common
 {
-    public abstract class BaseEntityConfiguration<T> : IEntityTypeConfiguration<T> where T : BaseEntity
+    public abstract class BaseMasterEntityConfiguration<T> : IEntityTypeConfiguration<T> where T : BaseMasterEntity
     {
         public virtual void Configure(EntityTypeBuilder<T> builder)
         {

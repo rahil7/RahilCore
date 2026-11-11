@@ -1,6 +1,9 @@
-﻿namespace RahilCore.Domain.Entities
+﻿using RahilCore.Domain.Entities.Common;
+using RahilCore.Domain.Entities.MasterData;
+
+namespace RahilCore.Domain.Entities.Customers
 {
-    public sealed class CustomerEn : BaseEntity
+    public sealed class CustomerEn : BaseMasterEntity
     {
         public long CustTypeId { get; set; }
         public MasterParameterEn? CustType { get; set; }

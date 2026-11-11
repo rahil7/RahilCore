@@ -1,6 +1,8 @@
-﻿namespace RahilCore.Domain.Entities
+﻿using RahilCore.Domain.Entities.Common;
+
+namespace RahilCore.Domain.Entities.MasterData
 {
-    public sealed class CityEn : BaseEntity
+    public sealed class CityEn : BaseMasterEntity
     {
         public string? Code { get; set; }
 

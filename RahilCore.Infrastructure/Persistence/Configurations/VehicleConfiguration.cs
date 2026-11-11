@@ -14,8 +14,7 @@ namespace RahilCore.Infrastructure.Persistence.Configurations
             builder.ToTable("vehicles", "public");
             
             builder.Property(x => x.PlateNo)
-                .HasColumnName("plate_no")
-                .HasMaxLength(50);
+                .HasColumnName("plate_no");
 
             builder.Property(x => x.BrandId)
                 .HasColumnName("brand_id");
@@ -70,12 +69,10 @@ namespace RahilCore.Infrastructure.Persistence.Configurations
                 .HasColumnName("year_of_manufacture");
 
             builder.Property(x => x.Vin)
-                .HasColumnName("vin")
-                .HasMaxLength(250);
+                .HasColumnName("vin");
 
             builder.Property(x => x.EngineNo)
-                .HasColumnName("engine_no")
-                .HasMaxLength(250);
+                .HasColumnName("engine_no");
 
             builder.Property(x => x.TaxExpiryDate)
                 .HasColumnName("tax_expiry_date");

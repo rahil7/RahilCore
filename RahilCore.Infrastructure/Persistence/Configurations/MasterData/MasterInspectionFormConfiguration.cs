@@ -5,13 +5,22 @@ using RahilCore.Infrastructure.Persistence.Configurations.Common;
 
 namespace RahilCore.Infrastructure.Persistence.Configurations.MasterData
 {
-    public class MasterInspectionFormConfiguration : BaseEntityConfiguration<MasterInspectionFormEn>
+    public class MasterInspectionFormConfiguration : BaseMasterEntityConfiguration<MasterInspectionFormEn>
     {
         public override void Configure(EntityTypeBuilder<MasterInspectionFormEn> builder)
         {
             base.Configure(builder);
 
             builder.ToTable("master_inspection_form", "public");
+            
+            builder.Property(e => e.Code)
+                .HasColumnName("code");
+
+            builder.Property(e => e.Name)
+                .HasColumnName("name");
+
+            builder.Property(e => e.Description)
+                .HasColumnName("description");
         }
     }
 }

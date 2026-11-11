@@ -1,6 +1,8 @@
-﻿namespace RahilCore.Domain.Entities
+﻿using RahilCore.Domain.Entities.Common;
+
+namespace RahilCore.Domain.Entities
 {
-    public sealed class MasterParameterEn : BaseEntity
+    public sealed class MasterParameterEn : BaseMasterEntity
     {
         public string ParamType { get; set; } = string.Empty;
 

@@ -1,6 +1,8 @@
-﻿namespace RahilCore.Domain.Entities
+﻿using RahilCore.Domain.Entities.Common;
+
+namespace RahilCore.Domain.Entities
 {
-    public sealed class MasterInspectionFormEn : BaseEntity
+    public sealed class MasterInspectionFormEn : BaseMasterEntity
     {
         public string Code { get; set; } = null!;
         public string Name { get; set; } = null!;

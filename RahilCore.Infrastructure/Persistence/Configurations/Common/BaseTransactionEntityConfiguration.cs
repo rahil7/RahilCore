@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RahilCore.Domain.Entities;
+using RahilCore.Domain.Entities.Common;
 
 namespace RahilCore.Infrastructure.Persistence.Configurations.Common
 {

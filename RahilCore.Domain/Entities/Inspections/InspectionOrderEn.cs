@@ -1,17 +1,14 @@
-﻿namespace RahilCore.Domain.Entities
+﻿using RahilCore.Domain.Entities.Common;
+using RahilCore.Domain.Entities.Customers;
+
+namespace RahilCore.Domain.Entities.Inspections
 {
-    public sealed class InspectionOrderEn : BaseEntity
+    public sealed class InspectionOrderEn : BaseTransactionEntity
     {
         public long OrderNo { get; set; }
 
         public long CustomerId { get; set; }
         public CustomerEn? Customer { get; set; }
-
-        public long VehicleId { get; set; }
-        public VehicleEn? Vehicle { get; set; }
-
-        public long InspectionFormId { get; set; }
-        public MasterInspectionFormEn? InspectionForm { get; set; }
 
         public long StatusId { get; set; }
         public MasterParameterEn? Status { get; set; }

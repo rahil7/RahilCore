@@ -1,6 +1,6 @@
 ﻿using RahilCore.Application.Features.Customers.DTOs;
 using RahilCore.Application.Features.Customers.Queries;
-using RahilCore.Domain.Entities;
+using RahilCore.Domain.Entities.Customers;
 
 namespace RahilCore.Application.Features.Customers
 {

@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RahilCore.Domain.Entities;
+using RahilCore.Domain.Entities.MasterData;
 using RahilCore.Infrastructure.Persistence.Configurations.Common;
 
-namespace RahilCore.Infrastructure.Persistence.Configurations
+namespace RahilCore.Infrastructure.Persistence.Configurations.MasterData
 {
-    public sealed class CityConfiguration : BaseEntityConfiguration<CityEn>
+    public sealed class CityConfiguration : BaseMasterEntityConfiguration<CityEn>
     {
         public override void Configure(EntityTypeBuilder<CityEn> builder)
         {

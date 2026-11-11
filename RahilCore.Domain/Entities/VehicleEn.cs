@@ -1,4 +1,8 @@
-﻿namespace RahilCore.Domain.Entities
+﻿using RahilCore.Domain.Entities.Common;
+using RahilCore.Domain.Entities.Customers;
+using RahilCore.Domain.Entities.MasterData;
+
+namespace RahilCore.Domain.Entities
 {
     public class VehicleEn : BaseTransactionEntity
     {

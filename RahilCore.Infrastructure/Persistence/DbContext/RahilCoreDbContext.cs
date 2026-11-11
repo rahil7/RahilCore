@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RahilCore.Domain.Entities;
+using RahilCore.Domain.Entities.Customers;
+using RahilCore.Domain.Entities.MasterData;
 
 namespace RahilCore.Infrastructure.Persistence.DbContext
 {
