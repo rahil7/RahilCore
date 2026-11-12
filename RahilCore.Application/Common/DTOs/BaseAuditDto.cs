@@ -1,10 +1,8 @@
 ﻿namespace RahilCore.Application.Common.DTOs
 {
-    public abstract class AuditableDto
+    public abstract class BaseAuditDto
     {
         public long Id { get; set; }
-
-        public bool IsActive { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

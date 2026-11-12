@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RahilCore.Application.Features.Customers.DTOs;
+using RahilCore.Application.Features.Customers.Queries;
 using RahilCore.Application.Features.Orders;
+using RahilCore.Application.Features.Orders.DTOs;
+using RahilCore.Application.Features.Orders.Queries;
 using RahilCore.Application.Features.Orders.Request;
 using RahilCore.Server.Contracts.Common;
 using System.Security.Claims;
@@ -65,6 +69,27 @@ namespace RahilCore.Server.Controllers
                     Success: true,
                     Message: "Order created successfully.",
                     Data: new { Id = id }));
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<PagedResponse<OrderListDto>>> GetPaged([FromQuery] GetOrderListQuery query, CancellationToken ct)
+        {
+            var (items, totalItems) = await _orderService.GetPagedAsync(query, ct);
+
+            var totalPages = (int)Math.Ceiling(
+                totalItems / (double)query.PageSize);
+
+            var response = new PagedResponse<OrderListDto>(
+                Success: true,
+                Message: "Orders retrieved successfully.",
+                Data: items,
+                Pagination: new PaginationMetadata(
+                    Page: query.Page,
+                    PageSize: query.PageSize,
+                    TotalItems: totalItems,
+                    TotalPages: totalPages));
+
+            return Ok(response);
         }
     }
 }

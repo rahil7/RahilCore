@@ -187,8 +187,7 @@ namespace RahilCore.Application.Features.Customers
             };
         }
 
-        public async Task<(IReadOnlyList<CustomerListDto> Items, int TotalItems)> 
-            GetPagedAsync(GetCustomersQuery query, CancellationToken ct = default)
+        public async Task<(IReadOnlyList<CustomerListDto> Items, int TotalItems)> GetPagedAsync(GetCustomersQuery query, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(query);
 

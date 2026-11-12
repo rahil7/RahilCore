@@ -4,20 +4,23 @@ using RahilCore.Application.Common.Exceptions;
 using RahilCore.Application.Common.Helpers;
 using RahilCore.Application.Features.City;
 using RahilCore.Application.Features.Customers;
+using RahilCore.Application.Features.Orders.DTOs;
+using RahilCore.Application.Features.Orders.Queries;
 using RahilCore.Application.Features.Orders.Request;
 using RahilCore.Application.Features.Vehicles;
 using RahilCore.Domain.Entities;
 using RahilCore.Domain.Entities.Customers;
 using RahilCore.Domain.Entities.Inspections;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RahilCore.Application.Features.Orders
 {
     public class OrderService(
-        IUnitOfWork uow,
-        IOrderRepository orderRepo,
-        ICustomerRepository customerRepo,
-        IVehicleRepository vehicleRepo,
-        ICityRepository cityRepo
+            IUnitOfWork uow,
+            IOrderRepository orderRepo,
+            ICustomerRepository customerRepo,
+            IVehicleRepository vehicleRepo,
+            ICityRepository cityRepo
         ) : IOrderService
     {
         public async Task<long> CreateOrderForCustomer(CreateOrderCustomerRequest request, string createdBy, CancellationToken ct = default)
@@ -33,7 +36,7 @@ namespace RahilCore.Application.Features.Orders
 
             if (!isValidVariant)
             {
-                throw new BusinessException(400,"Kombinasi Brand, Model, dan Variant tidak valid.");
+                throw new BusinessException(400, "Kombinasi Brand, Model, dan Variant tidak valid.");
             }
 
             if (!await vehicleRepo.ExistsColorAsync(request.Vehicle.ExteriorColorId, ct))
@@ -199,7 +202,7 @@ namespace RahilCore.Application.Features.Orders
             if (request.InspectionFormId != InspectionForm.DEALER_INSPECTION &&
                 request.InspectionFormId != InspectionForm.CUSTOMER_INSPECTION)
             {
-                throw new BusinessException(400,$"Form Inspeksi dengan ID '{request.InspectionFormId}' tidak valid.");
+                throw new BusinessException(400, $"Form Inspeksi dengan ID '{request.InspectionFormId}' tidak valid.");
             }
 
             var now = DateTime.UtcNow;
@@ -268,5 +271,70 @@ namespace RahilCore.Application.Features.Orders
                 throw;
             }
         }
+
+        public async Task<(IReadOnlyList<OrderListDto> Items, int TotalItems)> GetPagedAsync(GetOrderListQuery query, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(query);
+
+            query.Page = Math.Max(1, query.Page);
+            query.PageSize = Math.Clamp(query.PageSize, 1, 100);
+
+            query.SearchBy = string.IsNullOrWhiteSpace(query.SearchBy)
+                ? null
+                : query.SearchBy.Trim();
+
+            query.SearchKey = string.IsNullOrWhiteSpace(query.SearchKey)
+                ? null
+                : query.SearchKey.Trim();
+
+            query.SortBy = string.IsNullOrWhiteSpace(query.SortBy)
+                ? OrderQueryMetadata.DefaultSortBy
+                : query.SortBy.Trim();
+
+            query.SortDirection =
+                string.Equals(query.SortDirection,"asc",StringComparison.OrdinalIgnoreCase)
+                ? "asc"
+                : "desc";
+
+            if (query.SearchBy is not null &&
+                !OrderQueryMetadata.CanSearch(query.SearchBy))
+            {
+                throw new BusinessException(400, $"Field '{query.SearchBy}' is not allowed for searching.");
+            }
+
+            if (!OrderQueryMetadata.CanSort(query.SortBy))
+            {
+                throw new BusinessException(400,$"Field '{query.SortBy}' is not allowed for sorting.");
+            }
+
+            if (query.CreatedFrom.HasValue &&
+                query.CreatedTo.HasValue &&
+                query.CreatedFrom > query.CreatedTo)
+            {
+                throw new BusinessException(400, "Periode tanggal tidak valid.");
+            }
+
+            query.Status = query.Status?.Distinct().ToList();
+
+            query.CustTypeIds = query.CustTypeIds?.Where(x => x > 0).Distinct().ToList();
+
+            if (query.CreatedFrom.HasValue)
+            {
+                var createdFrom = query.CreatedFrom.Value.ToDateTime(TimeOnly.MinValue);
+
+                data = data.Where(x => x.CreatedAt >= createdFrom);
+            }
+
+            if (query.CreatedTo.HasValue)
+            {
+                var createdTo = query.CreatedTo.Value.AddDays(1).ToDateTime(TimeOnly.MinValue);
+
+                data = data.Where(x => x.CreatedAt < createdTo);
+            }
+
+            return await orderRepo.GetPagedAsync(query, ct);
+        }
+
+
     }
 }

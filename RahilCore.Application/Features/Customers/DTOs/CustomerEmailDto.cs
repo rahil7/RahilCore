@@ -2,7 +2,7 @@
 
 namespace RahilCore.Application.Features.Customers.DTOs
 {
-    public sealed class CustomerEmailDto : AuditableDto
+    public sealed class CustomerEmailDto : BaseMasterAuditDto
     {
         public long CustomerId { get; set; }
         public string Email { get; set; } = null!;

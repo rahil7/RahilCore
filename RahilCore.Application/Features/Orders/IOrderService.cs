@@ -1,4 +1,7 @@
-﻿using RahilCore.Application.Features.Orders.Request;
+﻿using RahilCore.Application.Features.Customers.DTOs;
+using RahilCore.Application.Features.Orders.DTOs;
+using RahilCore.Application.Features.Orders.Queries;
+using RahilCore.Application.Features.Orders.Request;
 
 namespace RahilCore.Application.Features.Orders
 {
@@ -6,5 +9,6 @@ namespace RahilCore.Application.Features.Orders
     {
         Task<long> CreateOrderForCustomer(CreateOrderCustomerRequest request, string createdBy, CancellationToken ct = default);
         Task<long> CreateOrderForDealer(CreateOrderDealerRequest request, string createdBy, CancellationToken ct = default);
+        Task<(IReadOnlyList<OrderListDto> Items, int TotalItems)> GetPagedAsync(GetOrderListQuery query, CancellationToken ct = default);
     }
 }

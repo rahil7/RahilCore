@@ -1,9 +1,9 @@
-﻿namespace RahilCore.Application.Features.Customers.DTOs
-{
-    public sealed class CustomerListDto
-    {
-        public long Id { get; set; }
+﻿using RahilCore.Application.Common.DTOs;
 
+namespace RahilCore.Application.Features.Customers.DTOs
+{
+    public sealed class CustomerListDto : BaseMasterAuditDto
+    {
         public string CustCode { get; set; } = string.Empty;
         public string CustName { get; set; } = string.Empty;
 
@@ -15,13 +15,5 @@
 
         public long? CityId { get; set; }
         public string? CityName { get; set; }
-
-        public bool IsActive { get; set; }
-
-        public DateTime CreatedAt { get; set; }
-
-        public DateTime LastActivityAt { get; set; }
-        public string LastActivityBy { get; set; } = string.Empty;
-        public string? LastActivityNote { get; set; }
     }
 }
