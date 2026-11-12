@@ -7,6 +7,7 @@ using RahilCore.Application.Features.Customers.DTOs;
 using RahilCore.Application.Features.Customers.Queries;
 using RahilCore.Application.Features.Customers.Requests;
 using RahilCore.Application.Features.MasterParameters;
+using RahilCore.Application.Features.Orders;
 using RahilCore.Domain.Entities.Customers;
 
 namespace RahilCore.Application.Features.Customers
@@ -150,8 +151,8 @@ namespace RahilCore.Application.Features.Customers
         {
             var cities = await cityRepo.GetFilterOptionsAsync(ct);
 
-            var customerTypes =
-                await masterParameterRepo.GetFilterOptionsAsync(MasterParameterTypes.CustomerType,ct);
+            var customerTypes = await masterParameterRepo
+                .GetFilterOptionsAsync(MasterParameterTypes.CUST_TYPE,ct);
 
             var searchFields = CustomerQueryMetadata.Fields
                 .Where(x => x.CanSearch)
@@ -206,13 +207,11 @@ namespace RahilCore.Application.Features.Customers
                 ? CustomerQueryMetadata.DefaultSortBy
                 : query.SortBy.Trim();
 
-            query.SortDirection =
-                string.Equals(
-                    query.SortDirection,
-                    "asc",
-                    StringComparison.OrdinalIgnoreCase)
-                ? "asc"
-                : "desc";
+            query.SortDirection = string.IsNullOrWhiteSpace(query.SortDirection)
+                ? OrderQueryMetadata.DefaultSortDirection
+                : string.Equals(query.SortDirection, "asc", StringComparison.OrdinalIgnoreCase)
+                    ? "asc"
+                    : "desc";
 
             if (query.SearchBy is not null &&
                 !CustomerQueryMetadata.CanSearch(query.SearchBy))

@@ -132,8 +132,7 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             return await _context.Customers.FirstOrDefaultAsync(x => x.Id == id, ct);
         }
 
-        public async Task<(IReadOnlyList<CustomerListDto> Items, int TotalItems)>
-            GetPagedAsync(GetCustomersQuery query,CancellationToken ct = default)
+        public async Task<(IReadOnlyList<CustomerListDto> Items, int TotalItems)>GetPagedAsync(GetCustomersQuery query,CancellationToken ct = default)
         {
             var customers = _context.Customers
                 .AsNoTracking()
@@ -147,23 +146,16 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
 
                 customers = query.SearchBy.Trim().ToLowerInvariant() switch
                 {
-                    "custcode" => customers.Where(x =>
-                        EF.Functions.ILike(x.CustCode, searchKey)),
+                    "custcode" => customers.Where(x => EF.Functions.ILike(x.CustCode, searchKey)),
 
-                    "custname" => customers.Where(x =>
-                        EF.Functions.ILike(x.CustName, searchKey)),
+                    "custname" => customers.Where(x => EF.Functions.ILike(x.CustName, searchKey)),
 
-                    "custtypename" => customers.Where(x =>
-                        x.CustType != null &&
-                        EF.Functions.ILike(
-                            x.CustType.ParamName,
-                            searchKey)),
+                    "custtypename" => customers.Where(x => 
+                        x.CustType != null && 
+                        x.CustType.ParamName != null && 
+                        EF.Functions.ILike(x.CustType.ParamName,searchKey)),
 
-                    "cityname" => customers.Where(x =>
-                        x.City != null &&
-                        EF.Functions.ILike(
-                            x.City.Name,
-                            searchKey)),
+                    "cityname" => customers.Where(x => x.City != null && EF.Functions.ILike(x.City.Name,searchKey)),
 
                     _ => customers
                 };
@@ -172,25 +164,20 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             // 2. Filtering.
             if (query.Status is { Count: > 0 })
             {
-                customers = customers.Where(
-                    x => query.Status.Contains(x.IsActive));
+                customers = customers.Where(x => query.Status.Contains(x.IsActive));
             }
 
             if (query.CustTypeIds is { Count: > 0 })
             {
-                customers = customers.Where(
-                    x => query.CustTypeIds.Contains(x.CustTypeId));
+                customers = customers.Where(x => query.CustTypeIds.Contains(x.CustTypeId));
             }
 
             if (query.CityIds is { Count: > 0 })
             {
-                customers = customers.Where(
-                    x => x.CityId.HasValue &&
-                         query.CityIds.Contains(x.CityId.Value));
+                customers = customers.Where(x => x.CityId.HasValue && query.CityIds.Contains(x.CityId.Value));
             }
 
-            // 3. Hitung total data setelah filter,
-            // sebelum pagination.
+            // 3. Hitung total data setelah filter, sebelum pagination.
             var totalItems = await customers.CountAsync(ct);
 
             // 4. Projection ke DTO.
@@ -201,17 +188,13 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 CustName = x.CustName,
 
                 CustType = x.CustTypeId,
-                CustTypeName = x.CustType != null
-                    ? x.CustType.ParamName
-                    : null,
+                CustTypeName = x.CustType != null ? x.CustType.ParamName : null,
 
                 Email = x.Email,
                 Phone = x.Phone,
 
                 CityId = x.CityId,
-                CityName = x.City != null
-                    ? x.City.Name
-                    : null,
+                CityName = x.City != null ? x.City.Name: null,
 
                 IsActive = x.IsActive,
                 CreatedAt = x.CreatedAt,
@@ -262,7 +245,9 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             };
 
             // Urutan sekunder untuk pagination yang stabil.
-            orderedResult = orderedResult.ThenBy(x => x.Id);
+            orderedResult = descending
+                ? orderedResult.ThenByDescending(x => x.Id)
+                : orderedResult.ThenBy(x => x.Id);
 
             // 6. Pagination.
             var page = Math.Max(1, query.Page);

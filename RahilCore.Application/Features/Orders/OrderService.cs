@@ -4,6 +4,7 @@ using RahilCore.Application.Common.Exceptions;
 using RahilCore.Application.Common.Helpers;
 using RahilCore.Application.Features.City;
 using RahilCore.Application.Features.Customers;
+using RahilCore.Application.Features.MasterParameters;
 using RahilCore.Application.Features.Orders.DTOs;
 using RahilCore.Application.Features.Orders.Queries;
 using RahilCore.Application.Features.Orders.Request;
@@ -11,7 +12,7 @@ using RahilCore.Application.Features.Vehicles;
 using RahilCore.Domain.Entities;
 using RahilCore.Domain.Entities.Customers;
 using RahilCore.Domain.Entities.Inspections;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using RahilCore.Domain.Entities.MasterData;
 
 namespace RahilCore.Application.Features.Orders
 {
@@ -20,7 +21,8 @@ namespace RahilCore.Application.Features.Orders
             IOrderRepository orderRepo,
             ICustomerRepository customerRepo,
             IVehicleRepository vehicleRepo,
-            ICityRepository cityRepo
+            ICityRepository cityRepo,
+            IMasterParameterRepository masterParameterRepo
         ) : IOrderService
     {
         public async Task<long> CreateOrderForCustomer(CreateOrderCustomerRequest request, string createdBy, CancellationToken ct = default)
@@ -272,6 +274,45 @@ namespace RahilCore.Application.Features.Orders
             }
         }
 
+        public async Task<OrderFilterOptions> GetFilterOptionsAsync(CancellationToken ct = default)
+        {
+            var customerTypes = await masterParameterRepo
+                .GetFilterOptionsAsync(MasterParameterTypes.CUST_TYPE, ct);
+
+            var inspectionStatus = await masterParameterRepo
+                .GetFilterOptionsAsync(MasterParameterTypes.INSP_STATUS, ct);
+
+            var paymentStatus = await masterParameterRepo
+                .GetFilterOptionsAsync(MasterParameterTypes.PAYMENT_STATUS, ct);
+
+            var searchFields = OrderQueryMetadata.Fields
+                .Where(x => x.CanSearch)
+                .Select(x => new QueryFieldOptionDto
+                {
+                    Value = x.Field,
+                    Label = x.Label
+                })
+                .ToList();
+
+            var sortFields = OrderQueryMetadata.Fields
+                .Where(x => x.CanSort)
+                .Select(x => new QueryFieldOptionDto
+                {
+                    Value = x.Field,
+                    Label = x.Label
+                })
+                .ToList();
+
+            return new OrderFilterOptions
+            {
+                CustomerTypes = customerTypes,
+                InspectionStatus = inspectionStatus,
+                PaymentStatus = paymentStatus,
+                SearchFields = searchFields,
+                SortFields = sortFields
+            };
+        }
+
         public async Task<(IReadOnlyList<OrderListDto> Items, int TotalItems)> GetPagedAsync(GetOrderListQuery query, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(query);
@@ -279,7 +320,7 @@ namespace RahilCore.Application.Features.Orders
             query.Page = Math.Max(1, query.Page);
             query.PageSize = Math.Clamp(query.PageSize, 1, 100);
 
-            query.SearchBy = string.IsNullOrWhiteSpace(query.SearchBy)
+            query.SearchBy = string.IsNullOrWhiteSpace(query.SearchBy) 
                 ? null
                 : query.SearchBy.Trim();
 
@@ -291,10 +332,11 @@ namespace RahilCore.Application.Features.Orders
                 ? OrderQueryMetadata.DefaultSortBy
                 : query.SortBy.Trim();
 
-            query.SortDirection =
-                string.Equals(query.SortDirection,"asc",StringComparison.OrdinalIgnoreCase)
-                ? "asc"
-                : "desc";
+            query.SortDirection = string.IsNullOrWhiteSpace(query.SortDirection)
+                ? OrderQueryMetadata.DefaultSortDirection
+                : string.Equals(query.SortDirection, "asc", StringComparison.OrdinalIgnoreCase)
+                    ? "asc"
+                    : "desc";
 
             if (query.SearchBy is not null &&
                 !OrderQueryMetadata.CanSearch(query.SearchBy))
@@ -314,23 +356,11 @@ namespace RahilCore.Application.Features.Orders
                 throw new BusinessException(400, "Periode tanggal tidak valid.");
             }
 
-            query.Status = query.Status?.Distinct().ToList();
+            query.StatusIds = query.StatusIds?.Where(x => x > 0).Distinct().ToList();
+
+            query.PaymentStatusIds = query.PaymentStatusIds?.Where(x => x > 0).Distinct().ToList();
 
             query.CustTypeIds = query.CustTypeIds?.Where(x => x > 0).Distinct().ToList();
-
-            if (query.CreatedFrom.HasValue)
-            {
-                var createdFrom = query.CreatedFrom.Value.ToDateTime(TimeOnly.MinValue);
-
-                data = data.Where(x => x.CreatedAt >= createdFrom);
-            }
-
-            if (query.CreatedTo.HasValue)
-            {
-                var createdTo = query.CreatedTo.Value.AddDays(1).ToDateTime(TimeOnly.MinValue);
-
-                data = data.Where(x => x.CreatedAt < createdTo);
-            }
 
             return await orderRepo.GetPagedAsync(query, ct);
         }

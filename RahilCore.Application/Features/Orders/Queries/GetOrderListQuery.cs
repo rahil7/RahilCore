@@ -8,8 +8,10 @@ namespace RahilCore.Application.Features.Orders.Queries
 
         public DateOnly? CreatedTo { get; set; }
 
-        public List<bool>? Status { get; set; }
-
         public List<long>? CustTypeIds { get; set; }
+
+        public List<long>? StatusIds { get; set; }
+
+        public List<long>? PaymentStatusIds { get; set; }
     }
 }

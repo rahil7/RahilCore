@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RahilCore.Application.Features.Customers;
 using RahilCore.Application.Features.Customers.DTOs;
 using RahilCore.Application.Features.Customers.Queries;
 using RahilCore.Application.Features.Orders;
@@ -69,6 +70,18 @@ namespace RahilCore.Server.Controllers
                     Success: true,
                     Message: "Order created successfully.",
                     Data: new { Id = id }));
+        }
+
+        [HttpGet("filter-options")]
+        public async Task<ActionResult<ApiResponse<OrderFilterOptions>>> GetFilterOptions(CancellationToken ct)
+        {
+            OrderFilterOptions options = await _orderService.GetFilterOptionsAsync(ct);
+
+            return Ok(
+                new ApiResponse<OrderFilterOptions>(
+                    Success: true,
+                    Message: "Order filter options retrieved successfully.",
+                    Data: options));
         }
 
         [HttpGet]

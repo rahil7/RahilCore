@@ -42,6 +42,28 @@ namespace RahilCore.Server.Controllers
             return Ok(response);
         }
 
+        [HttpGet("lookup")]
+        public async Task<ActionResult<PagedResponse<CustomerLookupDto>>> GetPagedLookup([FromQuery] GetCustomersQuery query, CancellationToken ct)
+        {
+            var (items, totalItems) = await _customerService.GetPagedLookupAsync(query, ct);
+
+            var totalPages = (int)Math.Ceiling(
+                totalItems / (double)query.PageSize);
+
+            var response = new PagedResponse<CustomerLookupDto>(
+                Success: true,
+                Message: "Customers retrieved successfully.",
+                Data: items,
+                Pagination: new PaginationMetadata(
+                    Page: query.Page,
+                    PageSize: query.PageSize,
+                    TotalItems: totalItems,
+                    TotalPages: totalPages));
+
+            return Ok(response);
+        }
+
+
         [HttpGet("{id:long}")]
         public async Task<ActionResult<ApiResponse<CustomerDetailDto>>> GetById(long id, CancellationToken ct)
         {
@@ -155,7 +177,7 @@ namespace RahilCore.Server.Controllers
         [HttpGet("filter-options")]
         public async Task<ActionResult<ApiResponse<CustomerFilterOptions>>>GetFilterOptions(CancellationToken ct)
         {
-            var options = await _customerService.GetFilterOptionsAsync(ct);
+            CustomerFilterOptions options = await _customerService.GetFilterOptionsAsync(ct);
 
             return Ok(
                 new ApiResponse<CustomerFilterOptions>(
