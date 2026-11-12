@@ -26,5 +26,7 @@ namespace RahilCore.Application.Features.Customers
         Task AddPhoneAsync(CustomerPhoneEn phone, long id, CancellationToken ct = default);
         Task<List<CustomerEmailDto>?> GetEmailsAsync(long id, CancellationToken ct);
         Task<List<CustomerPhoneDto>?> GetPhonesAsync(long id, CancellationToken ct);
+        Task<string> GenerateCustomerCodeAsync(CancellationToken ct = default);
+        void Add(CustomerEn customer);
     }
 }

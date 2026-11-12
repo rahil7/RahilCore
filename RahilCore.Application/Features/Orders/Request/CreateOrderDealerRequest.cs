@@ -14,6 +14,9 @@ namespace RahilCore.Application.Features.Orders.Request
         [Required]
         public long InspectionFormId { get; set; }
 
+        public string? PicName { get; set; }
+        public string? PicPhone { get; set; }
+
         [Required]
         [StringLength(500)]
         public string Note { get; set; } = string.Empty;

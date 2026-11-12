@@ -6,6 +6,8 @@ namespace RahilCore.Application.Features.Orders.Request
     {
         public long? CustomerId { get; set; }
 
+        [Required]
+        public long InspectionFormId { get; set; }
 
         [StringLength(150)]
         public string? CustName { get; set; }

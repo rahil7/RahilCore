@@ -19,6 +19,11 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             _context.InspectionOrders.Add(order);
         }
 
+        public void Add(InspectionOrderItemEn orderItems)
+        {
+            _context.InspectionOrderItems.Add(orderItems);
+        }
+
         public void AddItemRange(IEnumerable<InspectionOrderItemEn> items)
         {
             _context.InspectionOrderItems.AddRange(items);

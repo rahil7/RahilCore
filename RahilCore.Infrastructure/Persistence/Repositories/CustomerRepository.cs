@@ -16,6 +16,11 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             _context = context;
         }
 
+        public void Add(CustomerEn customer)
+        {
+            _context.Customers.Add(customer);
+        }
+
         public async Task AddAsync(CustomerEn customer, CancellationToken ct = default)
         {
             await _context.Customers.AddAsync(customer, ct);
@@ -53,6 +58,20 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
         public async Task<bool> ExistsByPhoneAsync(string phone, CancellationToken ct = default)
         {
             return await _context.Customers.AnyAsync(x => x.Phone == phone, ct);
+        }
+
+        public async Task<string> GenerateCustomerCodeAsync(CancellationToken ct = default)
+        {
+            const string sql = """
+        SELECT
+            'CUST' ||
+            TO_CHAR(CURRENT_DATE, 'YYMMDD') ||
+            nextval('customer_code_seq')::text AS "Value"
+        """;
+
+            return await _context.Database
+                .SqlQueryRaw<string>(sql)
+                .SingleAsync(ct);
         }
 
         public async Task<CustomerDetailDto?> GetByIdAsync(long id, CancellationToken ct = default)

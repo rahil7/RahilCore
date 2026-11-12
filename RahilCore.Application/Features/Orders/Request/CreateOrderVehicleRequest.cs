@@ -17,6 +17,7 @@ namespace RahilCore.Application.Features.Orders.Request
         public long VariantId { get; set; }
 
         [Required]
+        [Range(1999, 9999, ErrorMessage = "Tahun kendaraan minimal 1999.")]
         public int YearOfManufacture { get; set; }
 
         [Required]

@@ -42,5 +42,29 @@ namespace RahilCore.Server.Controllers
                     Message: "Order created successfully.",
                     Data: new { Id = id }));
         }
+
+        [HttpPost("create-customer")]
+        public async Task<IActionResult> CreateOrderForCustomer([FromBody] CreateOrderCustomerRequest request, CancellationToken ct)
+        {
+            var createdBy = User.FindFirstValue("username");
+
+            if (string.IsNullOrWhiteSpace(createdBy))
+            {
+                return Unauthorized(
+                    new ApiResponse<object>(
+                        Success: false,
+                        Message: "User identity not found.",
+                        Data: null));
+            }
+
+            long id = await _orderService.CreateOrderForCustomer(request, createdBy, ct);
+
+            return StatusCode(
+                StatusCodes.Status201Created,
+                new ApiResponse<object>(
+                    Success: true,
+                    Message: "Order created successfully.",
+                    Data: new { Id = id }));
+        }
     }
 }

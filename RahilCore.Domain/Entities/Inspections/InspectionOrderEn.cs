@@ -1,6 +1,5 @@
 ﻿using RahilCore.Domain.Entities.Common;
 using RahilCore.Domain.Entities.Customers;
-using System.Globalization;
 
 namespace RahilCore.Domain.Entities.Inspections
 {

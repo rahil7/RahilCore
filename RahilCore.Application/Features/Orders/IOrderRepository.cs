@@ -8,5 +8,6 @@ namespace RahilCore.Application.Features.Orders
 
         void AddItemRange(IEnumerable<InspectionOrderItemEn> items);
         void Add(InspectionOrderEn order);
+        void Add(InspectionOrderItemEn orderItems);
     }
 }

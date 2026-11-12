@@ -46,8 +46,7 @@ namespace RahilCore.Application.Features.Customers
                 throw new BusinessException(400, "Customer type tidak valid.");
             }
 
-            if (request.CityId.HasValue &&
-                !await cityRepo.ExistsAsync(request.CityId.Value, ct))
+            if (request.CityId.HasValue && !await cityRepo.ExistsAsync(request.CityId.Value, ct))
             {
                 throw new BusinessException(400, "City tidak valid.");
             }
