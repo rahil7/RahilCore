@@ -2,6 +2,7 @@
 {
     public sealed class CustomerLookupDto
     {
+        public long Id { get; set; }
         public string CustCode { get; set; } = string.Empty;
         public string CustName { get; set; } = string.Empty;
         public string? CustTypeName { get; set; }

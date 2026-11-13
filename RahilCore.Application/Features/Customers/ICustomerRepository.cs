@@ -6,7 +6,9 @@ namespace RahilCore.Application.Features.Customers
 {
     public interface ICustomerRepository
     {
-        Task<(IReadOnlyList<CustomerListDto> Items, int TotalItems)> GetPagedAsync(GetCustomersQuery query, CancellationToken ct = default);
+        Task<(IReadOnlyList<CustomerListDto> Items, int TotalItems)> GetPagedAsync(CustomersQuery query, CancellationToken ct = default);
+
+        Task<(IReadOnlyList<CustomerLookupDto> Items, int TotalItems)> GetPagedLookupAsync(CustomerLookupQuery query, int pageSize, CancellationToken ct = default);
 
         Task<CustomerDetailDto?> GetByIdAsync(long id, CancellationToken ct = default);
 

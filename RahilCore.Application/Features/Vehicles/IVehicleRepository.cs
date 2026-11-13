@@ -1,4 +1,5 @@
-﻿using RahilCore.Domain.Entities;
+﻿using RahilCore.Application.Common.DTOs;
+using RahilCore.Domain.Entities;
 
 namespace RahilCore.Application.Features.Vehicles
 {
@@ -7,12 +8,11 @@ namespace RahilCore.Application.Features.Vehicles
         void Add(VehicleEn vehicle);
         void AddRange(IEnumerable<VehicleEn> vehicles);
 
-        Task<bool> IsValidBrandModelVariantAsync(
-            long brandId,
-            long modelId,
-            long variantId,
-            CancellationToken ct = default);
-
+        Task<bool> IsValidBrandModelVariantAsync(long brandId,long modelId,long variantId,CancellationToken ct = default);
         Task<bool> ExistsColorAsync(long colorId, CancellationToken ct = default);
+        Task<IReadOnlyList<FilterOptionDto>> GetColorLookup(CancellationToken ct = default);
+        Task<IReadOnlyList<FilterOptionDto>> GetBarndLookup(CancellationToken ct = default);
+        Task<IReadOnlyList<FilterOptionDto>?> GetModelLookup(long brandId, CancellationToken ct = default);
+        Task<IReadOnlyList<FilterOptionDto>?> GetVariantLookup(long modelId, CancellationToken ct = default);
     }
 }

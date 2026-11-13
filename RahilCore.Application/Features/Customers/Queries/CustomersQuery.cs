@@ -2,7 +2,7 @@
 
 namespace RahilCore.Application.Features.Customers.Queries
 {
-    public sealed class GetCustomersQuery : ListQuery
+    public sealed class CustomersQuery : ListQuery
     {
         public List<bool>? Status { get; set; }
 

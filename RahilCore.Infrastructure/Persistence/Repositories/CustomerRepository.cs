@@ -132,7 +132,7 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             return await _context.Customers.FirstOrDefaultAsync(x => x.Id == id, ct);
         }
 
-        public async Task<(IReadOnlyList<CustomerListDto> Items, int TotalItems)>GetPagedAsync(GetCustomersQuery query,CancellationToken ct = default)
+        public async Task<(IReadOnlyList<CustomerListDto> Items, int TotalItems)>GetPagedAsync(CustomersQuery query,CancellationToken ct = default)
         {
             var customers = _context.Customers
                 .AsNoTracking()
@@ -256,6 +256,44 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             var items = await orderedResult
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToListAsync(ct);
+
+            return (items, totalItems);
+        }
+
+        public async Task<(IReadOnlyList<CustomerLookupDto> Items, int TotalItems)> GetPagedLookupAsync(CustomerLookupQuery query,int pageSize, CancellationToken ct = default)
+        {
+            var customers = _context.Customers
+                .AsNoTracking()
+                .AsQueryable();
+
+            // Search
+            if (!string.IsNullOrWhiteSpace(query.SearchKey))
+            {
+                var searchKey = $"%{query.SearchKey.Trim()}%";
+
+                customers = customers.Where(x =>
+                    EF.Functions.ILike(x.CustCode, searchKey) ||
+                    EF.Functions.ILike(x.CustName, searchKey) ||
+                    (x.Email != null && EF.Functions.ILike(x.Email, searchKey)) ||
+                    (x.Phone != null && EF.Functions.ILike(x.Phone, searchKey)));
+            }
+
+            var totalItems = await customers.CountAsync(ct);
+
+            var items = await customers
+                .OrderBy(x => x.CustName)
+                .ThenBy(x => x.Id)
+                .Skip((query.Page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(x => new CustomerLookupDto
+                {
+                    Id = x.Id,
+                    CustCode = x.CustCode,
+                    CustName = x.CustName,
+                    Email = x.Email,
+                    Phone = x.Phone
+                })
                 .ToListAsync(ct);
 
             return (items, totalItems);

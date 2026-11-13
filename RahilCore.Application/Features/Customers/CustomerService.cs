@@ -149,7 +149,7 @@ namespace RahilCore.Application.Features.Customers
 
         public async Task<CustomerFilterOptions> GetFilterOptionsAsync(CancellationToken ct = default)
         {
-            var cities = await cityRepo.GetFilterOptionsAsync(ct);
+            var cities = await cityRepo.GetForFilter(ct);
 
             var customerTypes = await masterParameterRepo
                 .GetFilterOptionsAsync(MasterParameterTypes.CUST_TYPE,ct);
@@ -188,7 +188,7 @@ namespace RahilCore.Application.Features.Customers
             };
         }
 
-        public async Task<(IReadOnlyList<CustomerListDto> Items, int TotalItems)> GetPagedAsync(GetCustomersQuery query, CancellationToken ct = default)
+        public async Task<(IReadOnlyList<CustomerListDto> Items, int TotalItems)> GetPagedAsync(CustomersQuery query, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(query);
 
@@ -233,6 +233,19 @@ namespace RahilCore.Application.Features.Customers
             query.CityIds = query.CityIds?.Where(x => x > 0).Distinct().ToList();
 
             return await custRepo.GetPagedAsync(query, ct);
+        }
+
+        public async Task<(IReadOnlyList<CustomerLookupDto> Items, int TotalItems)> GetPagedLookupAsync(CustomerLookupQuery query, int pageSize, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(query);
+
+            query.Page = Math.Max(1, query.Page);
+
+            query.SearchKey = string.IsNullOrWhiteSpace(query.SearchKey)
+                ? null
+                : query.SearchKey.Trim();
+
+            return await custRepo.GetPagedLookupAsync(query, pageSize, ct);
         }
 
         public async Task UpdateAsync(long id, UpdateCustomerRequest request, string updatedBy, CancellationToken ct = default)

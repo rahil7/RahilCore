@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RahilCore.Domain.Entities;
 using RahilCore.Infrastructure.Persistence.Configurations.Common;
 
-namespace RahilCore.Infrastructure.Persistence.Configurations.MasterData
+namespace RahilCore.Infrastructure.Persistence.Configurations.Inspections
 {
     public class MasterInspectionFormConfiguration : BaseMasterEntityConfiguration<MasterInspectionFormEn>
     {

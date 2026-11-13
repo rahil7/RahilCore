@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RahilCore.Application.Abstractions.Persistence;
 using RahilCore.Application.Features.City;
 using RahilCore.Application.Features.Customers;
+using RahilCore.Application.Features.Inspections;
 using RahilCore.Application.Features.MasterParameters;
 using RahilCore.Application.Features.Orders;
 using RahilCore.Application.Features.Vehicles;
@@ -34,6 +35,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddScoped<ICityRepository, CityRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IVehicleRepository, VehicleRepository>();
+        services.AddScoped<IInspectionRepository, InspectionRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

@@ -16,4 +16,9 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Vehicles\DTOs\" />
+    <Folder Include="Features\Vehicles\Request\" />
+  </ItemGroup>
+
 </Project>

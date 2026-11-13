@@ -19,7 +19,7 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             return await _context.Cities.AnyAsync(x => x.Id == id, ct);
         }
 
-        public async Task<IReadOnlyList<FilterOptionDto>> GetFilterOptionsAsync(CancellationToken ct = default)
+        public async Task<IReadOnlyList<FilterOptionDto>> GetForFilter(CancellationToken ct = default)
         {
             return await _context.Cities
                 .AsNoTracking()

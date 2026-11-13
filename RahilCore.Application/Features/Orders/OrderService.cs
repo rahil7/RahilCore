@@ -4,6 +4,7 @@ using RahilCore.Application.Common.Exceptions;
 using RahilCore.Application.Common.Helpers;
 using RahilCore.Application.Features.City;
 using RahilCore.Application.Features.Customers;
+using RahilCore.Application.Features.Inspections;
 using RahilCore.Application.Features.MasterParameters;
 using RahilCore.Application.Features.Orders.DTOs;
 using RahilCore.Application.Features.Orders.Queries;
@@ -12,7 +13,6 @@ using RahilCore.Application.Features.Vehicles;
 using RahilCore.Domain.Entities;
 using RahilCore.Domain.Entities.Customers;
 using RahilCore.Domain.Entities.Inspections;
-using RahilCore.Domain.Entities.MasterData;
 
 namespace RahilCore.Application.Features.Orders
 {
@@ -22,7 +22,8 @@ namespace RahilCore.Application.Features.Orders
             ICustomerRepository customerRepo,
             IVehicleRepository vehicleRepo,
             ICityRepository cityRepo,
-            IMasterParameterRepository masterParameterRepo
+            IMasterParameterRepository masterParameterRepo,
+            IInspectionRepository inspectionRepo
         ) : IOrderService
     {
         public async Task<long> CreateOrderForCustomer(CreateOrderCustomerRequest request, string createdBy, CancellationToken ct = default)
@@ -274,6 +275,22 @@ namespace RahilCore.Application.Features.Orders
             }
         }
 
+        public async Task<OrderCreateOptions> GetCreateOptionsAsync(CancellationToken ct = default)
+        {
+            var cities = await cityRepo.GetForFilter(ct);
+            var inspForms = await inspectionRepo.GetInspFormsForFilter(ct);
+            var vehicleColors = await vehicleRepo.GetColorLookup(ct);
+            var vehicleBrands = await vehicleRepo.GetBarndLookup(ct);
+
+            return new OrderCreateOptions
+            {
+                Cities = cities,
+                InspectionForms = inspForms,
+                Brands = vehicleBrands,
+                ExteriorColors = vehicleColors
+            };
+        }
+
         public async Task<OrderFilterOptions> GetFilterOptionsAsync(CancellationToken ct = default)
         {
             var customerTypes = await masterParameterRepo
@@ -364,7 +381,6 @@ namespace RahilCore.Application.Features.Orders
 
             return await orderRepo.GetPagedAsync(query, ct);
         }
-
 
     }
 }

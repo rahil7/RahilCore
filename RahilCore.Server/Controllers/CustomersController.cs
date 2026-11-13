@@ -15,6 +15,7 @@ namespace RahilCore.Server.Controllers
     public sealed class CustomersController : ControllerBase
     {
         private readonly ICustomerService _customerService;
+        private const int CustomerLookupPageSize = 10;
 
         public CustomersController(ICustomerService customerService)
         {
@@ -22,7 +23,7 @@ namespace RahilCore.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagedResponse<CustomerListDto>>> GetPaged([FromQuery] GetCustomersQuery query,CancellationToken ct)
+        public async Task<ActionResult<PagedResponse<CustomerListDto>>> GetPaged([FromQuery] CustomersQuery query,CancellationToken ct)
         {
             var (items, totalItems) = await _customerService.GetPagedAsync(query, ct);
 
@@ -43,12 +44,12 @@ namespace RahilCore.Server.Controllers
         }
 
         [HttpGet("lookup")]
-        public async Task<ActionResult<PagedResponse<CustomerLookupDto>>> GetPagedLookup([FromQuery] GetCustomersQuery query, CancellationToken ct)
+        public async Task<ActionResult<PagedResponse<CustomerLookupDto>>> GetPagedLookup([FromQuery] CustomerLookupQuery query, CancellationToken ct)
         {
-            var (items, totalItems) = await _customerService.GetPagedLookupAsync(query, ct);
+            var (items, totalItems) = await _customerService.GetPagedLookupAsync(query, CustomerLookupPageSize, ct);
 
             var totalPages = (int)Math.Ceiling(
-                totalItems / (double)query.PageSize);
+                totalItems / (double)CustomerLookupPageSize);
 
             var response = new PagedResponse<CustomerLookupDto>(
                 Success: true,
@@ -56,7 +57,7 @@ namespace RahilCore.Server.Controllers
                 Data: items,
                 Pagination: new PaginationMetadata(
                     Page: query.Page,
-                    PageSize: query.PageSize,
+                    PageSize: CustomerLookupPageSize,
                     TotalItems: totalItems,
                     TotalPages: totalPages));
 
