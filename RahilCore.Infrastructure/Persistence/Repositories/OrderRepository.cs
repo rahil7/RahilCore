@@ -71,19 +71,11 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             }
 
             // 2. Filtering.
-            if (query.CreatedFrom.HasValue)
-            {
-                var createdFrom = DateTimeHelper.JakartaToUtc(query.CreatedFrom.Value);
+            var createdFrom = DateTimeHelper.JakartaToUtc(query.CreatedFrom!.Value);
+            orders = orders.Where(x => x.CreatedAt >= createdFrom);
 
-                orders = orders.Where(x => x.CreatedAt >= createdFrom);
-            }
-
-            if (query.CreatedTo.HasValue)
-            {
-                var createdTo = DateTimeHelper.JakartaToUtc(query.CreatedTo.Value.AddDays(1));
-
-                orders = orders.Where(x => x.CreatedAt < createdTo);
-            }
+            var createdTo = DateTimeHelper.JakartaToUtc(query.CreatedTo!.Value.AddDays(1));
+            orders = orders.Where(x => x.CreatedAt < createdTo);
 
             if (query.CustTypeIds is { Count: > 0 })
             {

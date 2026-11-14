@@ -3,8 +3,8 @@ import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { Badge } from "../../../components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import CustomerActions from "./CustomerActions";
-import CustomerActivityCell from "./CustomerActivityCell";
 import type { CustomerListItem } from "../../../types/customer";
+import ActivityCell from "../../../components/shared/ActivityCell";
 
 interface CustomerMobileCardProps {
     customer: CustomerListItem;
@@ -87,7 +87,7 @@ export default function CustomerMobileCard({
                 <div className="min-w-0 space-y-1">
                     <p className="text-xs text-muted-foreground">Created</p>
 
-                    <CustomerActivityCell date={customer.createdAt} />
+                    <ActivityCell date={customer.createdAt} />
                 </div>
 
                 <div className="min-w-0 space-y-1">
@@ -95,7 +95,7 @@ export default function CustomerMobileCard({
                         Last Activity
                     </p>
 
-                    <CustomerActivityCell
+                    <ActivityCell
                         date={customer.lastActivityAt}
                         by={customer.lastActivityBy}
                         showTime

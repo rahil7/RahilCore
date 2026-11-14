@@ -1,3 +1,4 @@
+
 import type { ReactNode } from "react";
 import { X } from "lucide-react";
 
@@ -28,10 +29,10 @@ export default function FilterDialog({
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="filter-dialog-title"
-                className="flex w-full max-w-lg flex-col overflow-hidden rounded-xl border bg-card shadow-xl"
+                className="flex max-h-[85dvh] w-full max-w-lg flex-col overflow-hidden rounded-xl border bg-card shadow-xl"
             >
                 {/* Header */}
-                <div className="flex items-center justify-between border-b px-5 py-4">
+                <div className="flex shrink-0 items-center justify-between border-b px-5 py-4">
                     <h2
                         id="filter-dialog-title"
                         className="text-base font-semibold"
@@ -50,12 +51,12 @@ export default function FilterDialog({
                 </div>
 
                 {/* Content */}
-                <div className="min-h-0 p-5">
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-5">
                     {children}
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between gap-3 border-t bg-muted/20 px-5 py-4">
+                <div className="flex shrink-0 items-center justify-between gap-3 border-t bg-muted/20 px-5 py-4">
                     <button
                         type="button"
                         onClick={onReset}

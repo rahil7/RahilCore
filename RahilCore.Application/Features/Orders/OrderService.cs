@@ -366,11 +366,14 @@ namespace RahilCore.Application.Features.Orders
                 throw new BusinessException(400,$"Field '{query.SortBy}' is not allowed for sorting.");
             }
 
-            if (query.CreatedFrom.HasValue &&
-                query.CreatedTo.HasValue &&
-                query.CreatedFrom > query.CreatedTo)
+            var today = DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow,TimeZoneInfo.FindSystemTimeZoneById("Asia/Jakarta")));
+            
+            query.CreatedFrom ??= today;
+            query.CreatedTo ??= today;
+
+            if (query.CreatedFrom > query.CreatedTo)
             {
-                throw new BusinessException(400, "Periode tanggal tidak valid.");
+                throw new BusinessException(400, "CreatedFrom cannot be later than CreatedTo.");
             }
 
             query.StatusIds = query.StatusIds?.Where(x => x > 0).Distinct().ToList();

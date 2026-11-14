@@ -10,10 +10,10 @@ import CustomerActiveFilters from "../../features/customers/components/CustomerA
 import DataTable from "../../components/shared/data-table/DataTable";
 import CustomerMobileCard from "../../features/customers/components/CustomerMobileCard";
 import { customerColumns } from "../../features/customers/components/customerColumns";
-import CustomerListActions from "../../features/customers/components/CustomerListActions";
 import { useCustomerContext } from "../../contexts/customers/useCustomerContext";
 import { CustomerFormDialog } from "./CustomerFormDialog";
 import { PageHeader } from "../../components/layout/PageHeader";
+import ListActions from "../../components/shared/ListActions";
 
 // Initial state
 const emptyFilters: CustomerFilters = {
@@ -317,7 +317,7 @@ export default function CustomerList() {
 
             <DataTable<CustomerListItem>
                 actions={
-                    <CustomerListActions
+                    <ListActions
                         onRefresh={handleRefresh}
                         onExport={() => console.log("export")}
                         onAdd={() => setIsCustomerFormOpen(true)}

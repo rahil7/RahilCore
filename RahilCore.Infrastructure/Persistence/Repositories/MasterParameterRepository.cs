@@ -28,7 +28,7 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 .Select(x => new FilterOptionDto
                 {
                     Id = x.Id,
-                    Name = x.ParamName
+                    Name = x.ParamName ?? "-"
                 })
                 .ToListAsync(ct);
         }

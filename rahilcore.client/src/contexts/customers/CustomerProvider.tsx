@@ -12,8 +12,7 @@ import type { PaginationMetadata } from "../../types/pagination";
 import type { CustomerFilters } from "../../features/customers/components/CustomerFilterContent";
 
 export function CustomerProvider() {
-    const [lastFetchedQueryKey, setLastFetchedQueryKey] =
-        useState<string | null>(null);
+    const [lastFetchedQueryKey, setLastFetchedQueryKey] = useState<string | null>(null);
 
     const [shouldRefresh, setShouldRefresh] = useState(false);
 
@@ -22,8 +21,7 @@ export function CustomerProvider() {
     const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState("");
 
     const [sortBy, setSortBy] = useState("lastActivityAt");
-    const [sortDirection, setSortDirection] =
-        useState<"asc" | "desc">("desc");
+    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
     const [customers, setCustomers] = useState<CustomerListItem[]>([]);
 
