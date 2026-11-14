@@ -167,6 +167,8 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 {
                     Id = x.Id,
                     CreatedAt = x.CreatedAt,
+                    CreatedBy = x.CreatedBy ?? string.Empty,
+                    CreatedNote = x.CreatedNote,
                     LastActivityAt = x.UpdatedAt ?? x.CreatedAt,
                     LastActivityBy = x.UpdatedBy ?? x.CreatedBy ?? string.Empty,
                     LastActivityNote = x.UpdatedNote ?? x.CreatedNote,

@@ -21,6 +21,15 @@ export interface CustomerListItem {
     lastActivityAt: string;
 }
 
+export interface CustomerLookupItem {
+    id: number;
+    custCode: string;
+    custName: string;
+    custTypeName: string;
+    email: string | null;
+    phone: string | null;
+}
+
 export interface CustomerDetail extends BaseAudit {
     custTypeId: number;
     custTypeName: string;
@@ -45,6 +54,11 @@ export interface GetCustomersParams extends ListQueryParams {
     status?: boolean[];
     custTypeIds?: number[];
     cityIds?: number[];
+}
+
+export interface GetCustomersLookupParams {
+    page?: number;
+    searchKey?: string;
 }
 
 export interface CreateCustomerRequest {

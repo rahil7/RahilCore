@@ -164,8 +164,8 @@ export default function CustomerList() {
         const params: GetCustomersParams = {
             page: pagination.page,
             pageSize: pagination.pageSize,
-            searchBy,
-            searchKey: debouncedSearchKeyword,
+            searchBy: debouncedSearchKeyword.trim() ? searchBy : undefined,
+            searchKey: debouncedSearchKeyword.trim(),
             sortBy,
             sortDirection,
             status: appliedFilters.status,

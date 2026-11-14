@@ -1,5 +1,7 @@
 import ActivityCell from "../../../components/shared/ActivityCell";
 import type { DataTableColumn } from "../../../components/shared/data-table/types";
+import StatusBadge from "../../../components/shared/StatusBadge";
+import { orderStatusConfig, paymentStatusConfig } from "../../../config/status-config";
 import type { OrderListItem } from "../../../types/order";
 import OrderActions from "./OrderActions";
 import OrderCustomerCell from "./OrderCustomerCell";
@@ -9,6 +11,7 @@ export const orderColumns: DataTableColumn<OrderListItem>[] = [
         id: "orderNo",
         header: "Order No",
         accessorKey: "orderNo",
+        align: "center"
     },
     {
         id: "customer",
@@ -22,25 +25,43 @@ export const orderColumns: DataTableColumn<OrderListItem>[] = [
         )
     },
     {
-        id: "statusName",
+        id: "status",
         header: "Status",
-        accessorKey: "statusName",
+        align: "center",
+        cell: (row) => (
+            <StatusBadge
+                statusId={row.statusId}
+                label={row.statusName}
+                config={orderStatusConfig}
+            />
+        ),
     },
     {
-        id: "paymentStatusName",
+        id: "paymentStatus",
         header: "Payment Status",
-        accessorKey: "paymentStatusName",
+        align: "center",
+        cell: (row) => (
+            <StatusBadge
+                statusId={row.paymentStatusId}
+                label={row.paymentStatusName}
+                config={paymentStatusConfig}
+            />
+        ),
     },
     {
         id: "totalUnit",
         header: "Total Unit",
         accessorKey: "totalUnit",
+        align: "center",
     },
     {
         id: "createdAt",
         header: "Created",
         cell: (row) => (
-            <ActivityCell date={row.createdAt} />
+            <ActivityCell
+                date={row.createdAt}
+                by={row.createdBy }
+                showTime />
         ),
     },
     {

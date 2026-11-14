@@ -1,7 +1,7 @@
 import { apiClient } from "../lib/api-client";
 
 import type { ApiResponse } from "../types/api";
-import type { GetOrdersParams, OrderFilterOptions, OrderListItem } from "../types/order";
+import type { GetOrdersParams, OrderCreateOptions, OrderFilterOptions, OrderListItem } from "../types/order";
 import type { PagedResponse } from "../types/pagination";
 
 function buildQueryString(params: GetOrdersParams): string {
@@ -68,5 +68,11 @@ export const orderService = {
             : "/api/orders";
 
         return apiClient.get<PagedResponse<OrderListItem>>(url);
+    },
+
+    getCreateOptions() {
+        return apiClient.get<ApiResponse<OrderCreateOptions>>(
+            "/api/orders/create-options",
+        );
     },
 }

@@ -17,6 +17,7 @@ import InspectionList from "./pages/inspections/InspectionList";
 import Reports from "./pages/reports/Reports";
 import UserList from "./pages/users/UserList";
 import Profile from "./pages/profile/Profile";
+import CreateOrder from "./pages/orders/OrderCreate";
 
 export default function App() {
     return (
@@ -38,6 +39,7 @@ export default function App() {
 
                         <Route element={<OrderProvider />}>
                             <Route path="/orders" element={<OrderList />} />
+                            <Route path="/orders/create" element={<CreateOrder />} />
                         </Route>
 
                         <Route path="/inspections" element={<InspectionList />} />

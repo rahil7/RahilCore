@@ -12,6 +12,13 @@ import {
 import type { DataTableProps } from "./types";
 import DataTablePagination from "./DataTablePagination";
 
+// Alignment mapping
+const alignmentClass = {
+    left: "text-left",
+    center: "text-center",
+    right: "text-right",
+};
+
 export default function DataTable<T>({
     actions,
     columns,
@@ -67,7 +74,7 @@ export default function DataTable<T>({
                                 {columns.map((column) => (
                                     <TableHead
                                         key={column.id}
-                                        className={`h-11 px-4 font-semibold text-foreground ${column.className ?? ""}`}
+                                        className={`h-11 px-4 font-semibold text-foreground ${alignmentClass[column.align ?? "left"]} ${column.className ?? ""}`}
                                     >
                                         {column.header}
                                     </TableHead>
@@ -87,7 +94,7 @@ export default function DataTable<T>({
                                         {columns.map((column) => (
                                             <TableCell
                                                 key={column.id}
-                                                className={`px-4 py-3 ${column.className ?? ""}`}
+                                                className={`px-4 py-3 ${alignmentClass[column.align ?? "left"]} ${column.className ?? ""}`}
                                             >
                                                 {column.cell
                                                     ? column.cell(row)

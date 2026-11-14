@@ -13,6 +13,13 @@ export interface OrderFilterOptions {
     sortFields: QueryFieldOption[];
 }
 
+export interface OrderCreateOptions {
+    inspectionForms: FilterOption[];
+    cities: FilterOption[];
+    exteriorColors: FilterOption[];
+    brands: FilterOption[];
+}
+
 export interface OrderListItem {
     id: number;
     orderNo: string;
@@ -27,9 +34,9 @@ export interface OrderListItem {
     customerType: string;
 
     createdAt: string;
+    createdBy: string;
     lastActivityBy: string;
     lastActivityAt: string;
-    lastActivityNote: string;
 }
 
 export interface GetOrdersParams extends ListQueryParams {
@@ -38,4 +45,13 @@ export interface GetOrdersParams extends ListQueryParams {
     custTypeIds?: number[];
     statusIds?: number[];
     paymentStatusIds?: number[];
+}
+
+export interface CreateOrderVehicleRequest {
+    plateNo: string;
+    brandId: number;
+    modelId: number;
+    variantId: number;
+    yearOfManufacture: number;
+    exteriorColorId: number;
 }

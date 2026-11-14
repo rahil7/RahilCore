@@ -7,6 +7,7 @@ export interface DataTableColumn<T> {
     accessorKey?: keyof T;
     cell?: (row: T) => ReactNode;
     className?: string;
+    align?: "left" | "center" | "right";
 }
 
 export interface DataTablePagination {

@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import DataTable from "../../components/shared/data-table/DataTable";
 import ListActions from "../../components/shared/ListActions";
 import { orderColumns } from "../../features/orders/components/orderColumns";
+import { useNavigate } from "react-router-dom";
+import OrderMobileCard from "../../features/orders/components/OrderMobileCard";
 
 // Initial state
 const emptyFilters: OrderFilters = {
@@ -22,6 +24,8 @@ const emptyFilters: OrderFilters = {
 };
 
 export default function OrderList() {
+    const navigate = useNavigate();
+
     const {
         lastFetchedQueryKey,
         setLastFetchedQueryKey,
@@ -156,8 +160,8 @@ export default function OrderList() {
         const params: GetOrdersParams = {
             page: pagination.page,
             pageSize: pagination.pageSize,
-            searchBy,
-            searchKey: debouncedSearchKeyword,
+            searchBy: debouncedSearchKeyword.trim() ? searchBy : undefined,
+            searchKey: debouncedSearchKeyword.trim(),
             sortBy,
             sortDirection,
             createdFrom: appliedFilters.createdFrom,
@@ -188,8 +192,6 @@ export default function OrderList() {
                         response.message || "Gagal memuat data customer."
                     );
                 }
-
-                console.log(response);
 
                 setOrders(response.data);
 
@@ -274,7 +276,7 @@ export default function OrderList() {
     };
 
     const handleAdd = () => {
-        console.log("add");
+        navigate("/orders/create");
     };
 
     return (
@@ -337,6 +339,9 @@ export default function OrderList() {
                 }
                 columns={orderColumns}
                 data={orders}
+                renderMobile={(row) => (
+                    <OrderMobileCard order={row} />
+                )}
                 getRowId={(row) => row.id}
                 pagination={pagination}
                 onPageChange={handlePageChange}

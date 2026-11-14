@@ -13,6 +13,8 @@ import type {
     UpdateCustomerRequest,
     CustomerEmail,
     CustomerPhone,
+    CustomerLookupItem,
+    GetCustomersLookupParams,
 } from "../types/customer";
 
 function buildQueryString(params: GetCustomersParams): string {
@@ -103,5 +105,12 @@ export const customerService = {
             `/api/customers/${id}`,
             data,
         );
+    },
+
+    getLookup(params: GetCustomersLookupParams = {}) {
+        const query = buildQueryString(params);
+        const url = `/api/lookup?${query}`;
+
+        return apiClient.get<PagedResponse<CustomerLookupItem>>(url);
     },
 };
