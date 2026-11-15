@@ -267,6 +267,20 @@ export default function CustomerList() {
         };
     }, [searchKeyword, setDebouncedSearchKeyword]);
 
+    useEffect(() => {
+        setPagination((current) => ({
+            ...current,
+            page: 1,
+        }));
+    }, [
+        debouncedSearchKeyword,
+        searchBy,
+        sortBy,
+        sortDirection,
+        appliedFilters,
+        setPagination,
+    ]);
+
     return (
         <div className="w-full min-w-0 space-y-3">
             <PageHeader

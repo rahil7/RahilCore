@@ -107,9 +107,9 @@ export const customerService = {
         );
     },
 
-    getLookup(params: GetCustomersLookupParams = {}) {
+    getLookup(custTypeId: number, params: GetCustomersLookupParams = {}) {
         const query = buildQueryString(params);
-        const url = `/api/customers/lookup?${query}`;
+        const url = `/api/customers/${custTypeId}/lookup?${query}`;
 
         return apiClient.get<PagedResponse<CustomerLookupItem>>(url);
     },

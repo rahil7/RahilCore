@@ -235,7 +235,7 @@ namespace RahilCore.Application.Features.Customers
             return await custRepo.GetPagedAsync(query, ct);
         }
 
-        public async Task<(IReadOnlyList<CustomerLookupDto> Items, int TotalItems)> GetPagedLookupAsync(CustomerLookupQuery query, int pageSize, CancellationToken ct = default)
+        public async Task<(IReadOnlyList<CustomerLookupDto> Items, int TotalItems)> GetPagedLookupAsync(long typeId,CustomerLookupQuery query, int pageSize, CancellationToken ct = default)
         {
             ArgumentNullException.ThrowIfNull(query);
 
@@ -245,7 +245,7 @@ namespace RahilCore.Application.Features.Customers
                 ? null
                 : query.SearchKey.Trim();
 
-            return await custRepo.GetPagedLookupAsync(query, pageSize, ct);
+            return await custRepo.GetPagedLookupAsync(typeId, query, pageSize, ct);
         }
 
         public async Task UpdateAsync(long id, UpdateCustomerRequest request, string updatedBy, CancellationToken ct = default)

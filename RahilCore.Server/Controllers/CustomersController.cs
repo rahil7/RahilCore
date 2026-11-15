@@ -43,10 +43,10 @@ namespace RahilCore.Server.Controllers
             return Ok(response);
         }
 
-        [HttpGet("lookup")]
-        public async Task<ActionResult<PagedResponse<CustomerLookupDto>>> GetPagedLookup([FromQuery] CustomerLookupQuery query, CancellationToken ct)
+        [HttpGet("{typeId:long}/lookup")]
+        public async Task<ActionResult<PagedResponse<CustomerLookupDto>>> GetPagedLookup([FromRoute] long typeId, [FromQuery] CustomerLookupQuery query, CancellationToken ct)
         {
-            var (items, totalItems) = await _customerService.GetPagedLookupAsync(query, CustomerLookupPageSize, ct);
+            var (items, totalItems) = await _customerService.GetPagedLookupAsync(typeId, query, CustomerLookupPageSize, ct);
 
             var totalPages = (int)Math.Ceiling(
                 totalItems / (double)CustomerLookupPageSize);

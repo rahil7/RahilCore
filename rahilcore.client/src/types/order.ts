@@ -84,5 +84,15 @@ export interface CreateOrderErrors {
     yearOfManufacture?: string;
     exteriorColorId?: string;
     inspectionFormId?: string;
+    totalUnit?: string;
     note?: string;
+}
+
+export interface CreateOrderDealerRequest {
+    customerId: number;
+    totalUnit: number;
+    inspectionFormId: number;
+    picName: string | null;
+    picPhone: string | null;
+    note: string;
 }

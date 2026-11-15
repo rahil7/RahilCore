@@ -8,7 +8,7 @@ namespace RahilCore.Application.Features.Orders.Request
         public long CustomerId { get; set; }
 
         [Required]
-        [Range(1, 20, ErrorMessage = "Total unit harus antara 1 sampai 20.")]
+        [Range(1, 15, ErrorMessage = "Total unit harus antara 1 sampai 15.")]
         public int TotalUnit { get; set; }
 
         [Required]

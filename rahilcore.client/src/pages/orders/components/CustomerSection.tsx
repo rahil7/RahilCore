@@ -75,7 +75,7 @@ export default function CustomerSection({
             setLoadingCustomers(true);
             setCustomerError("");
 
-            const response = await customerService.getLookup({
+            const response = await customerService.getLookup(2,{
                 page,
                 searchKey: searchKey.trim() || undefined,
             });
@@ -371,7 +371,7 @@ export default function CustomerSection({
                     />
 
                     <PhoneInput
-                        label="Nomor Telepon PIC"
+                        label="Phone PIC"
                         value={picPhone}
                         onChange={onPicPhoneChange}
                         disabled={isSubmitting}

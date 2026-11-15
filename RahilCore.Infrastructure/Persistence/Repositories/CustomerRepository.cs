@@ -263,7 +263,7 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             return (items, totalItems);
         }
 
-        public async Task<(IReadOnlyList<CustomerLookupDto> Items, int TotalItems)> GetPagedLookupAsync(CustomerLookupQuery query,int pageSize, CancellationToken ct = default)
+        public async Task<(IReadOnlyList<CustomerLookupDto> Items, int TotalItems)> GetPagedLookupAsync(long typeId, CustomerLookupQuery query,int pageSize, CancellationToken ct = default)
         {
             var customers = _context.Customers
                 .AsNoTracking()
@@ -284,6 +284,7 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             var totalItems = await customers.CountAsync(ct);
 
             var items = await customers
+                .Where(x => x.CustTypeId == typeId)
                 .OrderBy(x => x.CustName)
                 .ThenBy(x => x.Id)
                 .Skip((query.Page - 1) * pageSize)

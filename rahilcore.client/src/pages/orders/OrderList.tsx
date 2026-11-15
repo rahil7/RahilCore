@@ -267,6 +267,20 @@ export default function OrderList() {
         };
     }, [searchKeyword, setDebouncedSearchKeyword]);
 
+    useEffect(() => {
+        setPagination((current) => ({
+            ...current,
+            page: 1,
+        }));
+    }, [
+        debouncedSearchKeyword,
+        searchBy,
+        sortBy,
+        sortDirection,
+        appliedFilters,
+        setPagination,
+    ]);
+
     const handleRefresh = () => {
         setShouldRefresh(true);
     };

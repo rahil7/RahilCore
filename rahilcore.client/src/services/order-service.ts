@@ -1,7 +1,7 @@
 import { apiClient } from "../lib/api-client";
 
 import type { ApiResponse } from "../types/api";
-import type { CreateOrderCustomerRequest, GetOrdersParams, OrderCreateOptions, OrderFilterOptions, OrderListItem } from "../types/order";
+import type { CreateOrderCustomerRequest, CreateOrderDealerRequest, GetOrdersParams, OrderCreateOptions, OrderFilterOptions, OrderListItem } from "../types/order";
 import type { PagedResponse } from "../types/pagination";
 
 function buildQueryString(params: GetOrdersParams): string {
@@ -76,9 +76,16 @@ export const orderService = {
         );
     },
 
-    create(data: CreateOrderCustomerRequest) {
+    createCustomer(data: CreateOrderCustomerRequest) {
         return apiClient.post<ApiResponse<unknown>>(
             "/api/orders/create-customer",
+            data,
+        );
+    },
+
+    createDealer(data: CreateOrderDealerRequest) {
+        return apiClient.post<ApiResponse<unknown>>(
+            "/api/orders/create-dealer",
             data,
         );
     },

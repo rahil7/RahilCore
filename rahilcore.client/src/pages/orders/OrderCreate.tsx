@@ -7,12 +7,15 @@ import type {
     CreateOrderVehicleRequest,
     CreateOrderCustomerRequest,
     CreateOrderErrors,
+    CreateOrderDealerRequest,
 } from "../../types/order";
 import VehicleSection from "./components/VehicleSection";
 import CustomerSection from "./components/CustomerSection";
 import type { CustomerLookupItem } from "../../types/customer";
 import type { NewOrderCustomer } from "./components/NewCustomerForm";
 import OrderInformationSection from "./components/OrderInformationSection";
+import { useOrderContext } from "../../contexts/orders/useOrderContext";
+import DealerSection from "./components/DealerSection";
 
 type OrderType = "customer" | "dealer";
 type CustomerMode = "existing" | "new";
@@ -35,6 +38,7 @@ const initialVehicle: CreateOrderVehicleRequest = {
 
 export default function CreateOrder() {
     const navigate = useNavigate();
+    const { setShouldRefresh } = useOrderContext();
 
     const [orderType, setOrderType] = useState<OrderType>("customer");
 
@@ -138,72 +142,88 @@ export default function CreateOrder() {
     function validateForm(): boolean {
         const nextErrors: CreateOrderErrors = {};
 
-        if (customerMode === "existing") {
-            if (!selectedCustomer) {
-                nextErrors.customerId = "Customer wajib dipilih.";
+        if (orderType === "customer") {
+            // Customer
+            if (customerMode === "existing") {
+                if (!selectedCustomer) {
+                    nextErrors.customerId = "Customer wajib dipilih.";
+                }
+            } else {
+                if (!newCustomer.custName.trim()) {
+                    nextErrors.custName = "Nama customer wajib diisi.";
+                } else if (newCustomer.custName.trim().length < 3) {
+                    nextErrors.custName = "Nama customer minimal 3 karakter.";
+                } else if (newCustomer.custName.trim().length > 150) {
+                    nextErrors.custName = "Nama customer maksimal 150 karakter.";
+                }
+
+                if (!newCustomer.email.trim()) {
+                    nextErrors.email = "Email wajib diisi.";
+                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newCustomer.email)) {
+                    nextErrors.email = "Format email tidak valid.";
+                } else if (newCustomer.email.length > 254) {
+                    nextErrors.email = "Email maksimal 254 karakter.";
+                }
+
+                const phoneDigits = newCustomer.phone.replace(/\D/g, "");
+
+                if (!phoneDigits) {
+                    nextErrors.phone = "Nomor telepon wajib diisi.";
+                } else if (phoneDigits.length < 8) {
+                    nextErrors.phone = "Nomor telepon minimal 8 digit.";
+                } else if (phoneDigits.length > 13) {
+                    nextErrors.phone = "Nomor telepon maksimal 13 digit setelah prefix 62.";
+                }
+
+                if (!newCustomer.cityId) {
+                    nextErrors.cityId = "Kota wajib dipilih.";
+                }
+            }
+
+            // Vehicle
+            if (!vehicle.plateNo.trim()) {
+                nextErrors.plateNo = "Nomor polisi wajib diisi.";
+            }
+
+            if (!vehicle.brandId) {
+                nextErrors.brandId = "Brand wajib dipilih.";
+            }
+
+            if (!vehicle.modelId) {
+                nextErrors.modelId = "Model wajib dipilih.";
+            }
+
+            if (!vehicle.variantId) {
+                nextErrors.variantId = "Variant wajib dipilih.";
+            }
+
+            if (
+                vehicle.yearOfManufacture < 1999 ||
+                vehicle.yearOfManufacture > new Date().getFullYear()
+            ) {
+                nextErrors.yearOfManufacture = "Tahun kendaraan tidak valid.";
+            }
+
+            if (!vehicle.exteriorColorId) {
+                nextErrors.exteriorColorId = "Warna kendaraan wajib dipilih.";
             }
         } else {
-            // Validasi New Customer
-            if (!newCustomer.custName.trim()) {
-                nextErrors.custName = "Nama customer wajib diisi.";
-            } else if (newCustomer.custName.trim().length < 3) {
-                nextErrors.custName = "Nama customer minimal 3 karakter.";
-            } else if (newCustomer.custName.trim().length > 150) {
-                nextErrors.custName = "Nama customer maksimal 150 karakter.";
+            // Dealer
+            if (!selectedDealer) {
+                nextErrors.customerId = "Dealer wajib dipilih.";
             }
 
-            if (!newCustomer.email.trim()) {
-                nextErrors.email = "Email wajib diisi.";
-            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newCustomer.email)) {
-                nextErrors.email = "Format email tidak valid.";
-            } else if (newCustomer.email.length > 254) {
-                nextErrors.email = "Email maksimal 254 karakter.";
-            }
-
-            const phoneDigits = newCustomer.phone.replace(/\D/g, "");
-
-            if (!phoneDigits) {
-                nextErrors.phone = "Nomor telepon wajib diisi.";
-            } else if (phoneDigits.length < 8) {
-                nextErrors.phone = "Nomor telepon minimal 8 digit.";
-            } else if (phoneDigits.length > 13) {
-                nextErrors.phone = "Nomor telepon maksimal 13 digit setelah prefix 62.";
-            }
-
-            if (!newCustomer.cityId) {
-                nextErrors.cityId = "Kota wajib dipilih.";
+            if (
+                totalUnit === "" ||
+                !Number.isInteger(totalUnit) ||
+                totalUnit < 1 ||
+                totalUnit > 15
+            ) {
+                nextErrors.totalUnit = "Total unit harus antara 1 sampai 15.";
             }
         }
 
-        // Vehicle
-        if (!vehicle.plateNo.trim()) {
-            nextErrors.plateNo = "Nomor polisi wajib diisi.";
-        }
-
-        if (!vehicle.brandId) {
-            nextErrors.brandId = "Brand wajib dipilih.";
-        }
-
-        if (!vehicle.modelId) {
-            nextErrors.modelId = "Model wajib dipilih.";
-        }
-
-        if (!vehicle.variantId) {
-            nextErrors.variantId = "Variant wajib dipilih.";
-        }
-
-        if (
-            vehicle.yearOfManufacture < 1999 ||
-            vehicle.yearOfManufacture > new Date().getFullYear()
-        ) {
-            nextErrors.yearOfManufacture = "Tahun kendaraan tidak valid.";
-        }
-
-        if (!vehicle.exteriorColorId) {
-            nextErrors.exteriorColorId = "Warna kendaraan wajib dipilih.";
-        }
-
-        // Order Information
+        // Shared Order Information
         if (!inspectionFormId) {
             nextErrors.inspectionFormId = "Inspection Form wajib dipilih.";
         }
@@ -224,54 +244,69 @@ export default function CreateOrder() {
 
         setSubmitError("");
 
-        if (orderType !== "customer") {
-            setSubmitError("Dealer order belum tersedia.");
-            return;
-        }
-
         if (!validateForm()) return;
-
-        const payload: CreateOrderCustomerRequest = {
-            customerId:
-                customerMode === "existing" ? selectedCustomer!.id : null,
-
-            inspectionFormId: inspectionFormId!,
-
-            custName:
-                customerMode === "new" ? newCustomer.custName.trim() : null,
-
-            email:
-                customerMode === "new" ? newCustomer.email.trim() : null,
-
-            phone:
-                customerMode === "new" ? newCustomer.phone.trim() : null,
-
-            cityId:
-                customerMode === "new" ? newCustomer.cityId : null,
-
-            address:
-                customerMode === "new" ? newCustomer.address.trim() || null : null,
-
-            custPresent,
-            picName: picName.trim() || null,
-            picPhone: picPhone.trim() || null,
-            note: note.trim() || null,
-
-            vehicle: {
-                ...vehicle,
-                plateNo: vehicle.plateNo.trim(),
-            },
-        };
 
         try {
             setIsSubmitting(true);
 
-            const response = await orderService.create(payload);
+            if (orderType === "customer") {
+                const payload: CreateOrderCustomerRequest = {
+                    customerId:
+                        customerMode === "existing" ? selectedCustomer!.id : null,
 
-            if (!response.success) {
-                throw new Error(response.message || "Gagal membuat order.");
+                    inspectionFormId: inspectionFormId!,
+
+                    custName:
+                        customerMode === "new" ? newCustomer.custName.trim() : null,
+
+                    email:
+                        customerMode === "new" ? newCustomer.email.trim() : null,
+
+                    phone:
+                        customerMode === "new" ? newCustomer.phone.trim() : null,
+
+                    cityId:
+                        customerMode === "new" ? newCustomer.cityId : null,
+
+                    address:
+                        customerMode === "new"
+                            ? newCustomer.address.trim() || null
+                            : null,
+
+                    custPresent,
+                    picName: picName.trim() || null,
+                    picPhone: picPhone.trim() || null,
+                    note: note.trim(),
+
+                    vehicle: {
+                        ...vehicle,
+                        plateNo: vehicle.plateNo.trim(),
+                    },
+                };
+
+                const response = await orderService.createCustomer(payload);
+
+                if (!response.success) {
+                    throw new Error(response.message || "Gagal membuat order.");
+                }
+            } else {
+                const payload: CreateOrderDealerRequest = {
+                    customerId: selectedDealer!.id,
+                    totalUnit: Number(totalUnit),
+                    inspectionFormId: inspectionFormId!,
+                    picName: picName.trim() || null,
+                    picPhone: picPhone.trim() || null,
+                    note: note.trim(),
+                };
+
+                const response = await orderService.createDealer(payload);
+
+                if (!response.success) {
+                    throw new Error(response.message || "Gagal membuat dealer order.");
+                }
             }
 
+            setShouldRefresh(true);
             navigate("/orders");
         } catch (error) {
             setSubmitError(
@@ -283,6 +318,11 @@ export default function CreateOrder() {
             setIsSubmitting(false);
         }
     };
+
+    const [selectedDealer, setSelectedDealer] =
+        useState<CustomerLookupItem | null>(null);
+
+    const [totalUnit, setTotalUnit] = useState<number | "">(1);
 
     return (
         <div className="w-full min-w-0 space-y-4">
@@ -342,23 +382,23 @@ export default function CreateOrder() {
                     {orderType === "customer" ? (
                         <>
                             {/* CustomerSection */}
-                                <CustomerSection
-                                    customerMode={customerMode}
-                                    onCustomerModeChange={handleCustomerModeChange}
-                                    cities={createOptions.cities}
-                                    selectedCustomer={selectedCustomer}
-                                    onSelectedCustomerChange={setSelectedCustomer}
-                                    newCustomer={newCustomer}
-                                    onNewCustomerChange={setNewCustomer}
-                                    custPresent={custPresent}
-                                    onCustPresentChange={setCustPresent}
-                                    picName={picName}
-                                    onPicNameChange={setPicName}
-                                    picPhone={picPhone}
-                                    onPicPhoneChange={setPicPhone}
-                                    errors={errors}
-                                    clearError={clearError}
-                                />
+                            <CustomerSection
+                                customerMode={customerMode}
+                                onCustomerModeChange={handleCustomerModeChange}
+                                cities={createOptions.cities}
+                                selectedCustomer={selectedCustomer}
+                                onSelectedCustomerChange={setSelectedCustomer}
+                                newCustomer={newCustomer}
+                                onNewCustomerChange={setNewCustomer}
+                                custPresent={custPresent}
+                                onCustPresentChange={setCustPresent}
+                                picName={picName}
+                                onPicNameChange={setPicName}
+                                picPhone={picPhone}
+                                onPicPhoneChange={setPicPhone}
+                                errors={errors}
+                                clearError={clearError}
+                            />
 
                             {/* VehicleSection */}
                             <VehicleSection
@@ -374,6 +414,19 @@ export default function CreateOrder() {
                     ) : (
                         <>
                             {/* DealerSection */}
+                            <DealerSection
+                                selectedDealer={selectedDealer}
+                                onSelectedDealerChange={setSelectedDealer}
+                                totalUnit={totalUnit}
+                                onTotalUnitChange={setTotalUnit}
+                                picName={picName}
+                                onPicNameChange={setPicName}
+                                picPhone={picPhone}
+                                onPicPhoneChange={setPicPhone}
+                                errors={errors}
+                                clearError={clearError}
+                                isSubmitting={isSubmitting}
+                            />
                         </>
                     )}
 
@@ -410,7 +463,7 @@ export default function CreateOrder() {
                 <button
                     type="button"
                     onClick={handleSubmit}
-                    disabled={isSubmitting || loadingOptions || orderType === "dealer"}
+                    disabled={isSubmitting || loadingOptions}
                     className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     {isSubmitting ? "Creating..." : "Create Order"}
