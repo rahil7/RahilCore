@@ -7,31 +7,51 @@ import { FormSelect } from "../../../components/common/FormSelect";
 import NewCustomerForm, {
     type NewOrderCustomer,
 } from "./NewCustomerForm";
+import { FormInput } from "../../../components/common/FormInput";
+import { PhoneInput } from "../../../components/common/PhoneInput";
+import type { CreateOrderErrors } from "../../../types/order";
 
 type CustomerMode = "existing" | "new";
 
 interface CustomerSectionProps {
     cities: FilterOption[];
+    customerMode: CustomerMode;
+    onCustomerModeChange: (mode: CustomerMode) => void;
     selectedCustomer: CustomerLookupItem | null;
     onSelectedCustomerChange: (
         customer: CustomerLookupItem | null,
     ) => void;
     newCustomer: NewOrderCustomer;
     onNewCustomerChange: (value: NewOrderCustomer) => void;
+    custPresent: boolean;
+    onCustPresentChange: (value: boolean) => void;
+    picName: string;
+    onPicNameChange: (value: string) => void;
+    picPhone: string;
+    onPicPhoneChange: (value: string) => void;
+    errors?: CreateOrderErrors;
+    clearError: (field: keyof CreateOrderErrors) => void;
     isSubmitting?: boolean;
 }
 
 export default function CustomerSection({
     cities,
+    customerMode,
+    onCustomerModeChange,
     selectedCustomer,
     onSelectedCustomerChange,
     newCustomer,
     onNewCustomerChange,
+    custPresent,
+    onCustPresentChange,
+    picName,
+    onPicNameChange,
+    picPhone,
+    onPicPhoneChange,
+    errors,
+    clearError,
     isSubmitting = false,
 }: CustomerSectionProps) {
-    const [customerMode, setCustomerMode] =
-        useState<CustomerMode>("existing");
-
     const [customers, setCustomers] = useState<CustomerLookupItem[]>([]);
     const [customerSearch, setCustomerSearch] = useState("");
     const [customerPage, setCustomerPage] = useState(1);
@@ -150,14 +170,24 @@ export default function CustomerSection({
         description: item.custCode,
     }));
 
+    // Change customer mode
     const handleModeChange = (mode: CustomerMode) => {
-        setCustomerMode(mode);
+        if (mode === customerMode) return;
+
+        onCustomerModeChange(mode);
 
         if (mode === "new") {
             onSelectedCustomerChange(null);
+            clearError("customerId");
+        } else {
+            clearError("custName");
+            clearError("email");
+            clearError("phone");
+            clearError("cityId");
         }
     };
 
+    // Select existing customer
     const handleCustomerChange = (selected: string | null) => {
         const customer = customers.find(
             (item) => String(item.id) === selected,
@@ -169,6 +199,10 @@ export default function CustomerSection({
             );
 
         onSelectedCustomerChange(customer);
+
+        if (customer) {
+            clearError("customerId");
+        }
     };
 
     return (
@@ -228,7 +262,7 @@ export default function CustomerSection({
                         onSearchChange={setCustomerSearch}
                         onLoadMore={handleLoadMoreCustomers}
                         loading={loadingCustomers}
-                        error={customerError}
+                        error={errors?.customerId || customerError}
                         disabled={isSubmitting}
                         required
                     />
@@ -285,8 +319,65 @@ export default function CustomerSection({
                     value={newCustomer}
                     onChange={onNewCustomerChange}
                     isSubmitting={isSubmitting}
+                    errors={errors}
+                    clearError={clearError}
                 />
             )}
+
+            <div className="space-y-4 border-t pt-4">
+                <div>
+                    <h4 className="text-sm font-semibold">
+                        Customer Attendance
+                    </h4>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                        Apakah customer ikut saat proses inspeksi?
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                    <button
+                        type="button"
+                        onClick={() => onCustPresentChange(true)}
+                        disabled={isSubmitting}
+                        className={`rounded-lg border p-3 text-left transition-colors ${custPresent
+                                ? "border-primary bg-primary/5"
+                                : "hover:bg-muted/50"
+                            }`}
+                    >
+                        <div className="text-sm font-medium">Ikut</div>
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={() => onCustPresentChange(false)}
+                        disabled={isSubmitting}
+                        className={`rounded-lg border p-3 text-left transition-colors ${!custPresent
+                                ? "border-primary bg-primary/5"
+                                : "hover:bg-muted/50"
+                            }`}
+                    >
+                        <div className="text-sm font-medium">Tidak Ikut</div>
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <FormInput
+                        label="Nama PIC"
+                        placeholder="Masukkan nama PIC"
+                        className="h-9"
+                        value={picName}
+                        onChange={(e) => onPicNameChange(e.target.value)}
+                        disabled={isSubmitting}
+                    />
+
+                    <PhoneInput
+                        label="Nomor Telepon PIC"
+                        value={picPhone}
+                        onChange={onPicPhoneChange}
+                        disabled={isSubmitting}
+                    />
+                </div>
+            </div>
         </div>
     );
 }

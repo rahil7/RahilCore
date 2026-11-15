@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import type { FilterOption } from "../../../types/common";
 import { vehicleService } from "../../../services/vehicle-service";
-import type { CreateOrderVehicleRequest } from "../../../types/order";
+import type { CreateOrderErrors, CreateOrderVehicleRequest } from "../../../types/order";
 import { FormSelect } from "../../../components/common/FormSelect";
 import { FormInput } from "../../../components/common/FormInput";
 
@@ -11,6 +11,8 @@ interface VehicleSectionProps {
     exteriorColors: FilterOption[];
     value: CreateOrderVehicleRequest;
     onChange: (value: CreateOrderVehicleRequest) => void;
+    clearError: (field: keyof CreateOrderErrors) => void;
+    errors?: CreateOrderErrors;
     isSubmitting?: boolean;
 }
 
@@ -19,6 +21,8 @@ export default function VehicleSection({
     exteriorColors,
     value,
     onChange,
+    clearError,
+    errors = {},
     isSubmitting = false,
 }: VehicleSectionProps) {
     const [models, setModels] = useState<FilterOption[]>([]);
@@ -124,6 +128,10 @@ export default function VehicleSection({
         setVariants([]);
         setModelError("");
         setVariantError("");
+
+        clearError("brandId");
+        clearError("modelId");
+        clearError("variantId");
     };
 
     const handleModelChange = (selected: string | null) => {
@@ -135,6 +143,9 @@ export default function VehicleSection({
 
         setVariants([]);
         setVariantError("");
+
+        clearError("modelId");
+        clearError("variantId");
     };
 
     const brandOptions = brands.map((item) => ({
@@ -170,8 +181,12 @@ export default function VehicleSection({
                     placeholder="e.g. B 1234 ABC"
                     className="h-9"
                     value={value.plateNo}
-                    onChange={(e) => updateField("plateNo", e.target.value)}
+                    onChange={(e) => {
+                        updateField("plateNo", e.target.value);
+                        clearError("plateNo");
+                    }}
                     disabled={isSubmitting}
+                    error={errors?.plateNo}
                     required
                 />
 
@@ -185,6 +200,7 @@ export default function VehicleSection({
                     value={value.brandId ? String(value.brandId) : ""}
                     onValueChange={handleBrandChange}
                     disabled={isSubmitting}
+                    error={errors?.brandId}
                     required
                 />
 
@@ -199,7 +215,7 @@ export default function VehicleSection({
                     options={modelOptions}
                     value={value.modelId ? String(value.modelId) : ""}
                     onValueChange={handleModelChange}
-                    error={modelError}
+                    error={errors?.modelId || modelError}
                     disabled={
                         isSubmitting ||
                         !value.brandId ||
@@ -220,10 +236,11 @@ export default function VehicleSection({
                     searchable
                     options={variantOptions}
                     value={value.variantId ? String(value.variantId) : ""}
-                    onValueChange={(selected) =>
-                        updateField("variantId", Number(selected) || 0)
-                    }
-                    error={variantError}
+                    onValueChange={(selected) => {
+                        updateField("variantId", Number(selected) || 0);
+                        clearError("variantId");
+                    }}
+                    error={errors?.variantId || variantError}
                     disabled={
                         isSubmitting ||
                         !value.modelId ||
@@ -239,13 +256,15 @@ export default function VehicleSection({
                     className="h-9"
                     placeholder="e.g. 2024"
                     value={value.yearOfManufacture || ""}
-                    onChange={(e) =>
+                    onChange={(e) => {
                         updateField(
                             "yearOfManufacture",
                             e.target.value === "" ? 0 : Number(e.target.value),
                         )
-                    }
+                        clearError("yearOfManufacture");
+                    }}
                     disabled={isSubmitting}
+                    error={errors?.yearOfManufacture}
                     required
                 />
 
@@ -261,12 +280,14 @@ export default function VehicleSection({
                             ? String(value.exteriorColorId)
                             : ""
                     }
-                    onValueChange={(selected) =>
+                    onValueChange={(selected) => {
                         updateField(
                             "exteriorColorId",
                             Number(selected) || 0,
-                        )
-                    }
+                        );
+                        clearError("exteriorColorId");
+                    }}
+                    error={errors?.exteriorColorId}
                     disabled={isSubmitting}
                     required
                 />

@@ -47,6 +47,21 @@ export interface GetOrdersParams extends ListQueryParams {
     paymentStatusIds?: number[];
 }
 
+export interface CreateOrderCustomerRequest {
+    customerId: number | null;
+    inspectionFormId: number;
+    custName: string | null;
+    email: string | null;
+    phone: string | null;
+    cityId: number | null;
+    address: string | null;
+    custPresent: boolean;
+    picName: string | null;
+    picPhone: string | null;
+    note: string | null;
+    vehicle: CreateOrderVehicleRequest;
+}
+
 export interface CreateOrderVehicleRequest {
     plateNo: string;
     brandId: number;
@@ -54,4 +69,20 @@ export interface CreateOrderVehicleRequest {
     variantId: number;
     yearOfManufacture: number;
     exteriorColorId: number;
+}
+
+export interface CreateOrderErrors {
+    customerId?: string;
+    custName?: string;
+    email?: string;
+    phone?: string;
+    cityId?: string;
+    plateNo?: string;
+    brandId?: string;
+    modelId?: string;
+    variantId?: string;
+    yearOfManufacture?: string;
+    exteriorColorId?: string;
+    inspectionFormId?: string;
+    note?: string;
 }
