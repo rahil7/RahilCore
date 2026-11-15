@@ -4,6 +4,7 @@ import type { FilterOption } from "../../../types/common";
 import { vehicleService } from "../../../services/vehicle-service";
 import type { CreateOrderVehicleRequest } from "../../../types/order";
 import { FormSelect } from "../../../components/common/FormSelect";
+import { FormInput } from "../../../components/common/FormInput";
 
 interface VehicleSectionProps {
     brands: FilterOption[];
@@ -156,11 +157,6 @@ export default function VehicleSection({
         label: item.name,
     }));
 
-    const inputClassName =
-        "h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
-
-    const labelClassName = "mb-1.5 block text-sm font-medium";
-
     return (
         <div className="rounded-lg border bg-card p-5 space-y-4">
             <div>
@@ -169,21 +165,15 @@ export default function VehicleSection({
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {/* License Plate */}
-                <div>
-                    <label className={labelClassName}>
-                        License Plate <span className="text-destructive">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        value={value.plateNo}
-                        onChange={(e) =>
-                            updateField("plateNo", e.target.value)
-                        }
-                        placeholder="e.g. B 1234 ABC"
-                        disabled={isSubmitting}
-                        className={inputClassName}
-                    />
-                </div>
+                <FormInput
+                    label="Pelat No"
+                    placeholder="e.g. B 1234 ABC"
+                    className="h-9"
+                    value={value.plateNo}
+                    onChange={(e) => updateField("plateNo", e.target.value)}
+                    disabled={isSubmitting}
+                    required
+                />
 
                 {/* Brand */}
                 <FormSelect
@@ -243,33 +233,25 @@ export default function VehicleSection({
                 />
 
                 {/* Year of Manufacture */}
-                <div>
-                    <label className={labelClassName}>
-                        Year of Manufacture{" "}
-                        <span className="text-destructive">*</span>
-                    </label>
-                    <input
-                        type="number"
-                        min={1999}
-                        max={9999}
-                        value={value.yearOfManufacture || ""}
-                        onChange={(e) =>
-                            updateField(
-                                "yearOfManufacture",
-                                e.target.value === ""
-                                    ? 0
-                                    : Number(e.target.value),
-                            )
-                        }
-                        placeholder="e.g. 2024"
-                        disabled={isSubmitting}
-                        className={inputClassName}
-                    />
-                </div>
+                <FormInput
+                    label="Tahun Pembuatan"
+                    type="number"
+                    className="h-9"
+                    placeholder="e.g. 2024"
+                    value={value.yearOfManufacture || ""}
+                    onChange={(e) =>
+                        updateField(
+                            "yearOfManufacture",
+                            e.target.value === "" ? 0 : Number(e.target.value),
+                        )
+                    }
+                    disabled={isSubmitting}
+                    required
+                />
 
                 {/* Exterior Color */}
                 <FormSelect
-                    label="Exterior Color"
+                    label="Warna Exterior"
                     placeholder="Pilih warna kendaraan"
                     searchPlaceholder="Cari warna..."
                     searchable

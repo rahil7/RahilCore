@@ -109,7 +109,7 @@ export const customerService = {
 
     getLookup(params: GetCustomersLookupParams = {}) {
         const query = buildQueryString(params);
-        const url = `/api/lookup?${query}`;
+        const url = `/api/customers/lookup?${query}`;
 
         return apiClient.get<PagedResponse<CustomerLookupItem>>(url);
     },

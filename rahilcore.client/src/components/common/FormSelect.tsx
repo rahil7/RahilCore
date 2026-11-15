@@ -1,5 +1,6 @@
+
 import { useId } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, LoaderCircle } from "lucide-react";
 import { Combobox } from "@base-ui/react/combobox";
 import { FormLabel } from "./FormLabel";
 
@@ -10,9 +11,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../ui/select";
+
 export interface FormSelectOption {
     value: string;
     label: string;
+    description?: string;
 }
 
 interface FormSelectProps {
@@ -27,6 +30,11 @@ interface FormSelectProps {
     searchable?: boolean;
     error?: string;
     disabled?: boolean;
+
+    // Remote search and pagination
+    onSearchChange?: (value: string) => void;
+    onLoadMore?: () => void;
+    loading?: boolean;
 }
 
 export function FormSelect({
@@ -41,9 +49,28 @@ export function FormSelect({
     searchable = false,
     error,
     disabled = false,
+    onSearchChange,
+    onLoadMore,
+    loading = false,
 }: FormSelectProps) {
     const generatedId = useId();
     const inputId = `form-select-${generatedId}`;
+
+    const handleListScroll = (
+        event: React.UIEvent<HTMLDivElement>,
+    ) => {
+        const element = event.currentTarget;
+
+        const isNearBottom =
+            element.scrollHeight -
+            element.scrollTop -
+            element.clientHeight <
+            50;
+
+        if (isNearBottom && !loading) {
+            onLoadMore?.();
+        }
+    };
 
     return (
         <div className="space-y-2">
@@ -88,6 +115,12 @@ export function FormSelect({
                     items={options}
                     value={options.find((item) => item.value === value) ?? null}
                     onValueChange={(item) => onValueChange(item?.value ?? null)}
+                    onInputValueChange={(inputValue, eventDetails) => {
+                        if (eventDetails.reason === "input-change") {
+                            onSearchChange?.(inputValue);
+                        }
+                    }}
+                    filter={onSearchChange ? null : undefined}
                     itemToStringLabel={(item) => item.label}
                     isItemEqualToValue={(item, selectedItem) =>
                         item.value === selectedItem.value
@@ -113,14 +146,25 @@ export function FormSelect({
                             className="z-50"
                         >
                             <Combobox.Popup className="max-h-60 w-(--anchor-width) overflow-hidden rounded-lg border bg-popover text-popover-foreground shadow-md">
-                                <Combobox.List className="max-h-60 overflow-y-auto p-1">
+                                <Combobox.List
+                                    className="max-h-60 overflow-y-auto p-1"
+                                    onScroll={handleListScroll}
+                                >
                                     {(option: FormSelectOption) => (
                                         <Combobox.Item
                                             key={option.value}
                                             value={option}
                                             className="flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm outline-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground"
                                         >
-                                            {option.label}
+                                            <span className="flex items-center gap-2 min-w-0">
+                                                <span className="truncate">{option.label}</span>
+
+                                                {option.description && (
+                                                    <span className="shrink-0 text-xs text-muted-foreground">
+                                                        {option.description}
+                                                    </span>
+                                                )}
+                                            </span>
 
                                             <Combobox.ItemIndicator>
                                                 <Check className="h-4 w-4" />
@@ -129,9 +173,18 @@ export function FormSelect({
                                     )}
                                 </Combobox.List>
 
-                                <Combobox.Empty className="px-3 py-4 text-center text-sm text-muted-foreground">
-                                    Data tidak ditemukan.
-                                </Combobox.Empty>
+                                {loading && (
+                                    <div className="flex items-center justify-center gap-2 border-t px-3 py-2 text-xs text-muted-foreground">
+                                        <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+                                        Memuat data...
+                                    </div>
+                                )}
+
+                                {!loading && options.length === 0 && (
+                                    <Combobox.Empty className="px-3 py-4 text-center text-sm text-muted-foreground">
+                                        Data tidak ditemukan.
+                                    </Combobox.Empty>
+                                )}
                             </Combobox.Popup>
                         </Combobox.Positioner>
                     </Combobox.Portal>

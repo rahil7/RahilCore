@@ -7,6 +7,9 @@ import type {
     CreateOrderVehicleRequest,
 } from "../../types/order";
 import VehicleSection from "./components/VehicleSection";
+import CustomerSection from "./components/CustomerSection";
+import type { CustomerLookupItem } from "../../types/customer";
+import type { NewOrderCustomer } from "./components/NewCustomerForm";
 
 type OrderType = "customer" | "dealer";
 
@@ -76,6 +79,17 @@ export default function CreateOrder() {
         };
     }, []);
 
+    const [selectedCustomer, setSelectedCustomer] =
+        useState<CustomerLookupItem | null>(null);
+
+    const [newCustomer, setNewCustomer] = useState<NewOrderCustomer>({
+        custName: "",
+        email: "",
+        phone: "",
+        cityId: 0,
+        address: "",
+    });
+
     return (
         <div className="w-full min-w-0 space-y-4">
             <PageDetailHeader
@@ -134,6 +148,16 @@ export default function CreateOrder() {
                     {orderType === "customer" ? (
                         <>
                             {/* CustomerSection */}
+
+                            <CustomerSection
+                                cities={createOptions.cities}
+                                selectedCustomer={selectedCustomer}
+                                onSelectedCustomerChange={setSelectedCustomer}
+                                newCustomer={newCustomer}
+                                onNewCustomerChange={setNewCustomer}
+                            />
+
+                            {/* VehicleSection */}
 
                             <VehicleSection
                                 brands={createOptions.brands}

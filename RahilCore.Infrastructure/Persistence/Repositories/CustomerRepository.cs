@@ -293,6 +293,7 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                     Id = x.Id,
                     CustCode = x.CustCode,
                     CustName = x.CustName,
+                    CustTypeName = x.CustType != null ? x.CustType.ParamName : null,
                     Email = x.Email,
                     Phone = x.Phone
                 })
