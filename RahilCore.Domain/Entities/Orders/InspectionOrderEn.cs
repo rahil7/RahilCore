@@ -1,7 +1,7 @@
 ﻿using RahilCore.Domain.Entities.Common;
 using RahilCore.Domain.Entities.Customers;
 
-namespace RahilCore.Domain.Entities.Inspections
+namespace RahilCore.Domain.Entities.Orders
 {
     public sealed class InspectionOrderEn : BaseTransactionEntity
     {

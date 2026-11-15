@@ -3,6 +3,7 @@ using RahilCore.Domain.Entities;
 using RahilCore.Domain.Entities.Customers;
 using RahilCore.Domain.Entities.Inspections;
 using RahilCore.Domain.Entities.MasterData;
+using RahilCore.Domain.Entities.Orders;
 
 namespace RahilCore.Infrastructure.Persistence.DbContext
 {
@@ -19,6 +20,7 @@ namespace RahilCore.Infrastructure.Persistence.DbContext
 
         public DbSet<InspectionOrderEn> InspectionOrders => Set<InspectionOrderEn>();
         public DbSet<InspectionOrderItemEn> InspectionOrderItems => Set<InspectionOrderItemEn>();
+        public DbSet<InspectionOrderPaymentEn> InspectionOrderPayments => Set<InspectionOrderPaymentEn>();
         public DbSet<InspectionEn> Inspections => Set<InspectionEn>();
 
         public DbSet<CityEn> Cities => Set<CityEn>();

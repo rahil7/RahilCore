@@ -42,7 +42,7 @@ namespace RahilCore.Application.Features.Customers
             if (await custRepo.ExistsByPhoneAsync(phone, ct))
                 throw new BusinessException(409, "Phone already exists.");
 
-            if (!await masterParameterRepo.ExistsAsync(request.CustTypeId, ct))
+            if (!await masterParameterRepo.ExistsAsync(request.CustTypeId, MasterParameterTypes.CUST_TYPE, ct))
             {
                 throw new BusinessException(400, "Customer type tidak valid.");
             }

@@ -14,9 +14,9 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<bool> ExistsAsync(long id, CancellationToken ct = default)
+        public async Task<bool> ExistsAsync(long id, string paramType, CancellationToken ct = default)
         {
-            return await _context.MasterParameters.AnyAsync(x => x.Id == id, ct);
+            return await _context.MasterParameters.AnyAsync(x => x.ParamType==paramType && x.Id == id, ct);
         }
 
         public async Task<IReadOnlyList<FilterOptionDto>> GetFilterOptionsAsync(string paramType, CancellationToken ct = default)

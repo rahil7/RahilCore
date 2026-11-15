@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RahilCore.Domain.Entities.Inspections;
+using RahilCore.Domain.Entities.Orders;
 using RahilCore.Infrastructure.Persistence.Configurations.Common;
 
-namespace RahilCore.Infrastructure.Persistence.Configurations.Inspections
+namespace RahilCore.Infrastructure.Persistence.Configurations.Orders
 {
     public sealed class InspectionOrderConfiguration : BaseTransactionEntityConfiguration<InspectionOrderEn>
     {

@@ -1,6 +1,6 @@
 ﻿using RahilCore.Application.Features.Orders.DTOs;
 using RahilCore.Application.Features.Orders.Queries;
-using RahilCore.Domain.Entities.Inspections;
+using RahilCore.Domain.Entities.Orders;
 
 namespace RahilCore.Application.Features.Orders
 {
@@ -11,5 +11,8 @@ namespace RahilCore.Application.Features.Orders
         void Add(InspectionOrderEn order);
         void Add(InspectionOrderItemEn orderItems);
         Task<(IReadOnlyList<OrderListDto> Items, int TotalItems)> GetPagedAsync(GetOrderListQuery query, CancellationToken ct = default);
+        Task<InspectionOrderEn?> GetByIdAsync(long id, CancellationToken ct = default);
+        void AddPayment(InspectionOrderPaymentEn payment);
+        Task<bool> ExistsPaymentAsync(long id, CancellationToken ct = default);
     }
 }

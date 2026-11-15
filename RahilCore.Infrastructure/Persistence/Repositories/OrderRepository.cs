@@ -3,7 +3,7 @@ using RahilCore.Application.Common.Helpers;
 using RahilCore.Application.Features.Orders;
 using RahilCore.Application.Features.Orders.DTOs;
 using RahilCore.Application.Features.Orders.Queries;
-using RahilCore.Domain.Entities.Inspections;
+using RahilCore.Domain.Entities.Orders;
 using RahilCore.Infrastructure.Persistence.DbContext;
 
 namespace RahilCore.Infrastructure.Persistence.Repositories
@@ -32,6 +32,16 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             _context.InspectionOrderItems.AddRange(items);
         }
 
+        public void AddPayment(InspectionOrderPaymentEn payment)
+        {
+            _context.InspectionOrderPayments.Add(payment);
+        }
+
+        public async Task<bool> ExistsPaymentAsync(long id, CancellationToken ct = default)
+        {
+            return await _context.InspectionOrderPayments.AnyAsync(x => x.Id == id, ct);
+        }
+
         public async Task<string> GenerateOrderNoAsync(CancellationToken ct = default)
         {
             const string sql = """SELECT 'ORD' || TO_CHAR(CURRENT_DATE, 'YYMMDD') || seq::text AS "Value" FROM (SELECT nextval('inspection_order_no_seq') AS seq) s""";
@@ -39,6 +49,11 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             return await _context.Database
                 .SqlQueryRaw<string>(sql)
                 .SingleAsync(ct);
+        }
+
+        public async Task<InspectionOrderEn?> GetByIdAsync(long id, CancellationToken ct = default)
+        {
+            return await _context.InspectionOrders.FirstOrDefaultAsync(x => x.Id == id, ct);
         }
 
         public async Task<(IReadOnlyList<OrderListDto> Items, int TotalItems)> GetPagedAsync(GetOrderListQuery query, CancellationToken ct = default)

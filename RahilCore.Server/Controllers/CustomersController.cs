@@ -12,20 +12,14 @@ namespace RahilCore.Server.Controllers
     [ApiController]
     [Route("api/customers")]
     [Authorize]
-    public sealed class CustomersController : ControllerBase
+    public sealed class CustomersController(ICustomerService customerService) : ControllerBase
     {
-        private readonly ICustomerService _customerService;
         private const int CustomerLookupPageSize = 10;
-
-        public CustomersController(ICustomerService customerService)
-        {
-            _customerService = customerService;
-        }
 
         [HttpGet]
         public async Task<ActionResult<PagedResponse<CustomerListDto>>> GetPaged([FromQuery] CustomersQuery query,CancellationToken ct)
         {
-            var (items, totalItems) = await _customerService.GetPagedAsync(query, ct);
+            var (items, totalItems) = await customerService.GetPagedAsync(query, ct);
 
             var totalPages = (int)Math.Ceiling(
                 totalItems / (double)query.PageSize);
@@ -46,7 +40,7 @@ namespace RahilCore.Server.Controllers
         [HttpGet("{typeId:long}/lookup")]
         public async Task<ActionResult<PagedResponse<CustomerLookupDto>>> GetPagedLookup([FromRoute] long typeId, [FromQuery] CustomerLookupQuery query, CancellationToken ct)
         {
-            var (items, totalItems) = await _customerService.GetPagedLookupAsync(typeId, query, CustomerLookupPageSize, ct);
+            var (items, totalItems) = await customerService.GetPagedLookupAsync(typeId, query, CustomerLookupPageSize, ct);
 
             var totalPages = (int)Math.Ceiling(
                 totalItems / (double)CustomerLookupPageSize);
@@ -68,7 +62,7 @@ namespace RahilCore.Server.Controllers
         [HttpGet("{id:long}")]
         public async Task<ActionResult<ApiResponse<CustomerDetailDto>>> GetById(long id, CancellationToken ct)
         {
-            var customer = await _customerService.GetByIdAsync(id, ct);
+            var customer = await customerService.GetByIdAsync(id, ct);
 
             if (customer is null)
             {
@@ -89,7 +83,7 @@ namespace RahilCore.Server.Controllers
         [HttpGet("{id:long}/emails")]
         public async Task<ActionResult<ApiResponse<List<CustomerEmailDto>>>> GetCustomerEmails(long id, CancellationToken ct)
         {
-            var customerEmails = await _customerService.GetCustomerEmails(id, ct);
+            var customerEmails = await customerService.GetCustomerEmails(id, ct);
 
             if (customerEmails is null)
             {
@@ -110,7 +104,7 @@ namespace RahilCore.Server.Controllers
         [HttpGet("{id:long}/phones")]
         public async Task<ActionResult<ApiResponse<List<CustomerPhoneDto>>>> GetCustomerPhones(long id, CancellationToken ct)
         {
-            var customerPhones = await _customerService.GetCustomerPhones(id, ct);
+            var customerPhones = await customerService.GetCustomerPhones(id, ct);
 
             if (customerPhones is null)
             {
@@ -142,7 +136,7 @@ namespace RahilCore.Server.Controllers
                         Data: null));
             }
 
-            var id = await _customerService.CreateAsync(request,createdBy,ct);
+            var id = await customerService.CreateAsync(request,createdBy,ct);
 
             return StatusCode(
                 StatusCodes.Status201Created,
@@ -166,7 +160,7 @@ namespace RahilCore.Server.Controllers
                         Data: null));
             }
 
-            await _customerService.UpdateAsync(id,request,updatedBy,ct);
+            await customerService.UpdateAsync(id,request,updatedBy,ct);
 
             return Ok(
                 new ApiResponse<object>(
@@ -178,7 +172,7 @@ namespace RahilCore.Server.Controllers
         [HttpGet("filter-options")]
         public async Task<ActionResult<ApiResponse<CustomerFilterOptions>>>GetFilterOptions(CancellationToken ct)
         {
-            CustomerFilterOptions options = await _customerService.GetFilterOptionsAsync(ct);
+            CustomerFilterOptions options = await customerService.GetFilterOptionsAsync(ct);
 
             return Ok(
                 new ApiResponse<CustomerFilterOptions>(

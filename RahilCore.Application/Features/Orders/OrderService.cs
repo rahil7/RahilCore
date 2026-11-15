@@ -12,7 +12,7 @@ using RahilCore.Application.Features.Orders.Request;
 using RahilCore.Application.Features.Vehicles;
 using RahilCore.Domain.Entities;
 using RahilCore.Domain.Entities.Customers;
-using RahilCore.Domain.Entities.Inspections;
+using RahilCore.Domain.Entities.Orders;
 
 namespace RahilCore.Application.Features.Orders
 {
@@ -267,6 +267,116 @@ namespace RahilCore.Application.Features.Orders
                 await uow.CommitAsync(ct);
 
                 return order.Id;
+            }
+            catch
+            {
+                await uow.RollbackAsync(CancellationToken.None);
+                throw;
+            }
+        }
+
+        public async Task<long> CreatePayment(long id, CreatePaymentRequest request, string createdBy, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+
+            var order = await orderRepo.GetByIdAsync(id, ct);
+
+            if (order is null)
+            {
+                throw new BusinessException(404, $"Order dengan ID '{id}' tidak ditemukan.");
+            }
+
+            if(!await orderRepo.ExistsPaymentAsync(id, ct))
+            {
+                throw new BusinessException(409, "Payment already exists.");
+            }
+
+            if(!await masterParameterRepo.ExistsAsync(request.PaymentMethodId, MasterParameterTypes.PAYMENT_METHOD, ct))
+            {
+                throw new BusinessException(400, "Payment Method tidak valid.");
+            }
+
+            if (request.Amount <= 0)
+            {
+                throw new BusinessException(400, "Amount harus lebih besar dari 0.");
+            }
+
+            if (request.AmountDiscount is < 0)
+            {
+                throw new BusinessException(400, "Amount discount tidak boleh kurang dari 0.");
+            }
+
+            if (request.AmountDiscount > request.Amount)
+            {
+                throw new BusinessException(400, "Amount discount tidak boleh melebihi Amount.");
+            }
+
+            if (request.PaymentProof is not null)
+            {
+                var file = request.PaymentProof;
+
+                if (file.Length <= 0)
+                {
+                    throw new BusinessException(400, "Payment proof tidak boleh kosong.");
+                }
+
+                if (file.Length > 3 * 1024 * 1024)
+                {
+                    throw new BusinessException(400, "Payment proof maksimal 5 MB.");
+                }
+
+                var allowedTypes = new Dictionary<string, string[]>
+                {
+                    [".jpg"] = ["image/jpeg"],
+                    [".jpeg"] = ["image/jpeg"],
+                    [".png"] = ["image/png"],
+                    [".pdf"] = ["application/pdf"]
+                };
+
+                var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+                if (!allowedTypes.TryGetValue(extension, out var mimeTypes))
+                {
+                    throw new BusinessException(400, "Format payment proof harus JPG, JPEG, PNG, atau PDF.");
+                }
+
+                if (!mimeTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
+                {
+                    throw new BusinessException(400, "Tipe file payment proof tidak valid.");
+                }
+            }
+
+            await uow.BeginTransactionAsync(ct);
+
+            try
+            {
+                var now = DateTime.UtcNow;
+                var note = request.Note.Trim();
+
+                order.UpdatedAt = now;
+                order.UpdatedBy = createdBy;
+                order.UpdatedNote = note;
+
+                var payment = new InspectionOrderPaymentEn
+                {
+                    OrderId = order.Id,
+                    PaymentMethodId = request.PaymentMethodId,
+                    Amount = request.Amount,
+                    AmountDiscount = request.AmountDiscount,
+                    PaymentStatusId = PaymentTransactionStatus.SUCCESS,
+                    PaymentDate = request.PaymentDate,
+                    ReferenceNo = request.ReferenceNo,
+                    FileName = "",
+                    FileSize = 0,
+                    FileType = ""
+                };
+
+                orderRepo.AddPayment(payment);
+
+                await uow.SaveChangesAsync(ct);
+                await uow.CommitAsync(ct);
+
+                return payment.Id;
             }
             catch
             {

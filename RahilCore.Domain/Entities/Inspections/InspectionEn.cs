@@ -1,4 +1,5 @@
 ﻿using RahilCore.Domain.Entities.Common;
+using RahilCore.Domain.Entities.Orders;
 
 namespace RahilCore.Domain.Entities.Inspections
 {

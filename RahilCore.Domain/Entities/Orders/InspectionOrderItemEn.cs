@@ -1,6 +1,6 @@
 ﻿using RahilCore.Domain.Entities.Common;
 
-namespace RahilCore.Domain.Entities.Inspections
+namespace RahilCore.Domain.Entities.Orders
 {
     public sealed class InspectionOrderItemEn : BaseAuditCreatedEntity
     {
