@@ -3,6 +3,7 @@
     public sealed record AuthResponse(
         Guid Id,
         string Username,
+        string UserLevel,
         string DisplayName
     );
 }

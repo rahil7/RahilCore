@@ -108,7 +108,7 @@ namespace RahilCore.Server.Controllers
                     Data: new { Id = id }));
         }
 
-        [HttpPost("{id:long}/payment")]
+        [HttpPost("{id:long}/payments")]
         public async Task<IActionResult> CreatePayment([FromRoute] long id, [FromForm] CreatePaymentRequest request, CancellationToken ct)
         {
             var createdBy = User.FindFirstValue("username");
@@ -131,5 +131,14 @@ namespace RahilCore.Server.Controllers
                     Message: "Payment created successfully.",
                     Data: new { Id = id }));
         }
+
+        [HttpGet("payments/{paymentId:long}/proof")]
+        public async Task<IActionResult> GetPaymentProof([FromRoute] long paymentId,CancellationToken ct)
+        {
+            var payment = await orderService.GetPaymentProofAsync(paymentId, ct);
+
+            return Ok(payment);
+        }
+
     }
 }

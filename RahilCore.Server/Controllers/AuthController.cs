@@ -37,11 +37,12 @@ namespace RahilCore.Server.Controllers
             }
 
             var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, result.UserId.ToString()),
-            new(ClaimTypes.Name, result.DisplayName),
-            new("username", result.Username)
-        };
+            {
+                new(ClaimTypes.NameIdentifier, result.UserId.ToString()),
+                new(ClaimTypes.Name, result.DisplayName),
+                new("userlevel", result.UserLevel),
+                new("username", result.Username),
+            };
 
             var identity = new ClaimsIdentity(
                 claims,
@@ -56,6 +57,7 @@ namespace RahilCore.Server.Controllers
             var response = new AuthResponse(
                 result.UserId,
                 result.Username,
+                result.UserLevel,
                 result.DisplayName);
 
             return Ok(
@@ -83,9 +85,11 @@ namespace RahilCore.Server.Controllers
             }
 
             var username = User.FindFirstValue("username");
+            var userLevel = User.FindFirstValue("user_level");
             var displayName = User.FindFirstValue(ClaimTypes.Name);
 
             if (string.IsNullOrWhiteSpace(username) ||
+                string.IsNullOrWhiteSpace(userLevel) ||
                 string.IsNullOrWhiteSpace(displayName))
             {
                 return Unauthorized(
@@ -99,7 +103,7 @@ namespace RahilCore.Server.Controllers
                 new ApiResponse<AuthResponse>(
                     true,
                     "Sesi valid.",
-                    new AuthResponse(userId, username, displayName)));
+                    new AuthResponse(userId, username, userLevel, displayName)));
         }
 
         [Authorize]

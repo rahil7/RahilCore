@@ -14,5 +14,16 @@
                 jakartaDate,
                 JakartaTimeZone);
         }
+
+        public static DateTime JakartaToUtc(DateTime dateTime)
+        {
+            var jakartaTime = DateTime.SpecifyKind(
+                dateTime,
+                DateTimeKind.Unspecified);
+
+            var jakartaZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Jakarta");
+
+            return TimeZoneInfo.ConvertTimeToUtc(jakartaTime, jakartaZone);
+        }
     }
 }

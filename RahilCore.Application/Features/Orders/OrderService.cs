@@ -1,5 +1,7 @@
 ﻿using RahilCore.Application.Abstractions.Persistence;
+using RahilCore.Application.Abstractions.Storage;
 using RahilCore.Application.Common.Constants;
+using RahilCore.Application.Common.DTOs;
 using RahilCore.Application.Common.Exceptions;
 using RahilCore.Application.Common.Helpers;
 using RahilCore.Application.Features.City;
@@ -23,7 +25,8 @@ namespace RahilCore.Application.Features.Orders
             IVehicleRepository vehicleRepo,
             ICityRepository cityRepo,
             IMasterParameterRepository masterParameterRepo,
-            IInspectionRepository inspectionRepo
+            IInspectionRepository inspectionRepo,
+            IObjectStorageService objectStorageService
         ) : IOrderService
     {
         public async Task<long> CreateOrderForCustomer(CreateOrderCustomerRequest request, string createdBy, CancellationToken ct = default)
@@ -286,7 +289,7 @@ namespace RahilCore.Application.Features.Orders
                 throw new BusinessException(404, $"Order dengan ID '{id}' tidak ditemukan.");
             }
 
-            if(!await orderRepo.ExistsPaymentAsync(id, ct))
+            if(await orderRepo.ExistsPaymentAsync(id, ct))
             {
                 throw new BusinessException(409, "Payment already exists.");
             }
@@ -298,17 +301,17 @@ namespace RahilCore.Application.Features.Orders
 
             if (request.Amount <= 0)
             {
-                throw new BusinessException(400, "Amount harus lebih besar dari 0.");
+                throw new BusinessException(400, "Amount must be greater than zero.");
             }
 
             if (request.AmountDiscount is < 0)
             {
-                throw new BusinessException(400, "Amount discount tidak boleh kurang dari 0.");
+                throw new BusinessException(400, "Amount discount cannot be negative.");
             }
 
             if (request.AmountDiscount > request.Amount)
             {
-                throw new BusinessException(400, "Amount discount tidak boleh melebihi Amount.");
+                throw new BusinessException(400, "Amount discount cannot exceed amount.");
             }
 
             if (request.PaymentProof is not null)
@@ -348,6 +351,8 @@ namespace RahilCore.Application.Features.Orders
 
             await uow.BeginTransactionAsync(ct);
 
+            string? uploadedObjectKey = null;
+
             try
             {
                 var now = DateTime.UtcNow;
@@ -364,12 +369,30 @@ namespace RahilCore.Application.Features.Orders
                     Amount = request.Amount,
                     AmountDiscount = request.AmountDiscount,
                     PaymentStatusId = PaymentTransactionStatus.SUCCESS,
-                    PaymentDate = request.PaymentDate,
+                    PaymentDate = DateTimeHelper.JakartaToUtc(request.PaymentDate),
                     ReferenceNo = request.ReferenceNo,
-                    FileName = "",
-                    FileSize = 0,
-                    FileType = ""
+                    CreatedAt = now,
+                    CreatedBy = createdBy,
+                    CreatedNote = note
                 };
+
+                // Upload payment proof jika ada
+                if (request.PaymentProof is not null)
+                {
+                    var file = request.PaymentProof;
+                    var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+                    uploadedObjectKey =$"payments/{now:yyyy/MM}/{Guid.NewGuid()}{extension}";
+
+                    await using var stream = file.OpenReadStream();
+
+                    await objectStorageService.UploadAsync(stream,uploadedObjectKey,file.ContentType,ct);
+
+                    payment.StorageKey = uploadedObjectKey;
+                    payment.FileName = Path.GetFileName(file.FileName);
+                    payment.FileSize = file.Length;
+                    payment.FileType = file.ContentType;
+                }
 
                 orderRepo.AddPayment(payment);
 
@@ -381,6 +404,21 @@ namespace RahilCore.Application.Features.Orders
             catch
             {
                 await uow.RollbackAsync(CancellationToken.None);
+
+                // Cleanup file jika upload sudah berhasil
+                if (uploadedObjectKey is not null)
+                {
+                    try
+                    {
+                        await objectStorageService.DeleteAsync(uploadedObjectKey,CancellationToken.None);
+                    }
+                    catch
+                    {
+                        // Jangan menutupi exception utama.
+                        // Catat kegagalan cleanup melalui logger.
+                    }
+                }
+
                 throw;
             }
         }
@@ -495,5 +533,24 @@ namespace RahilCore.Application.Features.Orders
             return await orderRepo.GetPagedAsync(query, ct);
         }
 
+        public async Task<FileAccessDto> GetPaymentProofAsync(long paymentId, CancellationToken ct)
+        {
+            var payment = await orderRepo.GetPaymentByIdAsync(paymentId, ct);
+
+            if (payment is null)
+                throw new BusinessException(404, "Payment not found.");
+
+            if (string.IsNullOrWhiteSpace(payment.StorageKey))
+                throw new BusinessException(404, "Payment proof not found.");
+
+            var url = await objectStorageService.GetPresignedUrlAsync(payment.StorageKey,15);
+
+            return new FileAccessDto(
+                Url: url,
+                FileName: payment.FileName!,
+                FileType: payment.FileType!,
+                FileSize: payment.FileSize!.Value
+            );
+        }
     }
 }

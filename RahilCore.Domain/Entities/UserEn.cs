@@ -6,6 +6,9 @@
 
         public string Username { get; set; } = string.Empty;
 
+        public long UserLevelId { get; set; }
+        public MasterParameterEn? UserLevel { get; set; }
+
         public string UsernameNormalized { get; set; } = string.Empty;
 
         public string PasswordHash { get; set; } = string.Empty;

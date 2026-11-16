@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Amazon.Runtime;
+using Microsoft.EntityFrameworkCore;
 using RahilCore.Application.Common.Helpers;
 using RahilCore.Application.Features.Orders;
 using RahilCore.Application.Features.Orders.DTOs;
@@ -37,9 +38,9 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             _context.InspectionOrderPayments.Add(payment);
         }
 
-        public async Task<bool> ExistsPaymentAsync(long id, CancellationToken ct = default)
+        public async Task<bool> ExistsPaymentAsync(long orderId, CancellationToken ct = default)
         {
-            return await _context.InspectionOrderPayments.AnyAsync(x => x.Id == id, ct);
+            return await _context.InspectionOrderPayments.AnyAsync(x => x.OrderId == orderId, ct);
         }
 
         public async Task<string> GenerateOrderNoAsync(CancellationToken ct = default)
@@ -204,6 +205,11 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 .ToListAsync(ct);
 
             return (items, totalItems);
+        }
+
+        public async Task<InspectionOrderPaymentEn?> GetPaymentByIdAsync(long paymentId, CancellationToken ct)
+        {
+            return await _context.InspectionOrderPayments.FirstOrDefaultAsync(x => x.Id == paymentId, ct);
         }
     }
 }

@@ -5,14 +5,12 @@ namespace RahilCore.Application.Features.Orders.Request
 {
     public sealed class CreatePaymentRequest
     {
-        [Required]
+        [Range(1, long.MaxValue)]
         public long PaymentMethodId { get; set; }
 
         [Required]
-        [Range(typeof(decimal), "0.01", "9999999999999999")]
         public decimal Amount { get; set; }
 
-        [Range(typeof(decimal), "0", "9999999999999999")]
         public decimal? AmountDiscount { get; set; }
 
         [Required]

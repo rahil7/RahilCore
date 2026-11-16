@@ -11,6 +11,9 @@ namespace RahilCore.Server.Contracts.Users
             ErrorMessage = "Username hanya boleh berisi huruf, angka, titik, underscore, dan tanda hubung.")]
         public string Username { get; init; } = string.Empty;
 
+        [Required]
+        public long UserLevelId { get; init; }
+
         [Required(ErrorMessage = "Password wajib diisi.")]
         [MinLength(8, ErrorMessage = "Password minimal 8 karakter.")]
         [MaxLength(128, ErrorMessage = "Password maksimal 128 karakter.")]

@@ -20,7 +20,7 @@ namespace RahilCore.Application.Features.Auth
             if (!isValid)
                 return null;
 
-            return new LoginResult(user.Id, user.Username, user.DisplayName);
+            return new LoginResult(user.Id, user.Username, user.Username, user.DisplayName);
         }
     }
 }
