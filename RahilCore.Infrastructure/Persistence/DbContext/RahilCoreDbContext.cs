@@ -21,6 +21,7 @@ namespace RahilCore.Infrastructure.Persistence.DbContext
         public DbSet<InspectionOrderEn> InspectionOrders => Set<InspectionOrderEn>();
         public DbSet<InspectionOrderItemEn> InspectionOrderItems => Set<InspectionOrderItemEn>();
         public DbSet<InspectionOrderPaymentEn> InspectionOrderPayments => Set<InspectionOrderPaymentEn>();
+        public DbSet<InspectionOrderAssignmentEn> InspectionOrderAssignments=> Set<InspectionOrderAssignmentEn>();
         public DbSet<InspectionEn> Inspections => Set<InspectionEn>();
 
         public DbSet<CityEn> Cities => Set<CityEn>();

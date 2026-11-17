@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RahilCore.Application.Common.Helpers;
 using RahilCore.Application.Features.Orders;
 using RahilCore.Application.Features.Orders.DTOs;
@@ -9,57 +8,58 @@ using RahilCore.Infrastructure.Persistence.DbContext;
 
 namespace RahilCore.Infrastructure.Persistence.Repositories
 {
-    public class OrderRepository : IOrderRepository
+    public class OrderRepository(RahilCoreDbContext context) : IOrderRepository
     {
-        private readonly RahilCoreDbContext _context;
-
-        public OrderRepository(RahilCoreDbContext context)
-        {
-            _context = context;
-        }
-
         public void Add(InspectionOrderEn order)
         {
-            _context.InspectionOrders.Add(order);
+            context.InspectionOrders.Add(order);
         }
 
         public void Add(InspectionOrderItemEn orderItems)
         {
-            _context.InspectionOrderItems.Add(orderItems);
+            context.InspectionOrderItems.Add(orderItems);
         }
 
         public void AddItemRange(IEnumerable<InspectionOrderItemEn> items)
         {
-            _context.InspectionOrderItems.AddRange(items);
+            context.InspectionOrderItems.AddRange(items);
         }
 
         public void AddPayment(InspectionOrderPaymentEn payment)
         {
-            _context.InspectionOrderPayments.Add(payment);
+            context.InspectionOrderPayments.Add(payment);
+        }
+
+        public async Task<bool> ExistsAssignment(long id, string inspectorUsername, CancellationToken ct)
+        {
+            return await context.InspectionOrderAssignments.AnyAsync(x => 
+                x.OrderId == id && 
+                x.InspectorUsername == inspectorUsername, 
+                ct);
         }
 
         public async Task<bool> ExistsPaymentAsync(long orderId, CancellationToken ct = default)
         {
-            return await _context.InspectionOrderPayments.AnyAsync(x => x.OrderId == orderId, ct);
+            return await context.InspectionOrderPayments.AnyAsync(x => x.OrderId == orderId, ct);
         }
 
         public async Task<string> GenerateOrderNoAsync(CancellationToken ct = default)
         {
             const string sql = """SELECT 'ORD' || TO_CHAR(CURRENT_DATE, 'YYMMDD') || seq::text AS "Value" FROM (SELECT nextval('inspection_order_no_seq') AS seq) s""";
 
-            return await _context.Database
+            return await context.Database
                 .SqlQueryRaw<string>(sql)
                 .SingleAsync(ct);
         }
 
         public async Task<InspectionOrderEn?> GetByIdAsync(long id, CancellationToken ct = default)
         {
-            return await _context.InspectionOrders.FirstOrDefaultAsync(x => x.Id == id, ct);
+            return await context.InspectionOrders.FirstOrDefaultAsync(x => x.Id == id, ct);
         }
 
         public async Task<(IReadOnlyList<OrderListDto> Items, int TotalItems)> GetPagedAsync(GetOrderListQuery query, CancellationToken ct = default)
         {
-            var orders = _context.InspectionOrders
+            var orders = context.InspectionOrders
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -209,7 +209,7 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
 
         public async Task<InspectionOrderPaymentEn?> GetPaymentByIdAsync(long paymentId, CancellationToken ct)
         {
-            return await _context.InspectionOrderPayments.FirstOrDefaultAsync(x => x.Id == paymentId, ct);
+            return await context.InspectionOrderPayments.FirstOrDefaultAsync(x => x.Id == paymentId, ct);
         }
     }
 }

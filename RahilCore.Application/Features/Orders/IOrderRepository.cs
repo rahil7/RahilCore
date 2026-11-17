@@ -15,5 +15,6 @@ namespace RahilCore.Application.Features.Orders
         void AddPayment(InspectionOrderPaymentEn payment);
         Task<bool> ExistsPaymentAsync(long orderId, CancellationToken ct = default);
         Task<InspectionOrderPaymentEn?> GetPaymentByIdAsync(long paymentId, CancellationToken ct = default);
+        Task<bool> ExistsAssignment(long id, string inspectorUsername, CancellationToken ct);
     }
 }

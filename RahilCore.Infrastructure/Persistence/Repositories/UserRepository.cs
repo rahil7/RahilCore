@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RahilCore.Application.Abstractions.Persistence;
+using RahilCore.Application.Common.Constants;
 using RahilCore.Domain.Entities;
 using RahilCore.Infrastructure.Persistence.DbContext;
 
@@ -42,6 +43,11 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 .SingleOrDefaultAsync(
                     x => x.UsernameNormalized == username,
                     ct);
+        }
+
+        public async Task<bool> ExistsInspector(string username, CancellationToken ct = default)
+        {
+            return await context.Users.AnyAsync(x => x.UserLevelId == UserLevel.INSPECTOR && x.Username == username, ct);
         }
     }
 }

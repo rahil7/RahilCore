@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using RahilCore.Application.Features.Orders;
 using RahilCore.Application.Features.Orders.DTOs;
@@ -140,16 +139,29 @@ namespace RahilCore.Server.Controllers
             return Ok(payment);
         }
 
-        [HttpPut("{id:long}/assign")]
+        [HttpPost("{id:long}/assign")]
         public async Task<IActionResult> Assign([FromRoute] long id,[FromBody] AssignOrderRequest request,CancellationToken ct)
         {
-            await orderService.AssignAsync(id, request, ct);
+            var createdBy = User.FindFirstValue("username");
 
-            return Ok(new ApiResponse<object>(
-                Success: true,
-                Message: "Inspector assigned successfully.",
-                Data: null
-            ));
+            if (string.IsNullOrWhiteSpace(createdBy))
+            {
+                return Unauthorized(
+                    new ApiResponse<object>(
+                        Success: false,
+                        Message: "User identity not found.",
+                        Data: null));
+            }
+
+            long resultId = await orderService.Assign(id, request, createdBy, ct);
+
+            return StatusCode(
+                StatusCodes.Status201Created,
+                new ApiResponse<object>(
+                    Success: true,
+                    Message: "Order assigned successfully.",
+                    Data: new { Id = id }));
         }
+    }
     }
 }

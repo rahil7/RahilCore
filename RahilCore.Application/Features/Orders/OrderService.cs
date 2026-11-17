@@ -26,7 +26,8 @@ namespace RahilCore.Application.Features.Orders
             ICityRepository cityRepo,
             IMasterParameterRepository masterParameterRepo,
             IInspectionRepository inspectionRepo,
-            IObjectStorageService objectStorageService
+            IObjectStorageService objectStorageService,
+            IUserRepository userRepository
         ) : IOrderService
     {
         public async Task<long> CreateOrderForCustomer(CreateOrderCustomerRequest request, string createdBy, CancellationToken ct = default)
@@ -358,6 +359,7 @@ namespace RahilCore.Application.Features.Orders
                 var now = DateTime.UtcNow;
                 var note = request.Note.Trim();
 
+                order.StatusId = InspectionStatus.AWAITING_ASSIGNMENT;
                 order.UpdatedAt = now;
                 order.UpdatedBy = createdBy;
                 order.UpdatedNote = note;
@@ -551,6 +553,55 @@ namespace RahilCore.Application.Features.Orders
                 FileType: payment.FileType!,
                 FileSize: payment.FileSize!.Value
             );
+        }
+
+        public async Task<long> Assign(long id, AssignOrderRequest request, string createdBy, CancellationToken ct)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+
+            var order = await orderRepo.GetByIdAsync(id, ct);
+
+            if (order is null)
+            {
+                throw new BusinessException(404, $"Order dengan ID '{id}' tidak ditemukan.");
+            }
+
+            if (!await userRepository.ExistsInspector(request.InspectorUsername,ct))
+            {
+                throw new BusinessException(404, $"Inspector tidak ditemukan.");
+            }
+
+            if (await orderRepo.ExistsAssignment(id, request.InspectorUsername, ct))
+            {
+                throw new BusinessException(409, "Assignment already exists.");
+            }
+
+            await uow.BeginTransactionAsync(ct);
+            try
+            {
+                var now = DateTime.UtcNow;
+                var note = request.Note.Trim();
+
+                order.StatusId = InspectionStatus.INSPECTOR_ASSIGNED;
+                order.UpdatedAt = now;
+                order.UpdatedBy = createdBy;
+                order.UpdatedNote = note;
+
+                var payment = new InspectionOrderAssignmentEn
+                {
+                    OrderId = order.Id,
+                    InspectorUsername = request.InspectorUsername,
+                    StatusId = AssignmentStatus.ASSIGNED,
+                    CreatedAt = now,
+                    CreatedBy = createdBy,
+                    CreatedNote = note
+                };
+            }
+            catch
+            {
+                await uow.RollbackAsync(CancellationToken.None);
+                throw;
+            }
         }
     }
 }
