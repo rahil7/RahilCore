@@ -17,23 +17,39 @@ namespace RahilCore.Application.Features.Users
             string displayName,
             CancellationToken ct = default)
         {
-            if (!await masterParameterRepo.ExistsAsync(userLevelId, MasterParameterTypes.USER_LEVEL, ct))
+            var userLevel = await masterParameterRepo.GetByIdAsync(
+                userLevelId,
+                MasterParameterTypes.USER_LEVEL,
+                ct);
+
+            if (userLevel is null)
             {
                 throw new BusinessException(400, "Level tidak valid.");
             }
 
-            var normalizedUsername = username.Trim().ToUpperInvariant();
+            var prefix = userLevel.ParamValue;
 
-            var existingUser = await userRepository.GetByUsernameNormalizedAsync(normalizedUsername, ct);
+            if (string.IsNullOrWhiteSpace(prefix))
+            {
+                throw new BusinessException(400, "Prefix user level belum tersedia.");
+            }
+
+            var finalUsername = $"{prefix.Trim().ToLowerInvariant()}.{username.Trim()}";
+            var normalizedUsername = finalUsername.ToUpperInvariant();
+
+            var existingUser = await userRepository.GetByUsernameNormalizedAsync(
+                normalizedUsername, 
+                userLevelId, 
+                ct);
 
             if (existingUser is not null)
             {
-                throw new InvalidOperationException("Username sudah terdaftar.");
+                throw new InvalidOperationException("Username dengan level ini sudah terdaftar.");
             }
 
             var user = new UserEn
             {
-                Username = username.Trim(),
+                Username = finalUsername,
                 UserLevelId = userLevelId,
                 UsernameNormalized = normalizedUsername,
                 PasswordHash = passwordHasher.HashPassword(password),
@@ -48,7 +64,7 @@ namespace RahilCore.Application.Features.Users
             return new CreateUserResult(
                 user.Id,
                 user.Username,
-                user.UserLevel != null && user.UserLevel.ParamName != null ? user.UserLevel.ParamName : "-",
+                userLevel.ParamName ?? "-",
                 user.DisplayName,
                 user.CreatedAtUtc);
         }

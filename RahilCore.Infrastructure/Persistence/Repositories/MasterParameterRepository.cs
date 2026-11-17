@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RahilCore.Application.Common.DTOs;
 using RahilCore.Application.Features.MasterParameters;
+using RahilCore.Domain.Entities;
 using RahilCore.Infrastructure.Persistence.DbContext;
 
 namespace RahilCore.Infrastructure.Persistence.Repositories
@@ -17,6 +18,15 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
         public async Task<bool> ExistsAsync(long id, string paramType, CancellationToken ct = default)
         {
             return await _context.MasterParameters.AnyAsync(x => x.ParamType==paramType && x.Id == id, ct);
+        }
+
+        public async Task<MasterParameterEn?> GetByIdAsync(long id,string paramType,CancellationToken ct = default)
+        {
+            return await _context.MasterParameters
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    x => x.Id == id && x.ParamType == paramType,
+                    ct);
         }
 
         public async Task<IReadOnlyList<FilterOptionDto>> GetFilterOptionsAsync(string paramType, CancellationToken ct = default)

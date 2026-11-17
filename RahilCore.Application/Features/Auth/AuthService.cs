@@ -10,7 +10,7 @@ namespace RahilCore.Application.Features.Auth
         {
             var normalizedUsername = username.Trim().ToUpperInvariant();
 
-            var user = await userRepository.GetByUsernameNormalizedAsync(normalizedUsername, ct);
+            var user = await userRepository.GetByUsernameAsync(normalizedUsername, ct);
 
             if (user is null || !user.IsActive)
                 return null;
@@ -20,7 +20,7 @@ namespace RahilCore.Application.Features.Auth
             if (!isValid)
                 return null;
 
-            return new LoginResult(user.Id, user.Username, user.Username, user.DisplayName);
+            return new LoginResult(user.Id, user.Username, user.UserLevel!.ParamCode, user.DisplayName);
         }
     }
 }

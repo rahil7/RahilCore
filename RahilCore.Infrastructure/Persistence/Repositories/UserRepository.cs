@@ -12,9 +12,12 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             await context.Users.AddAsync(user, ct);
         }
 
-        public Task<UserEn?> GetByUsernameNormalizedAsync(string usernameNormalized, CancellationToken ct = default)
+        public Task<UserEn?> GetByUsernameNormalizedAsync(string usernameNormalized, long userLevelId, CancellationToken ct = default)
         {
-            return context.Users.SingleOrDefaultAsync(x => x.UsernameNormalized == usernameNormalized, ct);
+            return context.Users.SingleOrDefaultAsync(x => 
+                x.UsernameNormalized == usernameNormalized && 
+                x.UserLevelId==userLevelId, 
+                ct);
         }
 
         public Task<UserEn?> GetByIdAsync(Guid id, CancellationToken ct = default)
@@ -30,6 +33,15 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
         public async Task SaveChangesAsync(CancellationToken ct = default)
         {
             await context.SaveChangesAsync(ct);
+        } 
+
+        public Task<UserEn?> GetByUsernameAsync(string username, CancellationToken ct = default)
+        {
+            return context.Users
+                .Include(x => x.UserLevel)
+                .SingleOrDefaultAsync(
+                    x => x.UsernameNormalized == username,
+                    ct);
         }
     }
 }

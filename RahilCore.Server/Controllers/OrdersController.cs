@@ -140,5 +140,16 @@ namespace RahilCore.Server.Controllers
             return Ok(payment);
         }
 
+        [HttpPut("{id:long}/assign")]
+        public async Task<IActionResult> Assign([FromRoute] long id,[FromBody] AssignOrderRequest request,CancellationToken ct)
+        {
+            await orderService.AssignAsync(id, request, ct);
+
+            return Ok(new ApiResponse<object>(
+                Success: true,
+                Message: "Inspector assigned successfully.",
+                Data: null
+            ));
+        }
     }
 }

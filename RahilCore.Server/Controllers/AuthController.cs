@@ -18,14 +18,9 @@ namespace RahilCore.Server.Controllers
         [ProducesResponseType(typeof(ApiResponse<AuthResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<ApiResponse<AuthResponse>>> Login(
-            [FromBody] LoginRequest request,
-            CancellationToken ct)
+        public async Task<ActionResult<ApiResponse<AuthResponse>>> Login([FromBody] LoginRequest request,CancellationToken ct)
         {
-            var result = await authService.LoginAsync(
-                request.Username,
-                request.Password,
-                ct);
+            var result = await authService.LoginAsync(request.Username,request.Password,ct);
 
             if (result is null)
             {
@@ -40,7 +35,7 @@ namespace RahilCore.Server.Controllers
             {
                 new(ClaimTypes.NameIdentifier, result.UserId.ToString()),
                 new(ClaimTypes.Name, result.DisplayName),
-                new("userlevel", result.UserLevel),
+                new("userlevel", result.UserLevelCode),
                 new("username", result.Username),
             };
 
@@ -57,7 +52,7 @@ namespace RahilCore.Server.Controllers
             var response = new AuthResponse(
                 result.UserId,
                 result.Username,
-                result.UserLevel,
+                result.UserLevelCode,
                 result.DisplayName);
 
             return Ok(
