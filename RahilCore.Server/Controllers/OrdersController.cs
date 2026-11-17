@@ -163,5 +163,4 @@ namespace RahilCore.Server.Controllers
                     Data: new { Id = id }));
         }
     }
-    }
 }

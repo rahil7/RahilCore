@@ -9,9 +9,9 @@ namespace RahilCore.Domain.Entities.Inspections
         public InspectionOrderItemEn? OrderItem { get; set; }
 
         public string InspectionNo { get; set; } = null!;
-        public DateTime StartedAt { get; set; }
-        public DateTime ReceivedAt { get; set; }
-        public DateTime SubmittedAt { get; set; }
+        public DateTime? StartedAt { get; set; }
+        public DateTime? ReceivedAt { get; set; }
+        public DateTime? SubmittedAt { get; set; }
         public string SubmittedBy { get; set; } = null!;
     }
 }

@@ -9,9 +9,9 @@ namespace RahilCore.Application.Features.Orders.Request
         public long PaymentMethodId { get; set; }
 
         [Required]
-        public decimal Amount { get; set; }
+        public decimal SubtotalAmount { get; set; }
 
-        public decimal? AmountDiscount { get; set; }
+        public decimal? DiscountAmount { get; set; }
 
         [Required]
         public DateTime PaymentDate { set; get; }

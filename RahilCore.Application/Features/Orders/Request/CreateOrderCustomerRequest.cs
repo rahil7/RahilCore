@@ -2,7 +2,7 @@
 
 namespace RahilCore.Application.Features.Orders.Request
 {
-    public sealed class CreateOrderCustomerRequest
+    public sealed class CreateOrderCustomerRequest : BaseCreateOrderRequest
     {
         public long? CustomerId { get; set; }
 
@@ -27,13 +27,6 @@ namespace RahilCore.Application.Features.Orders.Request
 
         [Required]
         public bool CustPresent { get; set; }
-
-        public string? PicName { get; set; }
-        public string? PicPhone { get; set; }
-
-        [Required]
-        [StringLength(500)]
-        public string Note { get; set; } = string.Empty;
 
         [Required]
         public CreateOrderVehicleRequest Vehicle { get; set; } = null!;

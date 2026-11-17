@@ -7,7 +7,6 @@ namespace RahilCore.Domain.Entities.Orders
         public long OrderId { set; get; }
         public long PaymentMethodId { set; get; }
         public decimal Amount { set; get; }
-        public decimal? AmountDiscount { set; get; }
         public long PaymentStatusId { set; get; }
         public DateTime PaymentDate { set; get; }
         public string? ReferenceNo { set; get; }

@@ -1,21 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RahilCore.Application.Common.DTOs;
 using RahilCore.Application.Features.Inspections;
+using RahilCore.Domain.Entities.Inspections;
 using RahilCore.Infrastructure.Persistence.DbContext;
 
 namespace RahilCore.Infrastructure.Persistence.Repositories
 {
-    public sealed class InspectionRepository : IInspectionRepository
+    public sealed class InspectionRepository(RahilCoreDbContext context) : IInspectionRepository
     {
-        private readonly RahilCoreDbContext _context;
-        public InspectionRepository(RahilCoreDbContext context)
+        public void Add(InspectionEn inspection)
         {
-            _context = context;
+            context.Inspections.Add(inspection);
+        }
+
+        public void AddRange(IEnumerable<InspectionEn> inspections)
+        {
+            context.Inspections.AddRange(inspections);
         }
 
         public async Task<IReadOnlyList<FilterOptionDto>> GetInspFormsForFilter(CancellationToken ct)
         {
-            return await _context.MasterInspectionForms
+            return await context.MasterInspectionForms
                 .AsNoTracking()
                 .Select(x => new FilterOptionDto
                 {

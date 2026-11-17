@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RahilCore.Application.Common.Constants;
+using RahilCore.Application.Common.Exceptions;
 using RahilCore.Application.Common.Helpers;
 using RahilCore.Application.Features.Orders;
 using RahilCore.Application.Features.Orders.DTOs;
@@ -18,6 +20,11 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
         public void Add(InspectionOrderItemEn orderItems)
         {
             context.InspectionOrderItems.Add(orderItems);
+        }
+
+        public void AddAssignment(InspectionOrderAssignmentEn assignment)
+        {
+            context.InspectionOrderAssignments.Add(assignment);
         }
 
         public void AddItemRange(IEnumerable<InspectionOrderItemEn> items)
@@ -43,18 +50,80 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             return await context.InspectionOrderPayments.AnyAsync(x => x.OrderId == orderId, ct);
         }
 
-        public async Task<string> GenerateOrderNoAsync(CancellationToken ct = default)
+        public async Task<string> GenerateOrderNoAsync(long custType, CancellationToken ct = default)
         {
-            const string sql = """SELECT 'ORD' || TO_CHAR(CURRENT_DATE, 'YYMMDD') || seq::text AS "Value" FROM (SELECT nextval('inspection_order_no_seq') AS seq) s""";
+            var prefix = custType switch
+            {
+                CustomerType.DEALER => "ORDS",
+                CustomerType.CUSTOMER => "ORDC",
+                _ => throw new BusinessException(400, "Invalid customer type.")
+            };
+
+            const string sql = """
+        SELECT @prefix || TO_CHAR(CURRENT_DATE, 'YYMMDD') || seq::text AS "Value"
+        FROM (
+            SELECT nextval('inspection_order_no_seq') AS seq
+        ) s
+        """;
 
             return await context.Database
-                .SqlQueryRaw<string>(sql)
+                .SqlQueryRaw<string>(sql,
+                    new Npgsql.NpgsqlParameter("prefix", prefix))
                 .SingleAsync(ct);
+        }
+
+        public async Task<string> GenerateInspectionNo(long custType,CancellationToken ct = default)
+        {
+            var prefix = custType switch
+            {
+                CustomerType.DEALER => "IPS",
+                CustomerType.CUSTOMER => "IPC",
+                _ => throw new BusinessException(400, "Invalid customer type.")
+            };
+
+            const string sql = """
+        SELECT
+            @prefix
+            || TO_CHAR(CURRENT_DATE, 'YYMMDD')
+            || LPAD(seq::text, 5, '0') AS "Value"
+        FROM (
+            SELECT nextval('inspection_no_seq') AS seq
+        ) s
+        """;
+
+            return await context.Database
+                .SqlQueryRaw<string>(
+                    sql,
+                    new Npgsql.NpgsqlParameter("prefix", prefix))
+                .SingleAsync(ct);
+        }
+
+        public async Task<InspectionOrderAssignmentEn?> GetActiveAssignment(long orderId, CancellationToken ct = default)
+        {
+            return await context.InspectionOrderAssignments
+                .FirstOrDefaultAsync(x => 
+                    x.OrderId == orderId &&
+                    x.StatusId == AssignmentStatus.ASSIGNED,
+                    ct);
+        }
+
+        public async Task<InspectionOrderAssignmentEn?> GetAssignment(long orderId, string inspectorUsername, CancellationToken ct = default)
+        {
+            return await context.InspectionOrderAssignments
+                .FirstOrDefaultAsync(x => 
+                    x.OrderId == orderId && 
+                    x.InspectorUsername == inspectorUsername,
+                    ct);
         }
 
         public async Task<InspectionOrderEn?> GetByIdAsync(long id, CancellationToken ct = default)
         {
             return await context.InspectionOrders.FirstOrDefaultAsync(x => x.Id == id, ct);
+        }
+
+        public async Task<InspectionOrderItemEn?> GetOrderItemByOrderId(long orderId, CancellationToken ct = default)
+        {
+            return await context.InspectionOrderItems.FirstOrDefaultAsync(x => x.OrderId == orderId, ct);
         }
 
         public async Task<(IReadOnlyList<OrderListDto> Items, int TotalItems)> GetPagedAsync(GetOrderListQuery query, CancellationToken ct = default)
@@ -210,6 +279,15 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
         public async Task<InspectionOrderPaymentEn?> GetPaymentByIdAsync(long paymentId, CancellationToken ct)
         {
             return await context.InspectionOrderPayments.FirstOrDefaultAsync(x => x.Id == paymentId, ct);
+        }
+
+        public async Task<bool> HasSubmittedInspectionAsync(long orderId, CancellationToken ct = default)
+        {
+            return await context.Inspections
+                .AnyAsync(x => 
+                    x.OrderItem!.OrderId == orderId && 
+                    x.SubmittedAt != null,
+                    ct);
         }
     }
 }

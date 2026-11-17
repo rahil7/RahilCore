@@ -16,7 +16,6 @@ namespace RahilCore.Infrastructure.Persistence.Configurations.Orders
             builder.Property(x => x.OrderId).HasColumnName("order_id");
             builder.Property(x => x.PaymentMethodId).HasColumnName("payment_method_id");
             builder.Property(x => x.Amount).HasColumnName("amount");
-            builder.Property(x => x.AmountDiscount).HasColumnName("amount_discount");
             builder.Property(x => x.PaymentStatusId).HasColumnName("payment_status_id");
             builder.Property(x => x.PaymentDate).HasColumnName("payment_date");
             builder.Property(x => x.ReferenceNo).HasColumnName("reference_no");

@@ -10,6 +10,8 @@ namespace RahilCore.Domain.Entities.Orders
         public long CustomerId { get; set; }
         public CustomerEn? Customer { get; set; }
 
+        public DateTime ScheduleAt { get; set; }
+
         public long StatusId { get; set; }
         public MasterParameterEn? Status { get; set; }
 
@@ -22,5 +24,11 @@ namespace RahilCore.Domain.Entities.Orders
 
         public string? PicName { get; set; }
         public string? PicPhone { get; set; }
+
+        public string? InvoiceNo { get; set; }
+        public DateTime? InvoiceDate { get; set; }
+        public decimal? SubtotalAmount { get; set; }
+        public decimal? DiscountAmount { get; set; }
+        public decimal? TotalAmount { get; set; }
     }
 }

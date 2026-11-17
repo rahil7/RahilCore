@@ -14,6 +14,7 @@ using RahilCore.Application.Features.Orders.Request;
 using RahilCore.Application.Features.Vehicles;
 using RahilCore.Domain.Entities;
 using RahilCore.Domain.Entities.Customers;
+using RahilCore.Domain.Entities.Inspections;
 using RahilCore.Domain.Entities.Orders;
 
 namespace RahilCore.Application.Features.Orders
@@ -136,12 +137,13 @@ namespace RahilCore.Application.Features.Orders
                     customerId = customer.Id;
                 }
 
-                string orderCode = await orderRepo.GenerateOrderNoAsync(ct);
+                string orderCode = await orderRepo.GenerateOrderNoAsync(CustomerType.CUSTOMER,ct);
 
                 var order = new InspectionOrderEn
                 {
                     OrderNo = orderCode,
                     CustomerId = customerId,
+                    ScheduleAt = request.ScheduleAt,
                     StatusId = InspectionStatus.ORDER_CREATED,
                     PaymentStatusId = PaymentStatus.UNPAID,
                     TotalUnit = 1,
@@ -215,7 +217,7 @@ namespace RahilCore.Application.Features.Orders
             var now = DateTime.UtcNow;
             var note = request.Note.Trim();
 
-            string orderCode = await orderRepo.GenerateOrderNoAsync(ct);
+            string orderCode = await orderRepo.GenerateOrderNoAsync(CustomerType.DEALER, ct);
 
             var order = new InspectionOrderEn
             {
@@ -300,19 +302,21 @@ namespace RahilCore.Application.Features.Orders
                 throw new BusinessException(400, "Payment Method tidak valid.");
             }
 
-            if (request.Amount <= 0)
+            if (request.SubtotalAmount <= 0)
             {
-                throw new BusinessException(400, "Amount must be greater than zero.");
+                throw new BusinessException(400, "Subtotal amount must be greater than zero.");
             }
 
-            if (request.AmountDiscount is < 0)
+            if (request.DiscountAmount is < 0)
             {
-                throw new BusinessException(400, "Amount discount cannot be negative.");
+                throw new BusinessException(400, "Discount amount cannot be negative.");
             }
 
-            if (request.AmountDiscount > request.Amount)
+            decimal discountAmount = request.DiscountAmount ?? 0m;
+
+            if (discountAmount > request.SubtotalAmount)
             {
-                throw new BusinessException(400, "Amount discount cannot exceed amount.");
+                throw new BusinessException(400, "Discount amount cannot exceed subtotal amount.");
             }
 
             if (request.PaymentProof is not null)
@@ -358,8 +362,14 @@ namespace RahilCore.Application.Features.Orders
             {
                 var now = DateTime.UtcNow;
                 var note = request.Note.Trim();
+               
+                decimal totalAmount = request.SubtotalAmount - discountAmount;
 
                 order.StatusId = InspectionStatus.AWAITING_ASSIGNMENT;
+                order.DiscountAmount = request.DiscountAmount;
+                order.SubtotalAmount = request.SubtotalAmount;
+                order.InvoiceDate = now;
+                order.InvoiceNo = InvoiceHelper.GenerateInvoiceNo(order.Customer!.CustTypeId,order.Id,now);
                 order.UpdatedAt = now;
                 order.UpdatedBy = createdBy;
                 order.UpdatedNote = note;
@@ -368,8 +378,7 @@ namespace RahilCore.Application.Features.Orders
                 {
                     OrderId = order.Id,
                     PaymentMethodId = request.PaymentMethodId,
-                    Amount = request.Amount,
-                    AmountDiscount = request.AmountDiscount,
+                    Amount = totalAmount,
                     PaymentStatusId = PaymentTransactionStatus.SUCCESS,
                     PaymentDate = DateTimeHelper.JakartaToUtc(request.PaymentDate),
                     ReferenceNo = request.ReferenceNo,
@@ -555,47 +564,148 @@ namespace RahilCore.Application.Features.Orders
             );
         }
 
-        public async Task<long> Assign(long id, AssignOrderRequest request, string createdBy, CancellationToken ct)
+        public async Task<long> Assign(long id, AssignOrderRequest request,string createdBy, CancellationToken ct)
         {
             ArgumentNullException.ThrowIfNull(request);
+
+            if (string.IsNullOrWhiteSpace(request.InspectorUsername))
+                throw new BusinessException(400, "Inspector username is required.");
+
+            var inspectorUsername = request.InspectorUsername.Trim();
 
             var order = await orderRepo.GetByIdAsync(id, ct);
 
             if (order is null)
-            {
                 throw new BusinessException(404, $"Order dengan ID '{id}' tidak ditemukan.");
+
+            if (order.TotalUnit <= 0)
+                throw new BusinessException(404, $"Total unit pada order tidak valid.");
+
+            if (order.StatusId != InspectionStatus.ORDER_CREATED &&
+                order.StatusId != InspectionStatus.AWAITING_ASSIGNMENT &&
+                order.StatusId != InspectionStatus.INSPECTOR_ASSIGNED)
+            {
+                throw new BusinessException(
+                    409,
+                    "Order tidak dapat di-assign karena status order tidak valid."
+                );
             }
 
-            if (!await userRepository.ExistsInspector(request.InspectorUsername,ct))
+            if (order.Customer is null)
+                throw new BusinessException(404, "Customer pada order tidak ditemukan.");
+
+            if (order.Customer.CustTypeId == CustomerType.CUSTOMER &&
+                order.StatusId == InspectionStatus.ORDER_CREATED)
             {
-                throw new BusinessException(404, $"Inspector tidak ditemukan.");
+                throw new BusinessException(
+                    409,
+                    "Silakan lakukan pembayaran sebelum melakukan assignment."
+                );
             }
 
-            if (await orderRepo.ExistsAssignment(id, request.InspectorUsername, ct))
+            if (!await userRepository.ExistsInspector(inspectorUsername, ct))
+                throw new BusinessException(404, "Inspector tidak ditemukan.");
+
+            var orderItem = await orderRepo.GetOrderItemByOrderId(id, ct);
+
+            if (orderItem is null)
+                throw new BusinessException(404, "Order item tidak ditemukan.");
+
+            var activeAssignment = await orderRepo.GetActiveAssignment(id, ct);
+
+            if (activeAssignment?.InspectorUsername.Equals(
+                inspectorUsername,
+                StringComparison.OrdinalIgnoreCase) == true)
             {
-                throw new BusinessException(409, "Assignment already exists.");
+                throw new BusinessException(
+                    409,
+                    "Inspector tersebut sudah ditugaskan pada order ini."
+                );
             }
+
+            if (activeAssignment is not null)
+            {
+                var hasSubmittedInspection =
+                    await orderRepo.HasSubmittedInspectionAsync(id, ct);
+
+                if (hasSubmittedInspection)
+                {
+                    throw new BusinessException(
+                        409,
+                        "Order tidak dapat di-reassign karena sudah ada unit yang disubmit oleh inspector."
+                    );
+                }
+            }
+
+            var previousAssignment = await orderRepo.GetAssignment(id, inspectorUsername, ct);
 
             await uow.BeginTransactionAsync(ct);
+
             try
             {
                 var now = DateTime.UtcNow;
                 var note = request.Note.Trim();
+
+                if (activeAssignment is not null)
+                {
+                    // Nonaktifkan assignment inspector sebelumnya.
+                    activeAssignment.StatusId = AssignmentStatus.REASSIGNED;
+                    activeAssignment.UpdatedAt = now;
+                    activeAssignment.UpdatedBy = createdBy;
+                    activeAssignment.UpdatedNote = note;
+                }
+
+                if (previousAssignment is not null)
+                {
+                    // Aktifkan kembali assignment sebelumnya.
+                    previousAssignment.StatusId = AssignmentStatus.ASSIGNED;
+                    previousAssignment.UpdatedAt = now;
+                    previousAssignment.UpdatedBy = createdBy;
+                    previousAssignment.UpdatedNote = note;
+                }
+                else
+                {
+                    var assignment = new InspectionOrderAssignmentEn
+                    {
+                        OrderId = order.Id,
+                        InspectorUsername = inspectorUsername,
+                        StatusId = AssignmentStatus.ASSIGNED,
+                        CreatedAt = now,
+                        CreatedBy = createdBy,
+                        CreatedNote = note
+                    };
+
+                    orderRepo.AddAssignment(assignment);
+                }
+
+                // Buat inspection hanya saat first assignment.
+                if (activeAssignment is null)
+                {
+                    var inspections = new List<InspectionEn>();
+
+                    for (var unit = 0; unit < order.TotalUnit; unit++)
+                    {
+                        inspections.Add(new InspectionEn
+                        {
+                            OrderItemId = orderItem.Id,
+                            InspectionNo = await orderRepo.GenerateInspectionNo(order.Customer.CustTypeId,ct),
+                            CreatedAt = now,
+                            CreatedBy = createdBy
+                        });
+                    }
+
+                    inspectionRepo.AddRange(inspections);
+                }
 
                 order.StatusId = InspectionStatus.INSPECTOR_ASSIGNED;
                 order.UpdatedAt = now;
                 order.UpdatedBy = createdBy;
                 order.UpdatedNote = note;
 
-                var payment = new InspectionOrderAssignmentEn
-                {
-                    OrderId = order.Id,
-                    InspectorUsername = request.InspectorUsername,
-                    StatusId = AssignmentStatus.ASSIGNED,
-                    CreatedAt = now,
-                    CreatedBy = createdBy,
-                    CreatedNote = note
-                };
+                await uow.SaveChangesAsync(ct);
+                await uow.CommitAsync(ct);
+
+                return order.Id;
             }
             catch
             {

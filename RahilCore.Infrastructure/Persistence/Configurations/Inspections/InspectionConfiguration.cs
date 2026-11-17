@@ -11,23 +11,21 @@ namespace RahilCore.Infrastructure.Persistence.Configurations.Inspections
             base.Configure(builder);
             builder.ToTable("Inspections");
 
-            builder.Property(x => x.OrderItemId)
-                .HasColumnName("order_item_id");
+            builder.Property(x => x.OrderItemId).HasColumnName("order_item_id");
+            builder.HasOne(x => x.OrderItem)
+                .WithMany()
+                .HasForeignKey(x => x.OrderItemId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Property(x => x.InspectionNo)
-                .HasColumnName("inspection_no");
+            builder.Property(x => x.InspectionNo).HasColumnName("inspection_no");
 
-            builder.Property(x => x.StartedAt)
-                .HasColumnName("started_at");
+            builder.Property(x => x.StartedAt).HasColumnName("started_at");
 
-            builder.Property(x => x.ReceivedAt)
-                .HasColumnName("received_at");
+            builder.Property(x => x.ReceivedAt).HasColumnName("received_at");
 
-            builder.Property(x => x.SubmittedAt)
-                .HasColumnName("submitted_at");
+            builder.Property(x => x.SubmittedAt).HasColumnName("submitted_at");
 
-            builder.Property(x => x.SubmittedBy)
-                .HasColumnName("submitted_by");
+            builder.Property(x => x.SubmittedBy).HasColumnName("submitted_by");
         }
     }
 }
