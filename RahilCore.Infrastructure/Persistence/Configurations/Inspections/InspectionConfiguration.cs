@@ -9,7 +9,7 @@ namespace RahilCore.Infrastructure.Persistence.Configurations.Inspections
         public override void Configure(EntityTypeBuilder<InspectionEn> builder)
         {
             base.Configure(builder);
-            builder.ToTable("Inspections");
+            builder.ToTable("inspections");
 
             builder.Property(x => x.OrderItemId).HasColumnName("order_item_id");
             builder.HasOne(x => x.OrderItem)

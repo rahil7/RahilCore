@@ -143,7 +143,7 @@ namespace RahilCore.Application.Features.Orders
                 {
                     OrderNo = orderCode,
                     CustomerId = customerId,
-                    ScheduleAt = request.ScheduleAt,
+                    ScheduleAt = DateTimeHelper.JakartaToUtc(request.ScheduleAt),
                     StatusId = InspectionStatus.ORDER_CREATED,
                     PaymentStatusId = PaymentStatus.UNPAID,
                     TotalUnit = 1,
@@ -223,6 +223,7 @@ namespace RahilCore.Application.Features.Orders
             {
                 OrderNo = orderCode,
                 CustomerId = request.CustomerId,
+                ScheduleAt = DateTimeHelper.JakartaToUtc(request.ScheduleAt),
                 StatusId = InspectionStatus.ORDER_CREATED,
                 PaymentStatusId = PaymentStatus.UNPAID,
                 TotalUnit = request.TotalUnit,
@@ -285,7 +286,7 @@ namespace RahilCore.Application.Features.Orders
         {
             ArgumentNullException.ThrowIfNull(request);
 
-            var order = await orderRepo.GetByIdAsync(id, ct);
+            InspectionOrderEn? order = await orderRepo.GetByIdAsync(id, ct);
 
             if (order is null)
             {
@@ -297,7 +298,12 @@ namespace RahilCore.Application.Features.Orders
                 throw new BusinessException(409, "Payment already exists.");
             }
 
-            if(!await masterParameterRepo.ExistsAsync(request.PaymentMethodId, MasterParameterTypes.PAYMENT_METHOD, ct))
+            if (order.Customer is null)
+            {
+                throw new BusinessException(404, "Customer pada order tidak ditemukan.");
+            }
+
+            if (!await masterParameterRepo.ExistsAsync(request.PaymentMethodId, MasterParameterTypes.PAYMENT_METHOD, ct))
             {
                 throw new BusinessException(400, "Payment Method tidak valid.");
             }
@@ -366,10 +372,11 @@ namespace RahilCore.Application.Features.Orders
                 decimal totalAmount = request.SubtotalAmount - discountAmount;
 
                 order.StatusId = InspectionStatus.AWAITING_ASSIGNMENT;
+                order.StatusId = PaymentStatus.PAID;
                 order.DiscountAmount = request.DiscountAmount;
                 order.SubtotalAmount = request.SubtotalAmount;
                 order.InvoiceDate = now;
-                order.InvoiceNo = InvoiceHelper.GenerateInvoiceNo(order.Customer!.CustTypeId,order.Id,now);
+                order.InvoiceNo = InvoiceHelper.GenerateInvoiceNo(order.Customer.CustTypeId,order.Id,now);
                 order.UpdatedAt = now;
                 order.UpdatedBy = createdBy;
                 order.UpdatedNote = note;
@@ -573,7 +580,7 @@ namespace RahilCore.Application.Features.Orders
 
             var inspectorUsername = request.InspectorUsername.Trim();
 
-            var order = await orderRepo.GetByIdAsync(id, ct);
+            InspectionOrderEn? order = await orderRepo.GetByIdAsync(id, ct);
 
             if (order is null)
                 throw new BusinessException(404, $"Order dengan ID '{id}' tidak ditemukan.");
@@ -611,7 +618,8 @@ namespace RahilCore.Application.Features.Orders
             if (orderItem is null)
                 throw new BusinessException(404, "Order item tidak ditemukan.");
 
-            var activeAssignment = await orderRepo.GetActiveAssignment(id, ct);
+            InspectionOrderAssignmentEn? activeAssignment = 
+                await orderRepo.GetActiveAssignment(id, ct);
 
             if (activeAssignment?.InspectorUsername.Equals(
                 inspectorUsername,
@@ -637,7 +645,8 @@ namespace RahilCore.Application.Features.Orders
                 }
             }
 
-            var previousAssignment = await orderRepo.GetAssignment(id, inspectorUsername, ct);
+            InspectionOrderAssignmentEn? previousAssignment = 
+                await orderRepo.GetAssignment(id, inspectorUsername, ct);
 
             await uow.BeginTransactionAsync(ct);
 
@@ -670,6 +679,7 @@ namespace RahilCore.Application.Features.Orders
                         OrderId = order.Id,
                         InspectorUsername = inspectorUsername,
                         StatusId = AssignmentStatus.ASSIGNED,
+                        AssignedAt = now,
                         CreatedAt = now,
                         CreatedBy = createdBy,
                         CreatedNote = note
@@ -712,6 +722,17 @@ namespace RahilCore.Application.Features.Orders
                 await uow.RollbackAsync(CancellationToken.None);
                 throw;
             }
+        }
+
+        public async Task<OrderPaymentCreateOption?> GetPaymentOptionsAsync(CancellationToken ct = default)
+        {
+            var paymentMethods = await masterParameterRepo
+                .GetFilterOptionsAsync(MasterParameterTypes.PAYMENT_METHOD, ct);
+
+            return new OrderPaymentCreateOption
+            {
+                PaymentMethods = paymentMethods
+            };
         }
     }
 }

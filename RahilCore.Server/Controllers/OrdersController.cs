@@ -59,6 +59,18 @@ namespace RahilCore.Server.Controllers
                     Data: options));
         }
 
+        [HttpGet("payment-options")]
+        public async Task<ActionResult<ApiResponse<OrderPaymentCreateOption>>> GetPaymentOptions(CancellationToken ct)
+        {
+            var options = await orderService.GetPaymentOptionsAsync(ct);
+
+            return Ok(
+                new ApiResponse<OrderPaymentCreateOption>(
+                    Success: true,
+                    Message: "Payemt options retrieved successfully.",
+                    Data: options));
+        }
+
         [HttpPost("create-dealer")]
         public async Task<IActionResult> CreateOrderDealer([FromBody] CreateOrderDealerRequest request, CancellationToken ct)
         {

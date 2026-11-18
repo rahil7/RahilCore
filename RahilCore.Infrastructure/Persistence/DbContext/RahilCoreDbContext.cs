@@ -7,9 +7,7 @@ using RahilCore.Domain.Entities.Orders;
 
 namespace RahilCore.Infrastructure.Persistence.DbContext
 {
-    public sealed class RahilCoreDbContext(
-        DbContextOptions<RahilCoreDbContext> options
-        ) : Microsoft.EntityFrameworkCore.DbContext(options)
+    public sealed class RahilCoreDbContext(DbContextOptions<RahilCoreDbContext> options) : Microsoft.EntityFrameworkCore.DbContext(options)
     {
         public DbSet<UserEn> Users => Set<UserEn>();
         public DbSet<CustomerEn> Customers => Set<CustomerEn>();

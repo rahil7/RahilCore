@@ -15,10 +15,11 @@ namespace RahilCore.Infrastructure.Persistence.Configurations.Orders
 
             builder.Property(x => x.OrderId).HasColumnName("order_id");
             
-            builder.Property(x => x.InspectorUsername).HasColumnName("inspector_id");
+            builder.Property(x => x.InspectorUsername).HasColumnName("inspector_username");
             builder.HasOne(x => x.Inspector)
                 .WithMany()
                 .HasForeignKey(x => x.InspectorUsername)
+                .HasPrincipalKey(x => x.Username)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(x => x.StatusId).HasColumnName("status_id");

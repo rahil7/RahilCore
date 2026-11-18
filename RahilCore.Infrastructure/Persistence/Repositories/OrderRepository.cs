@@ -101,6 +101,8 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
         public async Task<InspectionOrderAssignmentEn?> GetActiveAssignment(long orderId, CancellationToken ct = default)
         {
             return await context.InspectionOrderAssignments
+                .Include(x => x.Inspector)
+                .Include(x => x.Status)
                 .FirstOrDefaultAsync(x => 
                     x.OrderId == orderId &&
                     x.StatusId == AssignmentStatus.ASSIGNED,
@@ -118,7 +120,11 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
 
         public async Task<InspectionOrderEn?> GetByIdAsync(long id, CancellationToken ct = default)
         {
-            return await context.InspectionOrders.FirstOrDefaultAsync(x => x.Id == id, ct);
+            return await context.InspectionOrders
+                .Include(x => x.Customer)
+                .Include(x => x.Status)
+                .Include(x => x.PaymentStatus)
+                .FirstOrDefaultAsync(x => x.Id == id, ct);
         }
 
         public async Task<InspectionOrderItemEn?> GetOrderItemByOrderId(long orderId, CancellationToken ct = default)
