@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import ActivityCell from "../../../components/shared/ActivityCell";
 import type { DataTableColumn } from "../../../components/shared/data-table/types";
 import StatusBadge from "../../../components/shared/StatusBadge";
@@ -10,8 +11,15 @@ export const orderColumns: DataTableColumn<OrderListItem>[] = [
     {
         id: "orderNo",
         header: "Order No",
-        accessorKey: "orderNo",
-        align: "center"
+        align: "center",
+        cell: (row) => (
+            <Link
+                to={`/orders/${row.id}`}
+                className="font-semibold text-foreground hover:text-primary hover:underline"
+            >
+                {row.orderNo}
+            </Link>
+        ),
     },
     {
         id: "customer",

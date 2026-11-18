@@ -1,4 +1,6 @@
+
 import { MoreHorizontal, Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../../components/ui/button";
 import {
     DropdownMenu,
@@ -10,10 +12,9 @@ import {
 interface OrderActionsProps {
     id: number;
 }
+export default function OrderActions({ id }: OrderActionsProps) {
+    const navigate = useNavigate();
 
-export default function OrderActions({
-    id,
-}: OrderActionsProps) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger
@@ -21,7 +22,7 @@ export default function OrderActions({
                     <Button
                         variant="ghost"
                         size="icon"
-                        aria-label="Customer actions"
+                        aria-label="Order actions"
                         className="h-8 w-8 rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
                     >
                         <MoreHorizontal className="h-4 w-4" />
@@ -34,7 +35,9 @@ export default function OrderActions({
                 sideOffset={4}
                 className="min-w-40"
             >
-                <DropdownMenuItem onClick={() => { } }>
+                <DropdownMenuItem
+                    onClick={() => navigate(`/orders/${id}`)}
+                >
                     <Eye className="mr-2 h-4 w-4" />
                     Detail
                 </DropdownMenuItem>

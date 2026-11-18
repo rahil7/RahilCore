@@ -1,10 +1,10 @@
 
-import type { FilterOption } from "../../../types/common";
-import { FormInput } from "../../../components/common/FormInput";
-import { FormSelect } from "../../../components/common/FormSelect";
-import { PhoneInput } from "../../../components/common/PhoneInput";
-import { FormTextarea } from "../../../components/common/FormTextarea";
-import type { CreateOrderErrors } from "../../../types/order";
+import type { FilterOption } from "../../../../types/common";
+import { FormInput } from "../../../../components/common/FormInput";
+import { FormSelect } from "../../../../components/common/FormSelect";
+import { PhoneInput } from "../../../../components/common/PhoneInput";
+import { FormTextarea } from "../../../../components/common/FormTextarea";
+import type { CreateOrderErrors } from "../../../../types/order";
 
 export interface NewOrderCustomer {
     custName: string;

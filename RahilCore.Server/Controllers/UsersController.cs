@@ -62,27 +62,5 @@ namespace RahilCore.Server.Controllers
                 return Conflict(new ApiResponse<object>(false,ex.Message,null));
             }
         }
-
-        [HttpGet("inspectors/lookup")]
-        public async Task<ActionResult<PagedResponse<UserLookupDto>>> GetPagedLookup([FromQuery] BaseLookupQuery query, CancellationToken ct)
-        {
-            var (items, totalItems) = await customerService.GetPagedLookupAsync(typeId, query, CustomerLookupPageSize, ct);
-
-            var totalPages = (int)Math.Ceiling(
-                totalItems / (double)CustomerLookupPageSize);
-
-            var response = new PagedResponse<CustomerLookupDto>(
-                Success: true,
-                Message: "Customers retrieved successfully.",
-                Data: items,
-                Pagination: new PaginationMetadata(
-                    Page: query.Page,
-                    PageSize: CustomerLookupPageSize,
-                    TotalItems: totalItems,
-                    TotalPages: totalPages));
-
-            return Ok(response);
-        }
-
     }
 }

@@ -1,7 +1,7 @@
 import { apiClient } from "../lib/api-client";
 
 import type { ApiResponse } from "../types/api";
-import type { CreateOrderCustomerRequest, CreateOrderDealerRequest, GetOrdersParams, OrderCreateOptions, OrderFilterOptions, OrderListItem } from "../types/order";
+import type { CreateOrderCustomerRequest, CreateOrderDealerRequest, CreatePaymentRequest, GetOrdersParams, OrderCreateOptions, OrderFilterOptions, OrderListItem } from "../types/order";
 import type { PagedResponse } from "../types/pagination";
 
 function buildQueryString(params: GetOrdersParams): string {
@@ -87,6 +87,34 @@ export const orderService = {
         return apiClient.post<ApiResponse<unknown>>(
             "/api/orders/create-dealer",
             data,
+        );
+    },
+
+    createPayment(orderId: number, data: CreatePaymentRequest) {
+        const formData = new FormData();
+
+        formData.append("paymentMethodId", String(data.paymentMethodId));
+        formData.append("subtotalAmount", String(data.subtotalAmount));
+
+        if (data.discountAmount !== null) {
+            formData.append("discountAmount", String(data.discountAmount));
+        }
+
+        formData.append("paymentDate", data.paymentDate);
+
+        if (data.referenceNo) {
+            formData.append("referenceNo", data.referenceNo);
+        }
+
+        formData.append("note", data.note);
+
+        if (data.paymentProof) {
+            formData.append("paymentProof", data.paymentProof);
+        }
+
+        return apiClient.post<ApiResponse<unknown>>(
+            `/api/orders/${orderId}/payments`,
+            formData,
         );
     },
 }

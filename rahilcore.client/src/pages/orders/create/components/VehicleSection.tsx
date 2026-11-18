@@ -1,10 +1,10 @@
 
 import { useEffect, useState } from "react";
-import type { FilterOption } from "../../../types/common";
-import { vehicleService } from "../../../services/vehicle-service";
-import type { CreateOrderErrors, CreateOrderVehicleRequest } from "../../../types/order";
-import { FormSelect } from "../../../components/common/FormSelect";
-import { FormInput } from "../../../components/common/FormInput";
+import type { FilterOption } from "../../../../types/common";
+import { vehicleService } from "../../../../services/vehicle-service";
+import type { CreateOrderErrors, CreateOrderVehicleRequest } from "../../../../types/order";
+import { FormSelect } from "../../../../components/common/FormSelect";
+import { FormInput } from "../../../../components/common/FormInput";
 
 interface VehicleSectionProps {
     brands: FilterOption[];
@@ -182,7 +182,11 @@ export default function VehicleSection({
                     className="h-9"
                     value={value.plateNo}
                     onChange={(e) => {
-                        updateField("plateNo", e.target.value);
+                        const plateNo = e.target.value
+                            .toUpperCase()
+                            .replace(/[^A-Z0-9 ]/g, "");
+
+                        updateField("plateNo", plateNo);
                         clearError("plateNo");
                     }}
                     disabled={isSubmitting}

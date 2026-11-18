@@ -1,15 +1,15 @@
 
 import { useEffect, useRef, useState } from "react";
-import type { CustomerLookupItem } from "../../../types/customer";
-import type { FilterOption } from "../../../types/common";
-import { customerService } from "../../../services/customer-service";
-import { FormSelect } from "../../../components/common/FormSelect";
+import type { CustomerLookupItem } from "../../../../types/customer";
+import type { FilterOption } from "../../../../types/common";
+import { customerService } from "../../../../services/customer-service";
+import { FormSelect } from "../../../../components/common/FormSelect";
 import NewCustomerForm, {
     type NewOrderCustomer,
 } from "./NewCustomerForm";
-import { FormInput } from "../../../components/common/FormInput";
-import { PhoneInput } from "../../../components/common/PhoneInput";
-import type { CreateOrderErrors } from "../../../types/order";
+import { FormInput } from "../../../../components/common/FormInput";
+import { PhoneInput } from "../../../../components/common/PhoneInput";
+import type { CreateOrderErrors } from "../../../../types/order";
 
 type CustomerMode = "existing" | "new";
 

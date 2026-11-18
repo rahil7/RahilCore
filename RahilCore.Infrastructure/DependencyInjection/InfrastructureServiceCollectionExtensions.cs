@@ -10,6 +10,7 @@ using RahilCore.Application.Features.Customers;
 using RahilCore.Application.Features.Inspections;
 using RahilCore.Application.Features.MasterParameters;
 using RahilCore.Application.Features.Orders;
+using RahilCore.Application.Features.Users;
 using RahilCore.Application.Features.Vehicles;
 using RahilCore.Infrastructure.Persistence;
 using RahilCore.Infrastructure.Persistence.DbContext;

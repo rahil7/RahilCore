@@ -1,11 +1,11 @@
 
 import { useEffect, useRef, useState } from "react";
-import type { CustomerLookupItem } from "../../../types/customer";
-import { customerService } from "../../../services/customer-service";
-import { FormSelect } from "../../../components/common/FormSelect";
-import { FormInput } from "../../../components/common/FormInput";
-import type { CreateOrderErrors } from "../../../types/order";
-import { PhoneInput } from "../../../components/common/PhoneInput";
+import type { CustomerLookupItem } from "../../../../types/customer";
+import { customerService } from "../../../../services/customer-service";
+import { FormSelect } from "../../../../components/common/FormSelect";
+import { FormInput } from "../../../../components/common/FormInput";
+import type { CreateOrderErrors } from "../../../../types/order";
+import { PhoneInput } from "../../../../components/common/PhoneInput";
 
 interface DealerSectionProps {
     selectedDealer: CustomerLookupItem | null;
@@ -154,15 +154,15 @@ export default function DealerSection({
     return (
         <div className="rounded-lg border bg-card p-5 space-y-4">
             <div>
-                <h3 className="font-semibold">Dealer Information</h3>
+                <h3 className="font-semibold">Showroom Information</h3>
             </div>
 
             {/* Dealer & Total Unit */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr]">
                 <FormSelect
-                    label="Dealer"
-                    placeholder="Pilih dealer"
-                    searchPlaceholder="Cari dealer..."
+                    label="Showroom"
+                    placeholder="Pilih showroom"
+                    searchPlaceholder="Cari showroom..."
                     searchable
                     options={dealerOptions}
                     value={selectedDealer ? String(selectedDealer.id) : ""}
@@ -206,18 +206,18 @@ export default function DealerSection({
             {/* Dealer Details */}
             {selectedDealer && (
                 <div className="rounded-lg border bg-muted/30 p-4">
-                    <div className="mb-3 font-medium">Dealer Details</div>
+                    <div className="mb-3 font-medium">Showroom Details</div>
 
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div>
-                            <p className="text-sm text-muted-foreground">Dealer Code</p>
+                            <p className="text-sm text-muted-foreground">Showroom Code</p>
                             <p className="text-sm font-medium">
                                 {selectedDealer.custCode}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-muted-foreground">Dealer Type</p>
+                            <p className="text-sm text-muted-foreground">Customer Type</p>
                             <p className="text-sm font-medium">
                                 {selectedDealer.custTypeName}
                             </p>

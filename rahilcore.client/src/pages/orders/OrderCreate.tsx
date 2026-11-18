@@ -9,13 +9,13 @@ import type {
     CreateOrderErrors,
     CreateOrderDealerRequest,
 } from "../../types/order";
-import VehicleSection from "./components/VehicleSection";
-import CustomerSection from "./components/CustomerSection";
+import VehicleSection from "./create/components/VehicleSection";
+import CustomerSection from "./create/components/CustomerSection";
 import type { CustomerLookupItem } from "../../types/customer";
-import type { NewOrderCustomer } from "./components/NewCustomerForm";
-import OrderInformationSection from "./components/OrderInformationSection";
+import type { NewOrderCustomer } from "./create/components/NewCustomerForm";
+import OrderInformationSection from "./create/components/OrderInformationSection";
 import { useOrderContext } from "../../contexts/orders/useOrderContext";
-import DealerSection from "./components/DealerSection";
+import DealerSection from "./create/components/DealerSection";
 
 type OrderType = "customer" | "dealer";
 type CustomerMode = "existing" | "new";
@@ -109,6 +109,7 @@ export default function CreateOrder() {
     const [picPhone, setPicPhone] = useState("");
 
     const [inspectionFormId, setInspectionFormId] = useState<number | null>(null);
+    const [scheduleAt, setScheduleAt] = useState("");
     const [note, setNote] = useState("");
 
     const [errors, setErrors] = useState<CreateOrderErrors>({});
@@ -228,6 +229,10 @@ export default function CreateOrder() {
             nextErrors.inspectionFormId = "Inspection Form wajib dipilih.";
         }
 
+        if (!scheduleAt) {
+            nextErrors.scheduleAt = "Schedule Date & Time wajib diisi.";
+        }
+
         if (!note.trim()) {
             nextErrors.note = "Note wajib diisi.";
         } else if (note.trim().length > 500) {
@@ -251,31 +256,19 @@ export default function CreateOrder() {
 
             if (orderType === "customer") {
                 const payload: CreateOrderCustomerRequest = {
-                    customerId:
-                        customerMode === "existing" ? selectedCustomer!.id : null,
-
+                    customerId: customerMode === "existing" ? selectedCustomer!.id : null,
                     inspectionFormId: inspectionFormId!,
-
-                    custName:
-                        customerMode === "new" ? newCustomer.custName.trim() : null,
-
-                    email:
-                        customerMode === "new" ? newCustomer.email.trim() : null,
-
-                    phone:
-                        customerMode === "new" ? newCustomer.phone.trim() : null,
-
-                    cityId:
-                        customerMode === "new" ? newCustomer.cityId : null,
-
-                    address:
-                        customerMode === "new"
-                            ? newCustomer.address.trim() || null
-                            : null,
-
+                    custName: customerMode === "new" ? newCustomer.custName.trim() : null,
+                    email: customerMode === "new" ? newCustomer.email.trim() : null,
+                    phone: customerMode === "new" ? newCustomer.phone.trim() : null,
+                    cityId: customerMode === "new" ? newCustomer.cityId : null,
+                    address: customerMode === "new"
+                        ? newCustomer.address.trim() || null
+                        : null,
                     custPresent,
                     picName: picName.trim() || null,
                     picPhone: picPhone.trim() || null,
+                    scheduleAt: scheduleAt,
                     note: note.trim(),
 
                     vehicle: {
@@ -296,6 +289,7 @@ export default function CreateOrder() {
                     inspectionFormId: inspectionFormId!,
                     picName: picName.trim() || null,
                     picPhone: picPhone.trim() || null,
+                    scheduleAt: scheduleAt,
                     note: note.trim(),
                 };
 
@@ -358,9 +352,9 @@ export default function CreateOrder() {
                             : "hover:bg-muted/50"
                             }`}
                     >
-                        <div className="font-medium">Dealer</div>
+                        <div className="font-medium">Showroom</div>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Bulk order from registered dealer
+                            Bulk order from registered showroom
                         </p>
                     </button>
                 </div>
@@ -435,11 +429,13 @@ export default function CreateOrder() {
                         inspectionForms={createOptions.inspectionForms}
                         inspectionFormId={inspectionFormId}
                         onInspectionFormChange={setInspectionFormId}
+                        scheduleAt={scheduleAt}
+                        onScheduleAtChange={setScheduleAt}
                         note={note}
                         onNoteChange={setNote}
+                        clearError={clearError}
                         errors={errors}
                         isSubmitting={isSubmitting}
-                        clearError={clearError}
                     />
                 </>
             )}

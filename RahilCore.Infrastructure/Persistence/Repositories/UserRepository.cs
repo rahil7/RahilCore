@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RahilCore.Application.Abstractions.Persistence;
 using RahilCore.Application.Common.Constants;
+using RahilCore.Application.Features.Users;
+using RahilCore.Application.Features.Users.DTOs;
 using RahilCore.Domain.Entities;
 using RahilCore.Infrastructure.Persistence.DbContext;
 
@@ -48,6 +49,20 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
         public async Task<bool> ExistsInspector(string username, CancellationToken ct = default)
         {
             return await context.Users.AnyAsync(x => x.UserLevelId == UserLevel.INSPECTOR && x.Username == username, ct);
+        }
+
+        public async Task<IReadOnlyList<UserLookupDto>> GetInspectorLookup(CancellationToken ct)
+        {
+            return await context.Users
+                .AsNoTracking()
+                .Where(x => x.IsActive && x.UserLevelId == UserLevel.INSPECTOR)
+                .OrderBy(x => x.DisplayName)
+                .Select(x => new UserLookupDto
+                {
+                    Username = x.Username,
+                    DisplayName = x.DisplayName
+                })
+                .ToListAsync(ct);
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿using RahilCore.Domain.Entities;
+﻿using RahilCore.Application.Features.Users.DTOs;
+using RahilCore.Domain.Entities;
 
-namespace RahilCore.Application.Abstractions.Persistence
+namespace RahilCore.Application.Features.Users
 {
     public interface IUserRepository
     {
@@ -17,5 +18,7 @@ namespace RahilCore.Application.Abstractions.Persistence
         Task AddAsync(UserEn user,CancellationToken cancellationToken = default);
 
         Task SaveChangesAsync(CancellationToken cancellationToken = default);
+
+        Task<IReadOnlyList<UserLookupDto>> GetInspectorLookup(CancellationToken ct);
     }
 }

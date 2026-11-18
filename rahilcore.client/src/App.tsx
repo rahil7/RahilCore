@@ -18,6 +18,7 @@ import Reports from "./pages/reports/Reports";
 import UserList from "./pages/users/UserList";
 import Profile from "./pages/profile/Profile";
 import CreateOrder from "./pages/orders/OrderCreate";
+import OrderDetail from "./pages/orders/detail/OrderDetail";
 
 export default function App() {
     return (
@@ -39,6 +40,7 @@ export default function App() {
 
                         <Route element={<OrderProvider />}>
                             <Route path="/orders" element={<OrderList />} />
+                            <Route path="/orders/:id" element={<OrderDetail />} />
                             <Route path="/orders/create" element={<CreateOrder />} />
                         </Route>
 

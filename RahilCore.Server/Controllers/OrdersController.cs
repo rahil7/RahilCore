@@ -71,6 +71,19 @@ namespace RahilCore.Server.Controllers
                     Data: options));
         }
 
+        [HttpGet("assign-options")]
+        public async Task<ActionResult<ApiResponse<OrderAssignOption>>> GetAssignOptions(CancellationToken ct)
+        {
+            var options = await orderService.GetAssignOptionsAsync(ct);
+
+            return Ok(
+                new ApiResponse<OrderAssignOption>(
+                    Success: true,
+                    Message: "Payemt options retrieved successfully.",
+                    Data: options));
+        }
+
+
         [HttpPost("create-dealer")]
         public async Task<IActionResult> CreateOrderDealer([FromBody] CreateOrderDealerRequest request, CancellationToken ct)
         {

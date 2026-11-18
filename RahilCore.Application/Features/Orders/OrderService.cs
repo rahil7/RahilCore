@@ -11,6 +11,7 @@ using RahilCore.Application.Features.MasterParameters;
 using RahilCore.Application.Features.Orders.DTOs;
 using RahilCore.Application.Features.Orders.Queries;
 using RahilCore.Application.Features.Orders.Request;
+using RahilCore.Application.Features.Users;
 using RahilCore.Application.Features.Vehicles;
 using RahilCore.Domain.Entities;
 using RahilCore.Domain.Entities.Customers;
@@ -708,6 +709,7 @@ namespace RahilCore.Application.Features.Orders
                 }
 
                 order.StatusId = InspectionStatus.INSPECTOR_ASSIGNED;
+                order.ScheduleAt = DateTimeHelper.JakartaToUtc(request.ScheduleAt);
                 order.UpdatedAt = now;
                 order.UpdatedBy = createdBy;
                 order.UpdatedNote = note;
@@ -732,6 +734,15 @@ namespace RahilCore.Application.Features.Orders
             return new OrderPaymentCreateOption
             {
                 PaymentMethods = paymentMethods
+            };
+        }
+
+        public async Task<OrderAssignOption?> GetAssignOptionsAsync(CancellationToken ct = default)
+        {
+            var inspectorLookup = await userRepository.GetInspectorLookup(ct);
+            return new OrderAssignOption
+            {
+                Inspectors = inspectorLookup
             };
         }
     }

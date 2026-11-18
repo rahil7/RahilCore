@@ -80,7 +80,7 @@ namespace RahilCore.Server.Controllers
             }
 
             var username = User.FindFirstValue("username");
-            var userLevel = User.FindFirstValue("user_level");
+            var userLevel = User.FindFirstValue("userlevel");
             var displayName = User.FindFirstValue(ClaimTypes.Name);
 
             if (string.IsNullOrWhiteSpace(username) ||

@@ -46,9 +46,19 @@ export interface GetOrdersParams extends ListQueryParams {
     statusIds?: number[];
     paymentStatusIds?: number[];
 }
+export interface CreateOrderDealerRequest {
+    customerId: number;
+    scheduleAt: string | null;
+    totalUnit: number;
+    inspectionFormId: number;
+    picName: string | null;
+    picPhone: string | null;
+    note: string;
+}
 
 export interface CreateOrderCustomerRequest {
     customerId: number | null;
+    scheduleAt: string | null;
     inspectionFormId: number;
     custName: string | null;
     email: string | null;
@@ -73,6 +83,7 @@ export interface CreateOrderVehicleRequest {
 
 export interface CreateOrderErrors {
     customerId?: string;
+    scheduleAt?: string;
     custName?: string;
     email?: string;
     phone?: string;
@@ -88,11 +99,12 @@ export interface CreateOrderErrors {
     note?: string;
 }
 
-export interface CreateOrderDealerRequest {
-    customerId: number;
-    totalUnit: number;
-    inspectionFormId: number;
-    picName: string | null;
-    picPhone: string | null;
+export interface CreatePaymentRequest {
+    paymentMethodId: number;
+    subtotalAmount: number;
+    discountAmount: number | null;
+    paymentDate: string;
+    referenceNo: string | null;
     note: string;
+    paymentProof: File | null;
 }
