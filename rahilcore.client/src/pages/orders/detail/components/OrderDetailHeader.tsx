@@ -5,7 +5,7 @@ import { Button } from "../../../../components/ui/button";
 
 interface OrderDetailHeaderProps {
     orderNo: string;
-    orderType: "CUSTOMER" | "DEALER";
+    orderType: "CUSTOMER" | "SHOWROOM";
     status: string;
     paymentStatus: string;
     createdAt: string;
@@ -44,9 +44,13 @@ export default function OrderDetailHeader({
                 </div>
 
                 {canEdit && (
-                    <Button onClick={onEdit} size="sm">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onEdit}
+                    >
                         <Pencil className="mr-2 h-4 w-4" />
-                        Edit Order
+                        Edit
                     </Button>
                 )}
             </div>

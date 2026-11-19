@@ -123,7 +123,7 @@ export default function OrderInformationSection({
                     {/* Schedule Date & Time */}
                     <div className="space-y-2">
                         <label className="text-sm font-medium">
-                            Schedule Date & Time
+                            Jadwal Inspeksi
                             <span className="ml-1 text-destructive">*</span>
                         </label>
 

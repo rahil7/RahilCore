@@ -30,6 +30,8 @@ namespace RahilCore.Infrastructure.Persistence.DbContext
         public DbSet<MasterColorEn> MasterColors => Set<MasterColorEn>();
         public DbSet<MasterInspectionFormEn> MasterInspectionForms => Set<MasterInspectionFormEn>();
 
+        public DbSet<ActivityLogEn> ActivityLogs => Set<ActivityLogEn>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

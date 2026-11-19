@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RahilCore.Application.Common.DTOs;
+using RahilCore.Application.Features.Customers.DTOs;
 using RahilCore.Application.Features.Orders;
 using RahilCore.Application.Features.Orders.DTOs;
 using RahilCore.Application.Features.Orders.Queries;
@@ -33,6 +35,27 @@ namespace RahilCore.Server.Controllers
                     TotalPages: totalPages));
 
             return Ok(response);
+        }
+
+        [HttpGet("{id:long}")]
+        public async Task<ActionResult<ApiResponse<OrderDetailDto>>> GetById(long id, CancellationToken ct)
+        {
+            var customer = await orderService.GetByIdAsync(id, ct);
+
+            if (customer is null)
+            {
+                return NotFound(
+                    new ApiResponse<OrderDetailDto>(
+                        Success: false,
+                        Message: "Order tidak ditemukan.",
+                        Data: null));
+            }
+
+            return Ok(
+                new ApiResponse<OrderDetailDto>(
+                    Success: true,
+                    Message: "Customer retrieved successfully.",
+                    Data: customer));
         }
 
         [HttpGet("filter-options")]
@@ -82,7 +105,6 @@ namespace RahilCore.Server.Controllers
                     Message: "Payemt options retrieved successfully.",
                     Data: options));
         }
-
 
         [HttpPost("create-dealer")]
         public async Task<IActionResult> CreateOrderDealer([FromBody] CreateOrderDealerRequest request, CancellationToken ct)
@@ -159,7 +181,7 @@ namespace RahilCore.Server.Controllers
         [HttpGet("payments/{paymentId:long}/proof")]
         public async Task<IActionResult> GetPaymentProof([FromRoute] long paymentId,CancellationToken ct)
         {
-            var payment = await orderService.GetPaymentProofAsync(paymentId, ct);
+            FileAccessDto payment = await orderService.GetPaymentProofAsync(paymentId, ct);
 
             return Ok(payment);
         }

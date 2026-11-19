@@ -17,6 +17,7 @@ using RahilCore.Domain.Entities;
 using RahilCore.Domain.Entities.Customers;
 using RahilCore.Domain.Entities.Inspections;
 using RahilCore.Domain.Entities.Orders;
+using System.Text.Json;
 
 namespace RahilCore.Application.Features.Orders
 {
@@ -29,7 +30,8 @@ namespace RahilCore.Application.Features.Orders
             IMasterParameterRepository masterParameterRepo,
             IInspectionRepository inspectionRepo,
             IObjectStorageService objectStorageService,
-            IUserRepository userRepository
+            IUserRepository userRepo,
+            IActivityRepository activityRepo
         ) : IOrderService
     {
         public async Task<long> CreateOrderForCustomer(CreateOrderCustomerRequest request, string createdBy, CancellationToken ct = default)
@@ -189,6 +191,21 @@ namespace RahilCore.Application.Features.Orders
                 };
                 orderRepo.Add(orderItems);
 
+                // 4. Insert Activity Log
+                var activity = new ActivityLogEn
+                {
+                    OrderId = order.Id,
+                    EntitiyId = order.Id,
+                    EntitiyType = ActivityEntityType.ORDER,
+                    ActionCode = ActivityActionCode.ORDER_CREATED,
+                    Description = "Order customer berhasil dibuat",
+                    ActorUsername = createdBy,
+                    CreatedAt = now,
+                    Metadata = ""
+                };
+
+                activityRepo.Add(activity);
+
                 await uow.CommitAsync(ct);
 
                 return order.Id;
@@ -271,6 +288,19 @@ namespace RahilCore.Application.Features.Orders
 
                 // 5. Insert Order Items
                 orderRepo.AddItemRange(orderItems);
+
+                // 6. Insert Activity Log
+                var activity = new ActivityLogEn
+                {
+                    OrderId = order.Id,
+                    EntitiyId = order.Id,
+                    EntitiyType = ActivityEntityType.ORDER,
+                    ActionCode = ActivityActionCode.ORDER_CREATED,
+                    Description = "Order showroom berhasil dibuat",
+                    ActorUsername = createdBy,
+                    CreatedAt = now,
+                    Metadata = ""
+                };
 
                 await uow.CommitAsync(ct);
 
@@ -414,6 +444,19 @@ namespace RahilCore.Application.Features.Orders
                 }
 
                 orderRepo.AddPayment(payment);
+
+                // 6. Insert Activity Log
+                var activity = new ActivityLogEn
+                {
+                    OrderId = order.Id,
+                    EntitiyId = payment.Id,
+                    EntitiyType = ActivityEntityType.PAYMENT,
+                    ActionCode = ActivityActionCode.PAYMENT_CREATED,
+                    Description = "Pembayaran berhasil di buat",
+                    ActorUsername = createdBy,
+                    CreatedAt = now,
+                    Metadata = ""
+                };
 
                 await uow.SaveChangesAsync(ct);
                 await uow.CommitAsync(ct);
@@ -581,13 +624,13 @@ namespace RahilCore.Application.Features.Orders
 
             var inspectorUsername = request.InspectorUsername.Trim();
 
-            InspectionOrderEn? order = await orderRepo.GetByIdAsync(id, ct);
+            var order = await orderRepo.GetByIdAsync(id, ct);
 
             if (order is null)
                 throw new BusinessException(404, $"Order dengan ID '{id}' tidak ditemukan.");
 
             if (order.TotalUnit <= 0)
-                throw new BusinessException(404, $"Total unit pada order tidak valid.");
+                throw new BusinessException(400, "Total unit pada order tidak valid.");
 
             if (order.StatusId != InspectionStatus.ORDER_CREATED &&
                 order.StatusId != InspectionStatus.AWAITING_ASSIGNMENT &&
@@ -611,7 +654,9 @@ namespace RahilCore.Application.Features.Orders
                 );
             }
 
-            if (!await userRepository.ExistsInspector(inspectorUsername, ct))
+            var inspector = await userRepo.GetInspectorAsync(inspectorUsername, ct);
+
+            if (inspector is null)
                 throw new BusinessException(404, "Inspector tidak ditemukan.");
 
             var orderItem = await orderRepo.GetOrderItemByOrderId(id, ct);
@@ -619,8 +664,7 @@ namespace RahilCore.Application.Features.Orders
             if (orderItem is null)
                 throw new BusinessException(404, "Order item tidak ditemukan.");
 
-            InspectionOrderAssignmentEn? activeAssignment = 
-                await orderRepo.GetActiveAssignment(id, ct);
+            var activeAssignment = await orderRepo.GetActiveAssignment(id, ct);
 
             if (activeAssignment?.InspectorUsername.Equals(
                 inspectorUsername,
@@ -646,36 +690,50 @@ namespace RahilCore.Application.Features.Orders
                 }
             }
 
-            InspectionOrderAssignmentEn? previousAssignment = 
-                await orderRepo.GetAssignment(id, inspectorUsername, ct);
+            var previousAssignment = await orderRepo.GetAssignment(
+                id,
+                inspectorUsername,
+                ct
+            );
+
+            // Ambil informasi inspector sebelumnya untuk Activity Log.
+            // Hanya dibutuhkan ketika reassignment.
+            var previousInspector = activeAssignment is not null
+                ? await userRepo.GetInspectorAsync(activeAssignment.InspectorUsername, ct)
+                : null;
 
             await uow.BeginTransactionAsync(ct);
 
             try
             {
                 var now = DateTime.UtcNow;
-                var note = request.Note.Trim();
+                var note = request.Note?.Trim();
 
+                // 1. Nonaktifkan assignment inspector sebelumnya.
                 if (activeAssignment is not null)
                 {
-                    // Nonaktifkan assignment inspector sebelumnya.
                     activeAssignment.StatusId = AssignmentStatus.REASSIGNED;
                     activeAssignment.UpdatedAt = now;
                     activeAssignment.UpdatedBy = createdBy;
                     activeAssignment.UpdatedNote = note;
                 }
 
+                // 2. Aktifkan kembali assignment atau buat assignment baru.
+                InspectionOrderAssignmentEn currentAssignment;
+
                 if (previousAssignment is not null)
                 {
-                    // Aktifkan kembali assignment sebelumnya.
                     previousAssignment.StatusId = AssignmentStatus.ASSIGNED;
+                    previousAssignment.AssignedAt = now;
                     previousAssignment.UpdatedAt = now;
                     previousAssignment.UpdatedBy = createdBy;
                     previousAssignment.UpdatedNote = note;
+
+                    currentAssignment = previousAssignment;
                 }
                 else
                 {
-                    var assignment = new InspectionOrderAssignmentEn
+                    currentAssignment = new InspectionOrderAssignmentEn
                     {
                         OrderId = order.Id,
                         InspectorUsername = inspectorUsername,
@@ -686,20 +744,25 @@ namespace RahilCore.Application.Features.Orders
                         CreatedNote = note
                     };
 
-                    orderRepo.AddAssignment(assignment);
+                    orderRepo.AddAssignment(currentAssignment);
                 }
 
-                // Buat inspection hanya saat first assignment.
+                // 3. Buat inspection hanya saat first assignment.
                 if (activeAssignment is null)
                 {
                     var inspections = new List<InspectionEn>();
 
                     for (var unit = 0; unit < order.TotalUnit; unit++)
                     {
+                        var inspectionNo = await orderRepo.GenerateInspectionNo(
+                            order.Customer.CustTypeId,
+                            ct
+                        );
+
                         inspections.Add(new InspectionEn
                         {
                             OrderItemId = orderItem.Id,
-                            InspectionNo = await orderRepo.GenerateInspectionNo(order.Customer.CustTypeId,ct),
+                            InspectionNo = inspectionNo,
                             CreatedAt = now,
                             CreatedBy = createdBy
                         });
@@ -708,12 +771,51 @@ namespace RahilCore.Application.Features.Orders
                     inspectionRepo.AddRange(inspections);
                 }
 
+                // 4. Update Order.
                 order.StatusId = InspectionStatus.INSPECTOR_ASSIGNED;
                 order.ScheduleAt = DateTimeHelper.JakartaToUtc(request.ScheduleAt);
                 order.UpdatedAt = now;
                 order.UpdatedBy = createdBy;
                 order.UpdatedNote = note;
 
+                // 5. Insert Activity Log.
+                var isReassignment = activeAssignment is not null;
+
+                var activity = new ActivityLogEn
+                {
+                    OrderId = order.Id,
+                    EntitiyId = currentAssignment.Id,
+                    EntitiyType = ActivityEntityType.ASSIGNMENT,
+
+                    ActionCode = isReassignment
+                        ? ActivityActionCode.INSPECTOR_REASSIGNED
+                        : ActivityActionCode.INSPECTOR_ASSIGNED,
+
+                    Description = isReassignment
+                        ? $"Inspector reassigned: {previousInspector.} to {inspector.Name}"
+                        : $"Inspector assigned: {inspector.Name}",
+
+                    ActorUsername = createdBy,
+                    CreatedAt = now,
+
+                    Metadata = JsonSerializer.Serialize(isReassignment
+                        ? new
+                        {
+                            previousInspectorCode = previousInspector?.Code,
+                            previousInspectorName = previousInspector?.Name,
+                            newInspectorCode = inspector.Code,
+                            newInspectorName = inspector.Name
+                        }
+                        : new
+                        {
+                            inspectorCode = inspector.Code,
+                            inspectorName = inspector.Name
+                        })
+                };
+
+                activityRepo.Add(activity);
+
+                // 6. Save and Commit.
                 await uow.SaveChangesAsync(ct);
                 await uow.CommitAsync(ct);
 
@@ -739,7 +841,7 @@ namespace RahilCore.Application.Features.Orders
 
         public async Task<OrderAssignOption?> GetAssignOptionsAsync(CancellationToken ct = default)
         {
-            var inspectorLookup = await userRepository.GetInspectorLookup(ct);
+            var inspectorLookup = await userRepo.GetInspectorLookup(ct);
             return new OrderAssignOption
             {
                 Inspectors = inspectorLookup

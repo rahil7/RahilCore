@@ -64,5 +64,13 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 })
                 .ToListAsync(ct);
         }
+
+        public async Task<UserEn?> GetInspectorAsync(string inspectorUsername, CancellationToken ct = default)
+        {
+            return await context.Users.SingleOrDefaultAsync(x =>
+                x.Username == inspectorUsername &&
+                x.UserLevelId == UserLevel.INSPECTOR,
+                ct);
+        }
     }
 }

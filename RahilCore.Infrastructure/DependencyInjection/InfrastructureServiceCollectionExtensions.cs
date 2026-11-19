@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RahilCore.Application.Abstractions.Persistence;
 using RahilCore.Application.Abstractions.Storage;
+using RahilCore.Application.Features;
 using RahilCore.Application.Features.City;
 using RahilCore.Application.Features.Customers;
 using RahilCore.Application.Features.Inspections;
@@ -67,6 +68,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddScoped<IVehicleRepository, VehicleRepository>();
         services.AddScoped<IInspectionRepository, InspectionRepository>();
 
+        services.AddScoped<IActivityRepository, ActivityRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;

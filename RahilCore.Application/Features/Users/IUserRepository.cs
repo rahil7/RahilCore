@@ -19,6 +19,7 @@ namespace RahilCore.Application.Features.Users
 
         Task SaveChangesAsync(CancellationToken cancellationToken = default);
 
-        Task<IReadOnlyList<UserLookupDto>> GetInspectorLookup(CancellationToken ct);
+        Task<IReadOnlyList<UserLookupDto>> GetInspectorLookup(CancellationToken ct = default);
+        Task<UserEn?> GetInspectorAsync(string inspectorUsername, CancellationToken ct = default);
     }
 }
