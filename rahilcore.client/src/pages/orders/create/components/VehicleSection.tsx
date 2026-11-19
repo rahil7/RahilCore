@@ -179,7 +179,6 @@ export default function VehicleSection({
                 <FormInput
                     label="Pelat No"
                     placeholder="e.g. B 1234 ABC"
-                    className="h-9"
                     value={value.plateNo}
                     onChange={(e) => {
                         const plateNo = e.target.value
@@ -257,7 +256,6 @@ export default function VehicleSection({
                 <FormInput
                     label="Tahun Pembuatan"
                     type="number"
-                    className="h-9"
                     placeholder="e.g. 2024"
                     value={value.yearOfManufacture || ""}
                     onChange={(e) => {

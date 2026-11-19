@@ -14,7 +14,11 @@ namespace RahilCore.Infrastructure.Persistence.Configurations.Orders
             builder.ToTable("inspection_assignments", "public");
 
             builder.Property(x => x.OrderId).HasColumnName("order_id");
-            
+            builder.HasOne(x => x.Order)
+                .WithMany()
+                .HasForeignKey(x => x.OrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Property(x => x.InspectorUsername).HasColumnName("inspector_username");
             builder.HasOne(x => x.Inspector)
                 .WithMany()

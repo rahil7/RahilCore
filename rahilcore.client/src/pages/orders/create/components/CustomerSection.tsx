@@ -364,7 +364,6 @@ export default function CustomerSection({
                     <FormInput
                         label="Nama PIC"
                         placeholder="Masukkan nama PIC"
-                        className="h-9"
                         value={picName}
                         onChange={(e) => onPicNameChange(e.target.value)}
                         disabled={isSubmitting}

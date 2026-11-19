@@ -52,7 +52,6 @@ export default function NewCustomerForm({
             <FormInput
                 label="Nama Customer"
                 placeholder="Masukkan nama customer"
-                className="h-9"
                 value={value.custName}
                 onChange={(e) => {
                     updateField("custName", e.target.value);
@@ -68,7 +67,6 @@ export default function NewCustomerForm({
                 <FormInput
                     label="Email"
                     type="email"
-                    className="h-9"
                     placeholder="name@example.com"
                     value={value?.email}
                     onChange={(e) => {
@@ -81,7 +79,6 @@ export default function NewCustomerForm({
                 <PhoneInput
                     label="Phone"
                     value={value?.phone}
-                    className="h-9"
                     onChange={(phone) => {
                         updateField("phone", phone);
                         clearError("phone");

@@ -40,9 +40,9 @@ namespace RahilCore.Server.Controllers
         [HttpGet("{id:long}")]
         public async Task<ActionResult<ApiResponse<OrderDetailDto>>> GetById(long id, CancellationToken ct)
         {
-            var customer = await orderService.GetByIdAsync(id, ct);
+            var order = await orderService.GetByIdAsync(id, ct);
 
-            if (customer is null)
+            if (order is null)
             {
                 return NotFound(
                     new ApiResponse<OrderDetailDto>(
@@ -55,7 +55,7 @@ namespace RahilCore.Server.Controllers
                 new ApiResponse<OrderDetailDto>(
                     Success: true,
                     Message: "Customer retrieved successfully.",
-                    Data: customer));
+                    Data: order));
         }
 
         [HttpGet("filter-options")]

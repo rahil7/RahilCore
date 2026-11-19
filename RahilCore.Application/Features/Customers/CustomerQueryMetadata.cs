@@ -9,9 +9,9 @@ namespace RahilCore.Application.Features.Customers
 
         public static readonly IReadOnlyList<QueryFieldMetadata> Fields =
         [
-            new("custCode", "Customer Code", CanSearch: true, CanSort: true),
-            new("custName", "Customer Name", CanSearch: true, CanSort: true),
-            new("custTypeName", "Customer Type", CanSearch: true, CanSort: true),
+            new("custCode", "Customer CustomerCode", CanSearch: true, CanSort: true),
+            new("custName", "Customer CustomerName", CanSearch: true, CanSort: true),
+            new("custTypeName", "Customer CustomerType", CanSearch: true, CanSort: true),
             new("cityName", "City", CanSearch: true, CanSort: true),
             new("createdAt", "Date Created", CanSearch: false, CanSort: true),
             new("lastActivityAt", "Last Activity", CanSearch: false, CanSort: true)

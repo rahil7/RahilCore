@@ -14,9 +14,26 @@ namespace RahilCore.Infrastructure.Persistence.Configurations.Orders
             builder.ToTable("inspection_order_payments", "public");
 
             builder.Property(x => x.OrderId).HasColumnName("order_id");
+            builder.HasOne(x => x.Order)
+                .WithMany()
+                .HasForeignKey(x => x.OrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
             builder.Property(x => x.PaymentMethodId).HasColumnName("payment_method_id");
+            builder.HasOne(x => x.PaymentMethod)
+                .WithMany()
+                .HasForeignKey(x => x.PaymentMethodId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Property(x => x.Amount).HasColumnName("amount");
+
             builder.Property(x => x.PaymentStatusId).HasColumnName("payment_status_id");
+            builder.HasOne(x => x.PaymentStatus)
+                .WithMany()
+                .HasForeignKey(x => x.PaymentStatusId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Property(x => x.PaymentDate).HasColumnName("payment_date");
             builder.Property(x => x.ReferenceNo).HasColumnName("reference_no");
             builder.Property(x => x.FileName).HasColumnName("file_name");

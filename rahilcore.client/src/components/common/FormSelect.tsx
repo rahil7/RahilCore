@@ -93,7 +93,7 @@ export function FormSelect({
                 >
                     <SelectTrigger
                         id={inputId}
-                        className="w-full"
+                        className="h-9 w-full"
                         aria-invalid={!!error}
                     >
                         <SelectValue placeholder={placeholder} />

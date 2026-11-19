@@ -67,7 +67,7 @@ namespace RahilCore.Application.Features.Orders
             {
                 long customerId;
                 var now = DateTime.UtcNow;
-                var note = request.Note?.Trim();
+                var note = request.Note.Trim();
 
                 if (request.CustomerId.HasValue && request.CustomerId.Value > 0)
                 {
@@ -195,9 +195,9 @@ namespace RahilCore.Application.Features.Orders
                 var activity = new ActivityLogEn
                 {
                     OrderId = order.Id,
-                    EntitiyId = order.Id,
-                    EntitiyType = ActivityEntityType.ORDER,
-                    ActionCode = ActivityActionCode.ORDER_CREATED,
+                    EntityId = order.Id,
+                    EntityTypeId = ActivityEntityType.ORDER,
+                    ActionCodeId = ActivityActionCode.ORDER_CREATED,
                     Description = "Order customer berhasil dibuat",
                     ActorUsername = createdBy,
                     CreatedAt = now,
@@ -293,9 +293,9 @@ namespace RahilCore.Application.Features.Orders
                 var activity = new ActivityLogEn
                 {
                     OrderId = order.Id,
-                    EntitiyId = order.Id,
-                    EntitiyType = ActivityEntityType.ORDER,
-                    ActionCode = ActivityActionCode.ORDER_CREATED,
+                    EntityId = order.Id,
+                    EntityTypeId = ActivityEntityType.ORDER,
+                    ActionCodeId = ActivityActionCode.ORDER_CREATED,
                     Description = "Order showroom berhasil dibuat",
                     ActorUsername = createdBy,
                     CreatedAt = now,
@@ -403,7 +403,7 @@ namespace RahilCore.Application.Features.Orders
                 decimal totalAmount = request.SubtotalAmount - discountAmount;
 
                 order.StatusId = InspectionStatus.AWAITING_ASSIGNMENT;
-                order.StatusId = PaymentStatus.PAID;
+                order.PaymentStatusId = PaymentStatus.PAID;
                 order.DiscountAmount = request.DiscountAmount;
                 order.SubtotalAmount = request.SubtotalAmount;
                 order.InvoiceDate = now;
@@ -449,9 +449,9 @@ namespace RahilCore.Application.Features.Orders
                 var activity = new ActivityLogEn
                 {
                     OrderId = order.Id,
-                    EntitiyId = payment.Id,
-                    EntitiyType = ActivityEntityType.PAYMENT,
-                    ActionCode = ActivityActionCode.PAYMENT_CREATED,
+                    EntityId = payment.Id,
+                    EntityTypeId = ActivityEntityType.PAYMENT,
+                    ActionCodeId = ActivityActionCode.PAYMENT_CREATED,
                     Description = "Pembayaran berhasil di buat",
                     ActorUsername = createdBy,
                     CreatedAt = now,
@@ -707,7 +707,7 @@ namespace RahilCore.Application.Features.Orders
             try
             {
                 var now = DateTime.UtcNow;
-                var note = request.Note?.Trim();
+                var note = request.Note.Trim();
 
                 // 1. Nonaktifkan assignment inspector sebelumnya.
                 if (activeAssignment is not null)
@@ -784,32 +784,29 @@ namespace RahilCore.Application.Features.Orders
                 var activity = new ActivityLogEn
                 {
                     OrderId = order.Id,
-                    EntitiyId = currentAssignment.Id,
-                    EntitiyType = ActivityEntityType.ASSIGNMENT,
+                    EntityId = currentAssignment.Id,
+                    EntityTypeId = ActivityEntityType.ASSIGNMENT,
 
-                    ActionCode = isReassignment
+                    ActionCodeId = isReassignment
                         ? ActivityActionCode.INSPECTOR_REASSIGNED
                         : ActivityActionCode.INSPECTOR_ASSIGNED,
 
                     Description = isReassignment
-                        ? $"Inspector reassigned: {previousInspector.} to {inspector.Name}"
-                        : $"Inspector assigned: {inspector.Name}",
+                        ? $"Inspector reassigned: {previousInspector?.Username} to {inspector?.Username}"
+                        : $"Inspector assigned: {inspector.Username}",
 
                     ActorUsername = createdBy,
                     CreatedAt = now,
 
-                    Metadata = JsonSerializer.Serialize(isReassignment
-                        ? new
+                    Metadata = isReassignment
+                        ? JsonSerializer.Serialize(new
                         {
-                            previousInspectorCode = previousInspector?.Code,
-                            previousInspectorName = previousInspector?.Name,
-                            newInspectorCode = inspector.Code,
-                            newInspectorName = inspector.Name
-                        }
-                        : new
+                            previousInspector = previousInspector?.Username,
+                            newInspector = inspector?.Username
+                        })
+                        : JsonSerializer.Serialize(new
                         {
-                            inspectorCode = inspector.Code,
-                            inspectorName = inspector.Name
+                            inspector = inspector?.Username,
                         })
                 };
 
@@ -845,6 +842,88 @@ namespace RahilCore.Application.Features.Orders
             return new OrderAssignOption
             {
                 Inspectors = inspectorLookup
+            };
+        }
+
+        public async Task<OrderDetailDto?> GetByIdAsync(long id, CancellationToken ct = default)
+        {
+            if (id <= 0)
+            {
+                return null;
+            }
+
+            InspectionOrderEn? order = await orderRepo.GetByIdAsync(id, ct);
+            if (order is null || order.Customer is null)
+            {
+                return null;
+            }
+
+            IReadOnlyList<InspectionOrderItemEn> orderItems = await orderRepo.GetOrderDetailItems(id, ct);
+
+            if (orderItems.Count == 0)
+            {
+                return null;
+            }
+
+            OrderPaymentDto? payment = await orderRepo.GetOrderPayment(id, ct);
+            OrderAssignmentDto? assignment = await orderRepo.GetOrderAssignment(id, ct);
+            IReadOnlyList<OrderActivityDto> activities = await activityRepo.GetByOrderIdAsync(id,ct);
+
+            if (order.Customer is null) return null;
+            if (orderItems.Count == 0) return null;
+
+            var customer = new OrderCustomerDto
+            {
+                CustomerCode = order.Customer.CustCode,
+                CustomerName = order.Customer.CustName,
+                CustomerType = order.Customer.CustType?.ParamName ?? "-",
+                Email = order.Customer.Email,
+                Phone = order.Customer.Phone,
+                Address = order.Customer.Address
+            };
+
+            var inspectionForm = orderItems 
+                .Select(x => x.InspectionForm)
+                .FirstOrDefault(x => x != null);
+
+            IReadOnlyList<OrderVehicleDto> vehicles = orderItems
+                .Select(x => new OrderVehicleDto
+                {
+                    VehicleId = x.VehicleId,
+                    PlateNo = x.Vehicle?.PlateNo ?? string.Empty,
+                    Brand = x.Vehicle?.Brand?.Name ?? string.Empty,
+                    Model = x.Vehicle?.Model?.Name ?? string.Empty,
+                    Variant = x.Vehicle?.Variant?.Name ?? string.Empty,
+                    YearOfManufacture = x.Vehicle?.YearOfManufacture ?? 0,
+                    ExteriorColor = x.Vehicle?.ExteriorColor?.Name ?? string.Empty
+                })
+                .OrderBy(x => x.VehicleId)
+                .ToList();
+
+            return new OrderDetailDto
+            {
+                Id = order.Id,
+                OrderNo = order.OrderNo,
+                StatusId = order.StatusId,
+                Status = order.Status?.ParamName!,
+                PaymentStatusId = order.PaymentStatusId,
+                PaymentStatus = order.PaymentStatus?.ParamName!,
+                CreatedAt = order.CreatedAt,
+                CreatedBy = order.CreatedBy ?? string.Empty,
+                CreatedNote = order.CreatedNote ?? string.Empty,
+                PicName = order.PicName,
+                PicPhone = order.PicPhone,
+                ScheduleAt = order.ScheduleAt,
+                Note = order.CreatedNote,
+                InspectionFormId = inspectionForm!.Id,
+                InspectionFormName = inspectionForm!.Name,
+
+                Customer = customer,
+                Vehicles = vehicles,
+                Payment = payment,
+                Assignment = assignment,
+                IsAssigned = assignment != null,
+                Activities = activities
             };
         }
     }

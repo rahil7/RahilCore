@@ -12,6 +12,7 @@ namespace RahilCore.Application.Features.Orders
         Task<long> CreateOrderForDealer(CreateOrderDealerRequest request, string createdBy, CancellationToken ct = default);
         Task<long> CreatePayment(long id,CreatePaymentRequest request, string createdBy, CancellationToken ct = default);
         Task<OrderAssignOption?> GetAssignOptionsAsync(CancellationToken ct = default);
+        Task<OrderDetailDto?> GetByIdAsync(long id, CancellationToken ct = default);
         Task<OrderCreateOptions> GetCreateOptionsAsync(CancellationToken ct = default);
         Task<OrderFilterOptions> GetFilterOptionsAsync(CancellationToken ct = default);
         Task<(IReadOnlyList<OrderListDto> Items, int TotalItems)> GetPagedAsync(GetOrderListQuery query, CancellationToken ct = default);

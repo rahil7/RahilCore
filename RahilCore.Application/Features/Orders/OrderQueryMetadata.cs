@@ -14,9 +14,9 @@ namespace RahilCore.Application.Features.Orders
                 new("paymentStatusId", "Status Pembayaran", CanSearch: false, CanSort: true),
                 new("totalUnit", "Total Unit", CanSearch: true, CanSort: true),
 
-                new("custCode", "Customer Code", CanSearch: true, CanSort: true),
-                new("custName", "Customer Name", CanSearch: true, CanSort: true),
-                new("custTypeName", "Customer Type", CanSearch: false, CanSort: true),
+                new("custCode", "Customer CustomerCode", CanSearch: true, CanSort: true),
+                new("custName", "Customer CustomerName", CanSearch: true, CanSort: true),
+                new("custTypeName", "Customer CustomerType", CanSearch: false, CanSort: true),
 
                 new("createdAt", "Date Created", CanSearch: false, CanSort: true),
                 new("lastActivityAt", "Last Activity", CanSearch: false, CanSort: true)

@@ -2,9 +2,9 @@
 {
     public static class ActivityEntityType
     {
-        public const string ORDER = "ORDER";
-        public const string PAYMENT = "PAYMENT";
-        public const string ASSIGNMENT = "ASSIGNMENT";
-        public const string INSPECTION = "INSPECTION";
+        public const long ORDER = 68;
+        public const long PAYMENT = 79;
+        public const long ASSIGNMENT = 80;
+        public const long INSPECTION = 81;
     }
 }

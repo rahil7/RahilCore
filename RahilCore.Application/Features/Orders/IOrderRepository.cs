@@ -15,7 +15,7 @@ namespace RahilCore.Application.Features.Orders
         void AddPayment(InspectionOrderPaymentEn payment);
         Task<bool> ExistsPaymentAsync(long orderId, CancellationToken ct = default);
         Task<InspectionOrderPaymentEn?> GetPaymentByIdAsync(long paymentId, CancellationToken ct = default);
-        Task<bool> ExistsAssignment(long id, string inspectorUsername, CancellationToken ct);
+        Task<bool> ExistsAssignment(long id, string inspectorUsername, CancellationToken ct = default);
         Task<InspectionOrderAssignmentEn?> GetActiveAssignment(long orderId, CancellationToken ct = default);
         Task<InspectionOrderAssignmentEn?> GetAssignment(long orderId, string inspectorUsername, CancellationToken ct = default);
         void AddAssignment(InspectionOrderAssignmentEn assignment);
@@ -23,5 +23,8 @@ namespace RahilCore.Application.Features.Orders
         Task<bool> HasSubmittedInspectionAsync(long orderId, CancellationToken ct = default);
         Task<InspectionOrderItemEn?> GetOrderItemByOrderId(long orderId, CancellationToken ct = default);
         Task<string> GenerateInspectionNo(long custType, CancellationToken ct = default);
+        Task<IReadOnlyList<InspectionOrderItemEn>> GetOrderDetailItems(long orderId, CancellationToken ct = default);
+        Task<OrderPaymentDto?> GetOrderPayment(long orderId, CancellationToken ct = default);
+        Task<OrderAssignmentDto?> GetOrderAssignment(long orderId, CancellationToken ct = default);
     }
 }

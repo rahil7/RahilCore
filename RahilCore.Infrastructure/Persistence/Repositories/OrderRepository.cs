@@ -258,7 +258,7 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 {
                     Id = x.Id,
                     CreatedAt = x.CreatedAt,
-                    CreatedBy = x.CreatedBy ?? string.Empty,
+                    CreatedBy = x.CreatedBy,
                     CreatedNote = x.CreatedNote,
                     LastActivityAt = x.UpdatedAt ?? x.CreatedAt,
                     LastActivityBy = x.UpdatedBy ?? x.CreatedBy ?? string.Empty,
@@ -294,6 +294,58 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                     x.OrderItem!.OrderId == orderId && 
                     x.SubmittedAt != null,
                     ct);
+        }
+
+        public async Task<IReadOnlyList<InspectionOrderItemEn>> GetOrderDetailItems(long orderId, CancellationToken ct = default)
+        {
+            return await context.InspectionOrderItems
+                .AsNoTracking()
+                .Where(x => x.OrderId == orderId)
+                .Include(x => x.Vehicle!).ThenInclude(x => x.Brand)
+                .Include(x => x.Vehicle!).ThenInclude(x => x.Model)
+                .Include(x => x.Vehicle!).ThenInclude(x => x.Variant)
+                .Include(x => x.Vehicle!).ThenInclude(x => x.ExteriorColor)
+                .Include(x => x.InspectionForm)
+                .ToListAsync(ct);
+        }
+
+        public async Task<OrderPaymentDto?> GetOrderPayment(long orderId, CancellationToken ct = default)
+        {
+            return await context.InspectionOrderPayments
+                .AsNoTracking()
+                .Where(x => x.OrderId == orderId)
+                .Select(x => new OrderPaymentDto
+                {
+                    PaymentId = x.Id,
+                    PaymentDate = x.PaymentDate,
+                    PaymentMethodId = x.PaymentMethodId,
+                    PaymentMethodName = x.PaymentMethod == null
+                        ? string.Empty
+                        : (x.PaymentMethod.ParamName ?? string.Empty),
+                    SubtotalAmount = x.Order == null ? 0 : (x.Order.SubtotalAmount ?? 0),
+                    DiscountAmount = x.Order == null ? 0 : (x.Order.DiscountAmount ?? 0),
+                    TotalAmount = x.Order == null ? 0 : (x.Order.TotalAmount ?? 0),
+                    ReferenceNo = x.ReferenceNo,
+                    PaymentNote = x.CreatedNote ?? string.Empty
+
+                })
+                .FirstOrDefaultAsync(ct);
+        }
+
+        public async Task<OrderAssignmentDto?> GetOrderAssignment(long orderId, CancellationToken ct = default)
+        {
+            return await context.InspectionOrderAssignments
+                .AsNoTracking()
+                .Where(x => x.OrderId == orderId)
+                .Select(x => new OrderAssignmentDto
+                {
+                    InspectorName = x.Inspector!.DisplayName,
+                    ScheduleAt = x.Order!.ScheduleAt,
+                    AssignedAt = x.AssignedAt,
+                    AssignedBy = x.CreatedBy ?? string.Empty,
+                    AssignedNote = x.CreatedNote ?? string.Empty
+                })
+                .FirstOrDefaultAsync(ct);
         }
     }
 }

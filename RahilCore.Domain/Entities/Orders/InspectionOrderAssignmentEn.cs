@@ -5,6 +5,7 @@ namespace RahilCore.Domain.Entities.Orders
     public sealed class InspectionOrderAssignmentEn : BaseTransactionEntity
     {
         public long OrderId { set; get; }
+        public InspectionOrderEn? Order { set; get; }
 
         public string InspectorUsername { set; get; } = null!;
         public UserEn? Inspector { set; get; }
