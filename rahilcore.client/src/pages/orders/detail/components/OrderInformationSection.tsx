@@ -1,3 +1,4 @@
+import { formatDateTime } from "../../../../utils/date-utils";
 
 interface OrderInformationSectionProps {
     inspectionForm: string;
@@ -31,7 +32,7 @@ export default function OrderInformationSection({
                         Jadwal Inspeksi
                     </p>
                     <p className="text-sm font-medium">
-                        {scheduleAt || "-"}
+                        {formatDateTime(scheduleAt)}
                     </p>
                 </div>
 

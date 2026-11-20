@@ -10,8 +10,8 @@ namespace RahilCore.Application.Features.Orders
             public static readonly IReadOnlyList<QueryFieldMetadata> Fields =
             [
                 new("orderNo", "No Order", CanSearch: true, CanSort: true),
-                new("statusId", "Status", CanSearch: false, CanSort: true),
-                new("paymentStatusId", "Status Pembayaran", CanSearch: false, CanSort: true),
+                new("statusId", "StatusName", CanSearch: false, CanSort: true),
+                new("paymentStatusId", "StatusName Pembayaran", CanSearch: false, CanSort: true),
                 new("totalUnit", "Total Unit", CanSearch: true, CanSort: true),
 
                 new("custCode", "Customer CustomerCode", CanSearch: true, CanSort: true),

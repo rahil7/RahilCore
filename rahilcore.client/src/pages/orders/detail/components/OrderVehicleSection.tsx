@@ -1,20 +1,16 @@
-
-interface OrderVehicleItem {
-    plateNo: string;
-    brand: string;
-    model: string;
-    variant: string;
-    yearOfManufacture: number;
-    exteriorColor: string;
-}
+import type { OrderVehicle } from "../../../../types/order";
 
 interface OrderVehicleSectionProps {
-    vehicles: OrderVehicleItem[];
+    vehicles: OrderVehicle[];
 }
 
 export default function OrderVehicleSection({
     vehicles,
 }: OrderVehicleSectionProps) {
+
+    const displayValue = (value: string | number | null | undefined) =>
+        value && value !== 0 ? value : "—";
+
     return (
         <section className="rounded-xl border bg-card p-5">
             <div className="mb-4 flex items-center justify-between">
@@ -29,59 +25,54 @@ export default function OrderVehicleSection({
 
             <div className="max-h-[400px] overflow-auto">
                 <table className="w-full text-sm">
-
                     <thead>
                         <tr className="text-left">
-                            <th className="sticky top-0 z-20 whitespace-nowrap border-b bg-muted px-3 py-3 font-medium text-muted-foreground">
-                                No.
-                            </th>
-                            <th className="sticky top-0 z-20 whitespace-nowrap border-b bg-muted px-3 py-3 font-medium text-muted-foreground">
-                                Plate No.
-                            </th>
-                            <th className="sticky top-0 z-20 whitespace-nowrap border-b bg-muted px-3 py-3 font-medium text-muted-foreground">
-                                Brand
-                            </th>
-                            <th className="sticky top-0 z-20 whitespace-nowrap border-b bg-muted px-3 py-3 font-medium text-muted-foreground">
-                                Model
-                            </th>
-                            <th className="sticky top-0 z-20 whitespace-nowrap border-b bg-muted px-3 py-3 font-medium text-muted-foreground">
-                                Variant
-                            </th>
-                            <th className="sticky top-0 z-20 whitespace-nowrap border-b bg-muted px-3 py-3 font-medium text-muted-foreground">
-                                Year
-                            </th>
-                            <th className="sticky top-0 z-20 whitespace-nowrap border-b bg-muted px-3 py-3 font-medium text-muted-foreground">
-                                Exterior Color
-                            </th>
+                            {[
+                                "No.",
+                                "Plate No.",
+                                "Brand",
+                                "Model",
+                                "Variant",
+                                "Year",
+                                "Exterior Color",
+                            ].map((header) => (
+                                <th
+                                    key={header}
+                                    className="sticky top-0 z-20 whitespace-nowrap border-b bg-muted px-3 py-3 font-medium text-muted-foreground"
+                                >
+                                    {header}
+                                </th>
+                            ))}
                         </tr>
                     </thead>
+
                     <tbody>
                         {vehicles.length > 0 ? (
                             vehicles.map((vehicle, index) => (
                                 <tr
-                                    key={`${vehicle.plateNo}-${index}`}
+                                    key={vehicle.vehicleId}
                                     className="border-b last:border-0"
                                 >
                                     <td className="whitespace-nowrap px-3 py-3 text-muted-foreground">
                                         {index + 1}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-3 font-medium">
-                                        {vehicle.plateNo}
+                                        {displayValue(vehicle.plateNo)}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-3">
-                                        {vehicle.brand}
+                                        {displayValue(vehicle.brand)}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-3">
-                                        {vehicle.model}
+                                        {displayValue(vehicle.model)}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-3">
-                                        {vehicle.variant}
+                                        {displayValue(vehicle.variant)}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-3">
-                                        {vehicle.yearOfManufacture}
+                                        {displayValue(vehicle.yearOfManufacture)}
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-3">
-                                        {vehicle.exteriorColor}
+                                        {displayValue(vehicle.exteriorColor)}
                                     </td>
                                 </tr>
                             ))

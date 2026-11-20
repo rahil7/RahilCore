@@ -6,10 +6,10 @@
         public string OrderNo { get; set; } = string.Empty;
 
         public long StatusId { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public string StatusName { get; set; } = string.Empty;
 
         public long PaymentStatusId { get; set; }
-        public string PaymentStatus { get; set; } = string.Empty;
+        public string PaymentStatusName { get; set; } = string.Empty;
 
         public DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; } = string.Empty;
@@ -49,43 +49,45 @@
     public sealed class OrderVehicleDto
     {
         public long VehicleId { get; set; }
-        public string PlateNo { get; set; } = string.Empty;
+        public string? PlateNo { get; set; }
         
         public long BrandId { get; set; }
-        public string Brand { get; set; } = string.Empty;
+        public string? Brand { get; set; }
         
         public long ModelId { get; set; }
-        public string Model { get; set; } = string.Empty;
+        public string? Model { get; set; }
 
         public long VariantId { get; set; }
-        public string Variant { get; set; } = string.Empty;
+        public string? Variant { get; set; }
 
-        public int YearOfManufacture { get; set; }
+        public int? YearOfManufacture { get; set; }
 
         public long ExteriorColorId { get; set; }
-        public string ExteriorColor { get; set; } = string.Empty;
+        public string? ExteriorColor { get; set; }
     }
 
     public sealed class OrderPaymentDto
     {
         public long PaymentId { get; set; }
         public long PaymentMethodId { get; set; }
-        public string PaymentMethodName { get; set; } = string.Empty;
-        public decimal SubtotalAmount { get; set; }
-        public decimal DiscountAmount { get; set; }
-        public decimal TotalAmount { get; set; }
-        public DateTime PaymentDate { get; set; }
+        public string? PaymentMethodName { get; set; }
+        public decimal? SubtotalAmount { get; set; }
+        public decimal? DiscountAmount { get; set; }
+        public decimal? TotalAmount { get; set; }
+        public DateTime? PaymentDate { get; set; }
         public string? ReferenceNo { get; set; }
-        public string PaymentNote { get; set; } = string.Empty;
+        public string? PaymentNote { get; set; }
+        public bool HasPaymentProof { get; set; }
     }
 
     public sealed class OrderAssignmentDto
     {
+        public string InspectorUsername { get; set; } = string.Empty;
         public string InspectorName { get; set; } = string.Empty;
         public DateTime ScheduleAt { get; set; }
         public DateTime AssignedAt { get; set; }
-        public string AssignedBy { get; set; } = string.Empty;
-        public string AssignedNote { get; set; } = string.Empty;
+        public string? AssignedBy { get; set; }
+        public string? AssignedNote { get; set; }
     }
 
     public sealed class OrderActivityDto

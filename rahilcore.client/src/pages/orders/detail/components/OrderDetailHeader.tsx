@@ -4,12 +4,16 @@ import { Pencil } from "lucide-react";
 
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
+import StatusBadge from "../../../../components/shared/StatusBadge";
+import { orderStatusConfig, paymentStatusConfig } from "../../../../config/status-config";
 
 interface OrderDetailHeaderProps {
     orderNo: string;
     orderType?: string;
-    status: string;
-    paymentStatus: string;
+    statusId: number;
+    statusName: string;
+    paymentStatusId: number;
+    paymentStatusName: string;
     createdAt: string;
     createdBy: string;
     canEdit: boolean;
@@ -19,8 +23,10 @@ interface OrderDetailHeaderProps {
 export default function OrderDetailHeader({
     orderNo,
     orderType,
-    status,
-    paymentStatus,
+    statusId,
+    statusName,
+    paymentStatusId,
+    paymentStatusName,
     createdAt,
     createdBy,
     canEdit,
@@ -68,17 +74,21 @@ export default function OrderDetailHeader({
                     Order Status:
                 </span>
 
-                <Badge variant="outline">
-                    {status}
-                </Badge>
+                <StatusBadge
+                    statusId={statusId}
+                    label={statusName}
+                    config={orderStatusConfig}
+                />
 
                 <span className="ml-2 text-sm text-muted-foreground">
                     Payment:
                 </span>
 
-                <Badge variant="outline">
-                    {paymentStatus}
-                </Badge>
+                <StatusBadge
+                    statusId={paymentStatusId}
+                    label={paymentStatusName}
+                    config={paymentStatusConfig}
+                />
             </div>
         </div>
     );

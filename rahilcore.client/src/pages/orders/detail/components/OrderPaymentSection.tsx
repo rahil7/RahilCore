@@ -1,22 +1,18 @@
 
 import { FileText, Plus, Pencil } from "lucide-react";
-import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
+import type { OrderPayment } from "../../../../types/order";
+import StatusBadge from "../../../../components/shared/StatusBadge";
+import { paymentStatusConfig } from "../../../../config/status-config";
 
 interface OrderPaymentSectionProps {
-    payment: {
-        status: string;
-        paymentMethod: string;
-        paymentDate: string;
-        subtotalAmount: number;
-        discountAmount: number;
-        totalAmount: number;
-        referenceNo?: string | null;
-        note?: string | null;
-        paymentProof?: string | null;
-    } | null;
+    payment: OrderPayment | null;
+    paymentStatusId: number;
+    paymentStatusName: string;
+    proofLoading: boolean;
     onCreate: () => void;
     onEdit: () => void;
+    onViewProof: (paymentId: number) => void;
 }
 
 const formatCurrency = (amount: number) =>
@@ -28,10 +24,13 @@ const formatCurrency = (amount: number) =>
 
 export default function OrderPaymentSection({
     payment,
+    paymentStatusId,
+    paymentStatusName,
+    proofLoading,
     onCreate,
     onEdit,
+    onViewProof,
 }: OrderPaymentSectionProps) {
-    const isPaid = payment?.status === "PAID";
 
     return (
         <section className="rounded-xl border bg-card p-5">
@@ -40,20 +39,11 @@ export default function OrderPaymentSection({
                     Payment Information
                 </h3>
 
-                {payment ? (
-                    <Badge
-                        variant="outline"
-                        className={
-                            isPaid
-                                ? "border-green-200 bg-green-50 text-green-700"
-                                : "border-amber-200 bg-amber-50 text-amber-700"
-                        }
-                    >
-                        {payment.status}
-                    </Badge>
-                ) : (
-                    <Badge variant="outline">UNPAID</Badge>
-                )}
+                <StatusBadge
+                    statusId={paymentStatusId}
+                    label={paymentStatusName}
+                    config={paymentStatusConfig}
+                />
             </div>
 
             {!payment ? (
@@ -76,99 +66,83 @@ export default function OrderPaymentSection({
                 </div>
             ) : (
                 <>
+                    {/* Payment details */}
                     <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Payment Via
-                            </p>
+                            <p className="text-sm text-muted-foreground">Payment Via</p>
                             <p className="mt-1 text-sm font-medium">
-                                {payment.paymentMethod}
+                                {payment.paymentMethodName}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Payment Date
-                            </p>
+                            <p className="text-sm text-muted-foreground">Payment Date</p>
                             <p className="mt-1 text-sm font-medium">
                                 {payment.paymentDate}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Reference No.
-                            </p>
+                            <p className="text-sm text-muted-foreground">Reference No.</p>
                             <p className="mt-1 text-sm font-medium">
                                 {payment.referenceNo || "-"}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Subtotal Amount
-                            </p>
+                            <p className="text-sm text-muted-foreground">Subtotal Amount</p>
                             <p className="mt-1 text-sm font-medium">
                                 {formatCurrency(payment.subtotalAmount)}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Discount Amount
-                            </p>
+                            <p className="text-sm text-muted-foreground">Discount Amount</p>
                             <p className="mt-1 text-sm font-medium">
                                 {formatCurrency(payment.discountAmount)}
                             </p>
                         </div>
 
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Total Amount
-                            </p>
+                            <p className="text-sm text-muted-foreground">Total Amount</p>
                             <p className="mt-1 text-sm font-semibold">
                                 {formatCurrency(payment.totalAmount)}
                             </p>
                         </div>
 
                         <div className="sm:col-span-2 lg:col-span-3">
-                            <p className="text-sm text-muted-foreground">
-                                Note
-                            </p>
+                            <p className="text-sm text-muted-foreground">Note</p>
                             <p className="mt-1 whitespace-pre-wrap text-sm">
-                                {payment.note || "-"}
+                                {payment.paymentNote || "-"}
                             </p>
                         </div>
                     </div>
 
+                    {/* Payment Proof */}
                     <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
                         <div>
                             <p className="text-sm text-muted-foreground">
                                 Payment Proof
                             </p>
 
-                            {payment.paymentProof ? (
-                                <a
-                                    href={payment.paymentProof}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                            {payment.hasPaymentProof ? (
+                                <button
+                                    type="button"
+                                    disabled={proofLoading}
+                                    onClick={() => onViewProof(payment.paymentId)}
+                                    className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <FileText className="h-4 w-4" />
-                                    View Attachment
-                                </a>
+                                    {proofLoading ? "Opening..." : "View Attachment"}
+                                </button>
                             ) : (
                                 <p className="mt-1 text-sm">-</p>
                             )}
                         </div>
 
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={onEdit}
-                        >
+                        <Button size="sm" variant="outline" onClick={onEdit}>
                             <Pencil className="mr-2 h-4 w-4" />
-                            Edit Payment
+                            Edit
                         </Button>
                     </div>
                 </>

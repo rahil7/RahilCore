@@ -890,12 +890,12 @@ namespace RahilCore.Application.Features.Orders
                 .Select(x => new OrderVehicleDto
                 {
                     VehicleId = x.VehicleId,
-                    PlateNo = x.Vehicle?.PlateNo ?? string.Empty,
-                    Brand = x.Vehicle?.Brand?.Name ?? string.Empty,
-                    Model = x.Vehicle?.Model?.Name ?? string.Empty,
-                    Variant = x.Vehicle?.Variant?.Name ?? string.Empty,
-                    YearOfManufacture = x.Vehicle?.YearOfManufacture ?? 0,
-                    ExteriorColor = x.Vehicle?.ExteriorColor?.Name ?? string.Empty
+                    PlateNo = x.Vehicle?.PlateNo,
+                    Brand = x.Vehicle?.Brand?.Name,
+                    Model = x.Vehicle?.Model?.Name,
+                    Variant = x.Vehicle?.Variant?.Name,
+                    YearOfManufacture = x.Vehicle?.YearOfManufacture,
+                    ExteriorColor = x.Vehicle?.ExteriorColor?.Name
                 })
                 .OrderBy(x => x.VehicleId)
                 .ToList();
@@ -905,9 +905,9 @@ namespace RahilCore.Application.Features.Orders
                 Id = order.Id,
                 OrderNo = order.OrderNo,
                 StatusId = order.StatusId,
-                Status = order.Status?.ParamName!,
+                StatusName = order.Status?.ParamName!,
                 PaymentStatusId = order.PaymentStatusId,
-                PaymentStatus = order.PaymentStatus?.ParamName!,
+                PaymentStatusName = order.PaymentStatus?.ParamName!,
                 CreatedAt = order.CreatedAt,
                 CreatedBy = order.CreatedBy ?? string.Empty,
                 CreatedNote = order.CreatedNote ?? string.Empty,

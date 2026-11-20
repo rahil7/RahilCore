@@ -319,14 +319,13 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                     PaymentId = x.Id,
                     PaymentDate = x.PaymentDate,
                     PaymentMethodId = x.PaymentMethodId,
-                    PaymentMethodName = x.PaymentMethod == null
-                        ? string.Empty
-                        : (x.PaymentMethod.ParamName ?? string.Empty),
-                    SubtotalAmount = x.Order == null ? 0 : (x.Order.SubtotalAmount ?? 0),
-                    DiscountAmount = x.Order == null ? 0 : (x.Order.DiscountAmount ?? 0),
-                    TotalAmount = x.Order == null ? 0 : (x.Order.TotalAmount ?? 0),
+                    PaymentMethodName = x.PaymentMethod!.ParamName,
+                    SubtotalAmount = x.Order!.SubtotalAmount,
+                    DiscountAmount = x.Order.DiscountAmount,
+                    TotalAmount = x.Order.TotalAmount,
                     ReferenceNo = x.ReferenceNo,
-                    PaymentNote = x.CreatedNote ?? string.Empty
+                    PaymentNote = x.CreatedNote,
+                    HasPaymentProof = x.StorageKey != null
 
                 })
                 .FirstOrDefaultAsync(ct);
@@ -339,11 +338,12 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 .Where(x => x.OrderId == orderId)
                 .Select(x => new OrderAssignmentDto
                 {
+                    InspectorUsername = x.Inspector!.Username,
                     InspectorName = x.Inspector!.DisplayName,
                     ScheduleAt = x.Order!.ScheduleAt,
                     AssignedAt = x.AssignedAt,
-                    AssignedBy = x.CreatedBy ?? string.Empty,
-                    AssignedNote = x.CreatedNote ?? string.Empty
+                    AssignedBy = x.CreatedBy,
+                    AssignedNote = x.CreatedNote
                 })
                 .FirstOrDefaultAsync(ct);
         }

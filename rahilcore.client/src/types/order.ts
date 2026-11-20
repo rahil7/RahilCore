@@ -4,6 +4,8 @@ import type {
     FilterOption,
     QueryFieldOption,
 } from "./common";
+import type { Activity } from "./Activity";
+import type { FormSelectOption } from "../components/common/FormSelect";
 
 export interface OrderFilterOptions {
     customerTypes: FilterOption[];
@@ -114,9 +116,9 @@ export interface OrderDetailResponse {
     id: number;
     orderNo: string;
     statusId: number;
-    status: string;
+    statusName: string;
     paymentStatusId: number;
-    paymentStatus: string;
+    paymentStatusName: string;
     createdAt: string;
     createdBy: string;
     createdNote: string;
@@ -130,48 +132,13 @@ export interface OrderDetailResponse {
 
     customer: OrderCustomer;
 
-    vehicles: {
-        vehicleId: number;
-        plateNo: string;
-        brandId: number;
-        brand: string;
-        modelId: number;
-        model: string;
-        variantId: number;
-        variant: string;
-        yearOfManufacture: number;
-        exteriorColorId: number;
-        exteriorColor: string;
-    }[];
+    vehicles: OrderVehicle[];
 
-    payment: {
-        paymentId: number;
-        paymentMethodId: number;
-        paymentMethodName: string;
-        subtotalAmount: number;
-        discountAmount: number;
-        totalAmount: number;
-        paymentDate: string;
-        referenceNo: string | null;
-        paymentNote: string | null;
-    } | null;
+    payment: OrderPayment | null;
 
-    assignment: {
-        inspectorName: string;
-        scheduleAt: string;
-        assignedAt: string;
-        assignedBy: string;
-        assignedNote: string | null;
-    } | null;
+    assignment: OrderAssignment | null;
 
-    activities: {
-        id: number;
-        action: string;
-        description: string;
-        createdAt: string;
-        createdBy: string;
-        type: string;
-    }[];
+    activities: Activity[];
 }
 
 export interface OrderCustomer {
@@ -181,4 +148,44 @@ export interface OrderCustomer {
     email: string | null;
     phone: string | null;
     address: string | null;
+}
+
+export interface OrderVehicle {
+    vehicleId: number;
+    plateNo: string | null;
+    brandId: number | null;
+    brand: string | null;
+    modelId: number | null;
+    model: string | null;
+    variantId: number | null;
+    variant: string | null;
+    yearOfManufacture: number | null;
+    exteriorColorId: number | null;
+    exteriorColor: string | null;
+}
+
+export interface OrderPayment {
+    paymentId: number;
+    paymentMethodId: number;
+    paymentMethodName: string;
+    subtotalAmount: number;
+    discountAmount: number;
+    totalAmount: number;
+    paymentDate: string;
+    referenceNo: string | null;
+    paymentNote: string | null;
+    hasPaymentProof: boolean;
+}
+
+export interface OrderAssignment {
+    inspectorUsername: string;
+    inspectorName: string;
+    scheduleAt: string;
+    assignedAt: string;
+    assignedBy: string | null;
+    assignedNote: string | null;
+}
+
+export interface OrderPaymentOptions {
+    paymentMethods: FormSelectOption[];
 }

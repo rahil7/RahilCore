@@ -1,7 +1,8 @@
 import { apiClient } from "../lib/api-client";
 
 import type { ApiResponse } from "../types/api";
-import type { CreateOrderCustomerRequest, CreateOrderDealerRequest, CreatePaymentRequest, GetOrdersParams, OrderCreateOptions, OrderDetailResponse, OrderFilterOptions, OrderListItem } from "../types/order";
+import type { FileAccess } from "../types/file";
+import type { CreateOrderCustomerRequest, CreateOrderDealerRequest, CreatePaymentRequest, GetOrdersParams, OrderCreateOptions, OrderDetailResponse, OrderFilterOptions, OrderListItem, OrderPaymentOptions } from "../types/order";
 import type { PagedResponse } from "../types/pagination";
 
 function buildQueryString(params: GetOrdersParams): string {
@@ -121,6 +122,18 @@ export const orderService = {
     getDetail(id: number) {
         return apiClient.get<ApiResponse<OrderDetailResponse>>(
             `/api/orders/${id}`,
+        );
+    },
+
+    getPaymentProof(paymentId: number) {
+        return apiClient.get<FileAccess>(
+            `/api/orders/payments/${paymentId}/proof`
+        );
+    },
+
+    getPaymentOptions() {
+        return apiClient.get<ApiResponse<OrderPaymentOptions>>(
+            "/api/orders/payment-options"
         );
     },
 }

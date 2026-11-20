@@ -56,7 +56,7 @@ namespace RahilCore.Infrastructure.Storage
             catch (AmazonS3Exception ex)
             {
                 Console.WriteLine($"Error CustomerCode : {ex.ErrorCode}");
-                Console.WriteLine($"Status CustomerCode: {ex.StatusCode}");
+                Console.WriteLine($"StatusName CustomerCode: {ex.StatusCode}");
                 Console.WriteLine($"Message    : {ex.Message}");
                 Console.WriteLine($"Request ID : {ex.RequestId}");
                 Console.WriteLine($"Response   : {ex.ResponseBody}");

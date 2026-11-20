@@ -2,15 +2,11 @@
 import { UserRoundSearch, UserRound, Pencil } from "lucide-react";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
+import type { OrderAssignment } from "../../../../types/order";
+import { formatDateTime } from "../../../../utils/date-utils";
 
 interface OrderAssignmentSectionProps {
-    assignment: {
-        inspectorCode: string;
-        inspectorName: string;
-        scheduleAt: string;
-        assignedAt: string;
-        assignedBy: string;
-    } | null;
+    assignment: OrderAssignment | null;
     canAssign: boolean;
     canReassign: boolean;
     onAssign: () => void;
@@ -68,10 +64,10 @@ export default function OrderAssignmentSection({
                     <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
                         <div>
                             <p className="text-sm text-muted-foreground">
-                                Inspector Code
+                                Inspector Username
                             </p>
                             <p className="mt-1 text-sm font-medium">
-                                {assignment.inspectorCode}
+                                {assignment.inspectorUsername}
                             </p>
                         </div>
 
@@ -86,10 +82,10 @@ export default function OrderAssignmentSection({
 
                         <div>
                             <p className="text-sm text-muted-foreground">
-                                Schedule Date & Time
+                                Jadwal Inspeksi
                             </p>
                             <p className="mt-1 text-sm font-medium">
-                                {assignment.scheduleAt}
+                                {formatDateTime(assignment.scheduleAt)}
                             </p>
                         </div>
 
@@ -98,7 +94,7 @@ export default function OrderAssignmentSection({
                                 Assigned Date
                             </p>
                             <p className="mt-1 text-sm font-medium">
-                                {assignment.assignedAt}
+                                {formatDateTime(assignment.assignedAt)}
                             </p>
                         </div>
 
@@ -120,7 +116,7 @@ export default function OrderAssignmentSection({
                                 onClick={onReassign}
                             >
                                 <Pencil className="mr-2 h-4 w-4" />
-                                Reassign Inspector
+                                Reassign
                             </Button>
                         </div>
                     )}

@@ -1,31 +1,23 @@
-
 import {
     ClipboardList,
     CreditCard,
     UserRound,
-    Pencil,
-    RefreshCw,
+    ClipboardCheck,
     CircleDot,
 } from "lucide-react";
-
-interface OrderActivityItem {
-    id: number;
-    action: string;
-    description: string;
-    createdAt: string;
-    createdBy: string;
-    type: "ORDER" | "PAYMENT" | "ASSIGNMENT" | "UPDATE";
-}
+import type { LucideIcon } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import type { Activity } from "../../../../types/Activity";
 
 interface OrderActivitySectionProps {
-    activities: OrderActivityItem[];
+    activities: Activity[];
 }
 
-const activityIcons = {
+const activityIcons: Record<string, LucideIcon> = {
     ORDER: ClipboardList,
     PAYMENT: CreditCard,
     ASSIGNMENT: UserRound,
-    UPDATE: Pencil,
+    INSPECTION: ClipboardCheck,
 };
 
 export default function OrderActivitySection({
@@ -46,7 +38,8 @@ export default function OrderActivitySection({
             {activities.length > 0 ? (
                 <div className="relative space-y-5">
                     {activities.map((activity, index) => {
-                        const Icon = activityIcons[activity.type];
+                        const Icon =
+                            activityIcons[activity.type.toUpperCase()] ?? CircleDot;
 
                         return (
                             <div
@@ -73,7 +66,12 @@ export default function OrderActivitySection({
                                     </p>
 
                                     <p className="mt-2 text-xs text-muted-foreground">
-                                        {activity.createdAt} · {activity.createdBy}
+                                        {format(
+                                            parseISO(activity.createdAt),
+                                            "dd MMM yyyy, HH:mm"
+                                        )}
+                                        {" · "}
+                                        {activity.createdBy}
                                     </p>
                                 </div>
                             </div>
@@ -83,6 +81,7 @@ export default function OrderActivitySection({
             ) : (
                 <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed py-8">
                     <CircleDot className="h-8 w-8 text-muted-foreground" />
+
                     <p className="text-sm text-muted-foreground">
                         No activity history available.
                     </p>
