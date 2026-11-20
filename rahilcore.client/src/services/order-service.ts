@@ -1,7 +1,7 @@
 import { apiClient } from "../lib/api-client";
 
 import type { ApiResponse } from "../types/api";
-import type { CreateOrderCustomerRequest, CreateOrderDealerRequest, CreatePaymentRequest, GetOrdersParams, OrderCreateOptions, OrderFilterOptions, OrderListItem } from "../types/order";
+import type { CreateOrderCustomerRequest, CreateOrderDealerRequest, CreatePaymentRequest, GetOrdersParams, OrderCreateOptions, OrderDetailResponse, OrderFilterOptions, OrderListItem } from "../types/order";
 import type { PagedResponse } from "../types/pagination";
 
 function buildQueryString(params: GetOrdersParams): string {
@@ -115,6 +115,12 @@ export const orderService = {
         return apiClient.post<ApiResponse<unknown>>(
             `/api/orders/${orderId}/payments`,
             formData,
+        );
+    },
+
+    getDetail(id: number) {
+        return apiClient.get<ApiResponse<OrderDetailResponse>>(
+            `/api/orders/${id}`,
         );
     },
 }

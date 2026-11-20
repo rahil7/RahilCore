@@ -1,13 +1,7 @@
+import type { OrderCustomer } from "../../../../types/order";
 
 interface OrderCustomerSectionProps {
-    customer: {
-        code: string;
-        name: string;
-        type: string;
-        email?: string | null;
-        phone?: string | null;
-        address?: string | null;
-    };
+    customer: OrderCustomer;
     picName?: string | null;
     picPhone?: string | null;
 }
@@ -29,7 +23,7 @@ export default function OrderCustomerSection({
                         Name
                     </p>
                     <p className="text-sm font-medium">
-                        {customer.name}
+                        {customer.customerName}
                     </p>
                 </div>
 
@@ -38,7 +32,7 @@ export default function OrderCustomerSection({
                         Code
                     </p>
                     <p className="text-sm font-medium">
-                        {customer.code}
+                        {customer.customerCode}
                     </p>
                 </div>
 
@@ -47,7 +41,7 @@ export default function OrderCustomerSection({
                         Tipe
                     </p>
                     <p className="text-sm font-medium">
-                        {customer.type}
+                        {customer.customerType}
                     </p>
                 </div>
 

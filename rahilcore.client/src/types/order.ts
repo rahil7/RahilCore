@@ -108,3 +108,77 @@ export interface CreatePaymentRequest {
     note: string;
     paymentProof: File | null;
 }
+
+
+export interface OrderDetailResponse {
+    id: number;
+    orderNo: string;
+    statusId: number;
+    status: string;
+    paymentStatusId: number;
+    paymentStatus: string;
+    createdAt: string;
+    createdBy: string;
+    createdNote: string;
+    isAssigned: boolean;
+    picName: string | null;
+    picPhone: string | null;
+    inspectionFormId: number;
+    inspectionFormName: string;
+    scheduleAt: string;
+    note: string;
+
+    customer: OrderCustomer;
+
+    vehicles: {
+        vehicleId: number;
+        plateNo: string;
+        brandId: number;
+        brand: string;
+        modelId: number;
+        model: string;
+        variantId: number;
+        variant: string;
+        yearOfManufacture: number;
+        exteriorColorId: number;
+        exteriorColor: string;
+    }[];
+
+    payment: {
+        paymentId: number;
+        paymentMethodId: number;
+        paymentMethodName: string;
+        subtotalAmount: number;
+        discountAmount: number;
+        totalAmount: number;
+        paymentDate: string;
+        referenceNo: string | null;
+        paymentNote: string | null;
+    } | null;
+
+    assignment: {
+        inspectorName: string;
+        scheduleAt: string;
+        assignedAt: string;
+        assignedBy: string;
+        assignedNote: string | null;
+    } | null;
+
+    activities: {
+        id: number;
+        action: string;
+        description: string;
+        createdAt: string;
+        createdBy: string;
+        type: string;
+    }[];
+}
+
+export interface OrderCustomer {
+    customerCode: string;
+    customerName: string;
+    customerType: string;
+    email: string | null;
+    phone: string | null;
+    address: string | null;
+}

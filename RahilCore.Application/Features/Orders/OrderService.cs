@@ -852,7 +852,7 @@ namespace RahilCore.Application.Features.Orders
                 return null;
             }
 
-            InspectionOrderEn? order = await orderRepo.GetByIdAsync(id, ct);
+            InspectionOrderEn? order = await orderRepo.GetOrderDetail(id, ct);
             if (order is null || order.Customer is null)
             {
                 return null;
@@ -876,7 +876,7 @@ namespace RahilCore.Application.Features.Orders
             {
                 CustomerCode = order.Customer.CustCode,
                 CustomerName = order.Customer.CustName,
-                CustomerType = order.Customer.CustType?.ParamName ?? "-",
+                CustomerType = order.Customer.CustType?.ParamName ?? string.Empty,
                 Email = order.Customer.Email,
                 Phone = order.Customer.Phone,
                 Address = order.Customer.Address

@@ -1,11 +1,13 @@
 
+import { format, parseISO } from "date-fns";
 import { Pencil } from "lucide-react";
+
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
 
 interface OrderDetailHeaderProps {
     orderNo: string;
-    orderType: "CUSTOMER" | "SHOWROOM";
+    orderType?: string;
     status: string;
     paymentStatus: string;
     createdAt: string;
@@ -24,6 +26,10 @@ export default function OrderDetailHeader({
     canEdit,
     onEdit,
 }: OrderDetailHeaderProps) {
+    const formattedCreatedAt = createdAt
+        ? format(parseISO(createdAt), "dd MMM yyyy, HH:mm")
+        : "-";
+
     return (
         <div className="flex flex-col gap-4 rounded-xl border bg-card p-5">
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
@@ -33,13 +39,15 @@ export default function OrderDetailHeader({
                             {orderNo}
                         </h2>
 
-                        <Badge variant="outline">
-                            {orderType}
-                        </Badge>
+                        {orderType && (
+                            <Badge variant="outline">
+                                {orderType}
+                            </Badge>
+                        )}
                     </div>
 
                     <p className="text-sm text-muted-foreground">
-                        Created on {createdAt} by {createdBy}
+                        Created on {formattedCreatedAt} by {createdBy}
                     </p>
                 </div>
 
@@ -59,6 +67,7 @@ export default function OrderDetailHeader({
                 <span className="text-sm text-muted-foreground">
                     Order Status:
                 </span>
+
                 <Badge variant="outline">
                     {status}
                 </Badge>
@@ -66,6 +75,7 @@ export default function OrderDetailHeader({
                 <span className="ml-2 text-sm text-muted-foreground">
                     Payment:
                 </span>
+
                 <Badge variant="outline">
                     {paymentStatus}
                 </Badge>

@@ -347,5 +347,14 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 })
                 .FirstOrDefaultAsync(ct);
         }
+
+        public async Task<InspectionOrderEn?> GetOrderDetail(long id, CancellationToken ct = default)
+        {
+            return await context.InspectionOrders
+                .Include(x => x.Customer!).ThenInclude(x => x.CustType)
+                .Include(x => x.Status)
+                .Include(x => x.PaymentStatus)
+                .FirstOrDefaultAsync(x => x.Id == id, ct);
+        }
     }
 }

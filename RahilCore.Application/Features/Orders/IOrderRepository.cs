@@ -26,5 +26,6 @@ namespace RahilCore.Application.Features.Orders
         Task<IReadOnlyList<InspectionOrderItemEn>> GetOrderDetailItems(long orderId, CancellationToken ct = default);
         Task<OrderPaymentDto?> GetOrderPayment(long orderId, CancellationToken ct = default);
         Task<OrderAssignmentDto?> GetOrderAssignment(long orderId, CancellationToken ct = default);
+        Task<InspectionOrderEn?> GetOrderDetail(long id, CancellationToken ct = default);
     }
 }
