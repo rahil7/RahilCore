@@ -28,7 +28,7 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                     CreatedAt = x.CreatedAt,
                     CreatedBy = x.ActorUsername
                 })
-                .OrderBy(x => x.CreatedAt)
+                .OrderByDescending(x => x.CreatedAt)
                 .ToListAsync(ct);
         }
     }

@@ -191,8 +191,10 @@ export interface OrderPayment {
     totalAmount: number;
     paymentDate: string;
     referenceNo: string | null;
-    paymentNote: string | null;
     hasPaymentProof: boolean;
+    lastActivityAt: string;
+    lastActivityBy: string;
+    lastActivityNote: string;
 }
 
 export interface OrderAssignment {

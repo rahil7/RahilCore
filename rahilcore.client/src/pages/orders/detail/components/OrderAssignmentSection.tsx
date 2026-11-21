@@ -1,4 +1,3 @@
-
 import { UserRoundSearch, UserRound, Pencil } from "lucide-react";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
@@ -20,10 +19,10 @@ export default function OrderAssignmentSection({
     onAssign,
     onReassign,
 }: OrderAssignmentSectionProps) {
-
     return (
         <section className="rounded-xl border bg-card p-5">
-            <div className="mb-4 flex items-center justify-between">
+            {/* Header */}
+            <div className="mb-5 flex items-center justify-between">
                 <h3 className="font-semibold">
                     Inspector Assignment
                 </h3>
@@ -41,6 +40,7 @@ export default function OrderAssignmentSection({
             </div>
 
             {!assignment ? (
+                /* Empty State */
                 <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed py-8">
                     <UserRoundSearch className="h-8 w-8 text-muted-foreground" />
 
@@ -61,56 +61,62 @@ export default function OrderAssignmentSection({
                     )}
                 </div>
             ) : (
-                <>
-                    <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="space-y-5">
+                    {/* Assignment Information */}
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {/* Inspector */}
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Inspector Username
-                            </p>
-                            <p className="mt-1 text-sm font-medium">
-                                {assignment.inspectorUsername}
-                            </p>
-                        </div>
-
-                        <div>
-                            <p className="text-sm text-muted-foreground">
-                                Inspector Name
-                            </p>
+                            <p className="text-sm text-muted-foreground">Inspector</p>
                             <p className="mt-1 text-sm font-medium">
                                 {assignment.inspectorName}
                             </p>
+                            <p className="text-sm text-muted-foreground">
+                                @{assignment.inspectorUsername}
+                            </p>
                         </div>
 
+                        {/* Inspection Schedule */}
                         <div>
                             <p className="text-sm text-muted-foreground">
-                                Jadwal Inspeksi
+                                Inspection Schedule
                             </p>
                             <p className="mt-1 text-sm font-medium">
                                 {formatDateTime(assignment.scheduleAt)}
                             </p>
                         </div>
 
+                        {/* Assigned Date */}
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Assigned Date
-                            </p>
+                            <p className="text-sm text-muted-foreground">Assigned Date</p>
                             <p className="mt-1 text-sm font-medium">
                                 {formatDateTime(assignment.assignedAt)}
                             </p>
                         </div>
 
+                        {/* Assigned By */}
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Assigned By
-                            </p>
+                            <p className="text-sm text-muted-foreground">Assigned By</p>
                             <p className="mt-1 text-sm font-medium">
-                                {assignment.assignedBy}
+                                {assignment.assignedBy || "-"}
                             </p>
                         </div>
                     </div>
 
+                    {/* Assignment Note */}
+                    {assignment.assignedNote && (
+                        <div className="mt-4">
+                            <p className="text-sm text-muted-foreground">
+                                Assignment Note
+                            </p>
+                            <p className="mt-1 whitespace-pre-wrap text-sm">
+                                {assignment.assignedNote}
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Actions */}
                     {canReassign && (
-                        <div className="mt-5 flex justify-end border-t pt-4">
+                        <div className="flex justify-end border-t pt-4">
                             <Button
                                 size="sm"
                                 variant="outline"
@@ -121,7 +127,7 @@ export default function OrderAssignmentSection({
                             </Button>
                         </div>
                     )}
-                </>
+                </div>
             )}
         </section>
     );

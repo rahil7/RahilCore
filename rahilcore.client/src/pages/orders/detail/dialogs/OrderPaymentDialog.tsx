@@ -79,9 +79,7 @@ export default function OrderPaymentDialog({
         payment ? String(payment.discountAmount ?? 0) : ""
     );
 
-    const [note, setNote] = useState(
-        payment?.paymentNote ?? ""
-    );
+    const [note, setNote] = useState("");
 
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
 

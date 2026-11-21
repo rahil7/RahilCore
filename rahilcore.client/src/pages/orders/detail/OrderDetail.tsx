@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PageDetailHeader } from "../../../components/layout/PageDetailHeader";
-import type { CreatePaymentRequest, OrderAssignRequest, OrderDetailResponse, UpdatePaymentRequest } from "../../../types/order";
+import type {
+    CreatePaymentRequest,
+    OrderAssignRequest,
+    OrderDetailResponse,
+    UpdatePaymentRequest
+} from "../../../types/order";
 
 import OrderDetailHeader from "./components/OrderDetailHeader";
 import OrderCustomerSection from "./components/OrderCustomerSection";
@@ -14,10 +19,12 @@ import { orderService } from "../../../services/order-service";
 import type { CachedFileAccess } from "../../../types/file";
 import OrderPaymentDialog from "./dialogs/OrderPaymentDialog";
 import OrderAssignmentDialog from "./dialogs/OrderAssignmentDialog";
+import { useOrderContext } from "../../../contexts/orders/useOrderContext";
 
 export default function OrderDetail() {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
+    const { setShouldRefresh } = useOrderContext();
 
     const [order, setOrder] = useState<OrderDetailResponse | null>(null);
     const [loading, setLoading] = useState(true);
@@ -61,6 +68,7 @@ export default function OrderDetail() {
 
         const response = await orderService.getDetail(Number(id));
         setOrder(response.data);
+        setShouldRefresh(true);
     };
     
     const [proofLoading, setProofLoading] = useState(false);
@@ -118,6 +126,7 @@ export default function OrderDetail() {
         const response = await orderService.getDetail(Number(id));
 
         setOrder(response.data);
+        setShouldRefresh(true);
     };
 
     useEffect(() => {
@@ -129,6 +138,8 @@ export default function OrderDetail() {
                 setError(null);
 
                 const response = await orderService.getDetail(Number(id));
+
+                console.log(response.data);
 
                 setOrder(response.data);
             } catch (err) {
@@ -196,7 +207,11 @@ export default function OrderDetail() {
                 />
             </div>
 
-            <OrderVehicleSection vehicles={order.vehicles} />
+            <OrderVehicleSection
+                vehicles={order.vehicles}
+                canDeleteVehicle={() => true}
+                onDeleteVehicle={async () => { }}
+            />
 
             <OrderPaymentSection
                 payment={order.payment}

@@ -79,8 +79,11 @@
         public decimal? TotalAmount { get; set; }
         public DateTime? PaymentDate { get; set; }
         public string? ReferenceNo { get; set; }
-        public string? PaymentNote { get; set; }
         public bool HasPaymentProof { get; set; }
+
+        public DateTime LastActivityAt { get; set; }
+        public string? LastActivityBy { get; set; }
+        public string? LastActivityNote { get; set; }
     }
 
     public sealed class OrderAssignmentDto

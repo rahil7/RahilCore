@@ -324,8 +324,10 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                     DiscountAmount = x.Order.DiscountAmount,
                     TotalAmount = x.Order.TotalAmount,
                     ReferenceNo = x.ReferenceNo,
-                    PaymentNote = x.CreatedNote,
-                    HasPaymentProof = x.StorageKey != null
+                    HasPaymentProof = x.StorageKey != null,
+                    LastActivityAt = x.UpdatedAt ?? x.CreatedAt,
+                    LastActivityBy = x.UpdatedBy ?? x.CreatedBy ?? string.Empty,
+                    LastActivityNote = x.UpdatedNote ?? x.CreatedNote,
 
                 })
                 .FirstOrDefaultAsync(ct);
@@ -341,9 +343,9 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                     InspectorUsername = x.Inspector!.Username,
                     InspectorName = x.Inspector!.DisplayName,
                     ScheduleAt = x.Order!.ScheduleAt,
-                    AssignedAt = x.AssignedAt,
-                    AssignedBy = x.CreatedBy,
-                    AssignedNote = x.CreatedNote
+                    AssignedAt = x.UpdatedAt ?? x.CreatedAt,
+                    AssignedBy = x.UpdatedBy ?? x.CreatedBy ?? string.Empty,
+                    AssignedNote = x.UpdatedNote ?? x.CreatedNote,
                 })
                 .FirstOrDefaultAsync(ct);
         }

@@ -201,7 +201,7 @@ namespace RahilCore.Application.Features.Orders
                     Description = "Order customer berhasil dibuat",
                     ActorUsername = createdBy,
                     CreatedAt = now,
-                    Metadata = ""
+                    Metadata = null
                 };
 
                 activityRepo.Add(activity);
@@ -299,7 +299,7 @@ namespace RahilCore.Application.Features.Orders
                     Description = "Order showroom berhasil dibuat",
                     ActorUsername = createdBy,
                     CreatedAt = now,
-                    Metadata = ""
+                    Metadata = null
                 };
 
                 activityRepo.Add(activity);
@@ -408,6 +408,7 @@ namespace RahilCore.Application.Features.Orders
                 order.PaymentStatusId = PaymentStatus.PAID;
                 order.DiscountAmount = request.DiscountAmount;
                 order.SubtotalAmount = request.SubtotalAmount;
+                order.TotalAmount = totalAmount;
                 order.InvoiceDate = now;
                 order.InvoiceNo = InvoiceHelper.GenerateInvoiceNo(order.Customer.CustTypeId,order.Id,now);
                 order.UpdatedAt = now;
@@ -433,7 +434,7 @@ namespace RahilCore.Application.Features.Orders
                     var file = request.PaymentProof;
                     var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
 
-                    uploadedObjectKey =$"payments/{now:yyyy/MM}/{Guid.NewGuid()}{extension}";
+                    uploadedObjectKey = $"payments/{now:yyyy/MM}/{Guid.NewGuid()}{extension}";
 
                     await using var stream = file.OpenReadStream();
 
@@ -457,7 +458,7 @@ namespace RahilCore.Application.Features.Orders
                     Description = "Pembayaran berhasil di buat",
                     ActorUsername = createdBy,
                     CreatedAt = now,
-                    Metadata = ""
+                    Metadata = null
                 };
 
                 activityRepo.Add(activity);
@@ -600,15 +601,16 @@ namespace RahilCore.Application.Features.Orders
                 // Update order amount
                 order.SubtotalAmount = subtotalAmount;
                 order.DiscountAmount = discountAmount;
+                order.TotalAmount = totalAmount;
 
                 // Update order audit
                 order.UpdatedAt = now;
                 order.UpdatedBy = createdBy;
+                order.UpdatedNote = note;
 
-                if (note is not null)
-                {
-                    order.UpdatedNote = note;
-                }
+                payment.UpdatedAt = now;
+                payment.UpdatedBy = createdBy;
+                payment.UpdatedNote = note;
 
                 // Update payment only for fields sent in request
                 if (request.PaymentMethodId.HasValue)
