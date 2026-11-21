@@ -1,4 +1,4 @@
-import type { CreatePaymentRequest } from "../../../../types/order";
+import type { CreatePaymentRequest, OrderDetailResponse, UpdatePaymentRequest } from "../../../../types/order";
 
 import { useEffect, useState } from "react";
 import { FileText, Upload, X } from "lucide-react";
@@ -24,7 +24,12 @@ import { CurrencyInput } from "../../../../components/common/CurrencyInput";
 interface OrderPaymentDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    onSubmit: (request: CreatePaymentRequest) => Promise<void>;
+    mode: "create" | "edit";
+    payment?: OrderDetailResponse["payment"];
+    onViewPaymentProof?: () => void;
+    onSubmit: (
+        request: CreatePaymentRequest | UpdatePaymentRequest
+    ) => Promise<void>;
 }
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024;
@@ -45,18 +50,39 @@ const formatCurrency = (amount: number) =>
 export default function OrderPaymentDialog({
     open,
     onOpenChange,
+    mode,
+    payment,
+    onViewPaymentProof,
     onSubmit,
 }: OrderPaymentDialogProps) {
     const [paymentMethods, setPaymentMethods] = useState<FilterOption[]>([]);
     const [loadingOptions, setLoadingOptions] = useState(false);
     const [submitting, setSubmitting] = useState(false);
 
-    const [paymentMethodId, setPaymentMethodId] = useState("");
-    const [paymentDate, setPaymentDate] = useState<string | null>(null);
-    const [referenceNo, setReferenceNo] = useState("");
-    const [subtotalAmount, setSubtotalAmount] = useState("");
-    const [discountAmount, setDiscountAmount] = useState("");
-    const [note, setNote] = useState("");
+    const [paymentMethodId, setPaymentMethodId] = useState(
+        payment ? String(payment.paymentMethodId) : ""
+    );
+
+    const [paymentDate, setPaymentDate] = useState<string | null>(
+        payment?.paymentDate ?? null
+    );
+
+    const [referenceNo, setReferenceNo] = useState(
+        payment?.referenceNo ?? ""
+    );
+
+    const [subtotalAmount, setSubtotalAmount] = useState(
+        payment ? String(payment.subtotalAmount) : ""
+    );
+
+    const [discountAmount, setDiscountAmount] = useState(
+        payment ? String(payment.discountAmount ?? 0) : ""
+    );
+
+    const [note, setNote] = useState(
+        payment?.paymentNote ?? ""
+    );
+
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
 
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -87,12 +113,12 @@ export default function OrderPaymentDialog({
     }, [open]);
 
     const resetForm = () => {
-        setPaymentMethodId("");
-        setPaymentDate(null);
-        setReferenceNo("");
-        setSubtotalAmount("");
-        setDiscountAmount("");
-        setNote("");
+        setPaymentMethodId(payment ? String(payment.paymentMethodId) : "");
+        setPaymentDate(payment?.paymentDate ?? null);
+        setReferenceNo(payment?.referenceNo ?? "");
+        setSubtotalAmount(payment ? String(payment.subtotalAmount) : "");
+        setDiscountAmount(payment ? String(payment.discountAmount ?? 0) : "");
+        setNote(payment?.paymentNote ?? "");
         setPaymentProof(null);
         setErrors({});
         setFileError("");
@@ -179,6 +205,12 @@ export default function OrderPaymentDialog({
             onOpenChange(false);
         } catch (error) {
             console.error("Failed to create payment:", error);
+
+            if (error instanceof Error) {
+                console.error("Error message:", error.message);
+            }
+
+            console.error("Error detail:", error);
         } finally {
             setSubmitting(false);
         }
@@ -197,9 +229,14 @@ export default function OrderPaymentDialog({
                 showCloseButton={false}
             >
                 <DialogHeader className="shrink-0">
-                    <DialogTitle>Create Payment</DialogTitle>
+                    <DialogTitle>
+                        {mode === "edit" ? "Edit Payment" : "Create Payment"}
+                    </DialogTitle>
+
                     <DialogDescription>
-                        Add payment information for this order.
+                        {mode === "edit"
+                            ? "Update payment information for this order."
+                            : "Add payment information for this order."}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -338,9 +375,40 @@ export default function OrderPaymentDialog({
                         </div>
 
                         {/* Payment Proof */}
+                        {/* Payment Proof */}
                         <div className="space-y-2">
                             <Label>Payment Proof</Label>
 
+                            {/* Existing Payment Proof */}
+                            {mode === "edit" &&
+                                payment?.hasPaymentProof &&
+                                !paymentProof && (
+                                    <div className="flex items-center justify-between rounded-lg border p-3">
+                                        <div className="flex min-w-0 items-center gap-2">
+                                            <FileText className="h-5 w-5 shrink-0 text-muted-foreground" />
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-medium">
+                                                    Existing Payment Proof
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Payment proof is already uploaded.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={onViewPaymentProof}
+                                            disabled={submitting}
+                                        >
+                                            View
+                                        </Button>
+                                    </div>
+                                )}
+
+                            {/* New Payment Proof */}
                             {paymentProof ? (
                                 <div className="flex items-center justify-between rounded-lg border p-3">
                                     <div className="flex min-w-0 items-center gap-2">
@@ -409,11 +477,12 @@ export default function OrderPaymentDialog({
                             Cancel
                         </Button>
 
-                        <Button
-                            type="submit"
-                            disabled={submitting || loadingOptions}
-                        >
-                            {submitting ? "Saving..." : "Create Payment"}
+                        <Button type="submit" disabled={submitting || loadingOptions}>
+                            {submitting
+                                ? "Saving..."
+                                : mode === "edit"
+                                    ? "Update Payment"
+                                    : "Create Payment"}
                         </Button>
                     </DialogFooter>
                 </form>

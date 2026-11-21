@@ -35,7 +35,7 @@ namespace RahilCore.Infrastructure.Persistence.Configurations
 
             builder.Property(x => x.Description).HasColumnName("description");
             builder.Property(x => x.ActorUsername).HasColumnName("actor_username");
-            builder.Property(x => x.Metadata).HasColumnName("metadata");
+            builder.Property(x => x.Metadata).HasColumnName("metadata").HasColumnType("jsonb");
             builder.Property(x => x.CreatedAt).HasColumnName("created_at");
         }
     }

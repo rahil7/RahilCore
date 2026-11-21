@@ -2,7 +2,7 @@
 
 namespace RahilCore.Application.Features.Orders.Request
 {
-    public sealed class AssignOrderRequest
+    public sealed class OrderAssignRequest
     {
         [Required]
         public DateTime ScheduleAt { get; set; }

@@ -7,7 +7,7 @@ namespace RahilCore.Application.Features.Orders
 {
     public interface IOrderService
     {
-        Task<long> Assign(long id, AssignOrderRequest request, string createdBy, CancellationToken ct);
+        Task<long> Assign(long id, OrderAssignRequest request, string createdBy, CancellationToken ct);
         Task<long> CreateOrderForCustomer(CreateOrderCustomerRequest request, string createdBy, CancellationToken ct = default);
         Task<long> CreateOrderForDealer(CreateOrderDealerRequest request, string createdBy, CancellationToken ct = default);
         Task<long> CreatePayment(long id,CreatePaymentRequest request, string createdBy, CancellationToken ct = default);
@@ -18,5 +18,6 @@ namespace RahilCore.Application.Features.Orders
         Task<(IReadOnlyList<OrderListDto> Items, int TotalItems)> GetPagedAsync(GetOrderListQuery query, CancellationToken ct = default);
         Task<OrderPaymentCreateOption?> GetPaymentOptionsAsync(CancellationToken ct = default);
         Task<FileAccessDto> GetPaymentProofAsync(long paymentId, CancellationToken ct = default);
+        Task<long> UpdatePayment(long id, long paymentId, UpdatePaymentRequest request, string createdBy, CancellationToken ct = default);
     }
 }

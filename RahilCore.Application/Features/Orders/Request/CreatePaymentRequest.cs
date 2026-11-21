@@ -14,9 +14,9 @@ namespace RahilCore.Application.Features.Orders.Request
         public decimal? DiscountAmount { get; set; }
 
         [Required]
-        public DateTime PaymentDate { set; get; }
+        public DateTime PaymentDate { get; set; }
 
-        public string? ReferenceNo { set; get; }
+        public string? ReferenceNo { get; set; }
 
         [Required]
         [StringLength(500)]

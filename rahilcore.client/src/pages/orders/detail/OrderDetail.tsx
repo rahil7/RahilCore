@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PageDetailHeader } from "../../../components/layout/PageDetailHeader";
-import type { CreatePaymentRequest, OrderDetailResponse } from "../../../types/order";
+import type { CreatePaymentRequest, OrderAssignRequest, OrderDetailResponse, UpdatePaymentRequest } from "../../../types/order";
 
 import OrderDetailHeader from "./components/OrderDetailHeader";
 import OrderCustomerSection from "./components/OrderCustomerSection";
@@ -13,6 +13,7 @@ import OrderActivitySection from "./components/OrderActivitySection";
 import { orderService } from "../../../services/order-service";
 import type { CachedFileAccess } from "../../../types/file";
 import OrderPaymentDialog from "./dialogs/OrderPaymentDialog";
+import OrderAssignmentDialog from "./dialogs/OrderAssignmentDialog";
 
 export default function OrderDetail() {
     const navigate = useNavigate();
@@ -22,26 +23,44 @@ export default function OrderDetail() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const [paymentDialogKey, setPaymentDialogKey] = useState(0);
     const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
-    const [paymentSubmitting, setPaymentSubmitting] = useState(false);
+    const [paymentDialogMode, setPaymentDialogMode] = useState<"create" | "edit">("create");
 
-    const handleCreatePayment = async (request: CreatePaymentRequest) => {
-        try {
-            setPaymentSubmitting(true);
+    const openCreatePayment = () => {
+        setPaymentDialogMode("create");
+        setPaymentDialogKey((prev) => prev + 1);
+        setPaymentDialogOpen(true);
+    };
 
-            await orderService.createPayment(Number(id), request);
+    const handleEditPayment = () => {
+        setPaymentDialogMode("edit");
+        setPaymentDialogKey((prev) => prev + 1);
+        setPaymentDialogOpen(true);
+    };
 
-            setPaymentDialogOpen(false);
+    const handleSubmitPayment = async (
+        request: CreatePaymentRequest | UpdatePaymentRequest
+    ) => {
+        if (paymentDialogMode === "create") {
+            await orderService.createPayment(
+                Number(id),
+                request as CreatePaymentRequest
+            );
+        } else {
+            if (!order?.payment) {
+                throw new Error("Payment data not found.");
+            }
 
-            // Refresh detail agar payment dan payment status terbaru ditampilkan.
-            const response = await orderService.getDetail(Number(id));
-            setOrder(response.data);
-        } catch (error) {
-            console.error("Failed to create payment:", error);
-            throw error;
-        } finally {
-            setPaymentSubmitting(false);
+            await orderService.updatePayment(
+                Number(id),
+                order.payment.paymentId,
+                request as UpdatePaymentRequest
+            );
         }
+
+        const response = await orderService.getDetail(Number(id));
+        setOrder(response.data);
     };
     
     const [proofLoading, setProofLoading] = useState(false);
@@ -87,6 +106,20 @@ export default function OrderDetail() {
         }
     }, []);
 
+    const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
+
+    const handleOpenAssignmentDialog = () => {
+        setAssignmentDialogOpen(true);
+    };
+
+    const handleAssignInspector = async (request: OrderAssignRequest) => {
+        await orderService.assignment(Number(id), request);
+
+        const response = await orderService.getDetail(Number(id));
+
+        setOrder(response.data);
+    };
+
     useEffect(() => {
         if (!id) return;
 
@@ -96,8 +129,6 @@ export default function OrderDetail() {
                 setError(null);
 
                 const response = await orderService.getDetail(Number(id));
-
-                console.log(response);
 
                 setOrder(response.data);
             } catch (err) {
@@ -172,29 +203,46 @@ export default function OrderDetail() {
                 paymentStatusId={order.paymentStatusId}
                 paymentStatusName={order.paymentStatusName}
                 proofLoading={proofLoading}
-                onCreate={() => setPaymentDialogOpen(true)}
-                onEdit={() => {
-                    // Akan kita hubungkan ke PaymentDialog
-                }}
+                onCreate={openCreatePayment}
+                onEdit={handleEditPayment}
                 onViewProof={handleViewPaymentProof}
             />
 
             <OrderPaymentDialog
+                key={paymentDialogKey}
                 open={paymentDialogOpen}
                 onOpenChange={setPaymentDialogOpen}
-                onSubmit={handleCreatePayment}
+                mode={paymentDialogMode}
+                payment={order?.payment ?? null}
+                onSubmit={handleSubmitPayment}
+                onViewPaymentProof={() => {
+                    if (order?.payment) {
+                        handleViewPaymentProof(order.payment.paymentId);
+                    }
+                }}
             />
 
             <OrderAssignmentSection
                 assignment={order.assignment}
-                canAssign={!order.assignment}
-                canReassign={Boolean(order.assignment)}
-                onAssign={() => {
-                    // Nanti buka AssignmentDialog
-                }}
-                onReassign={() => {
-                    // Nanti buka AssignmentDialog
-                }}
+                canAssign={order.canAssign}
+                canReassign={order.canReassign}
+                onAssign={handleOpenAssignmentDialog}
+                onReassign={handleOpenAssignmentDialog}
+            />
+
+            <OrderAssignmentDialog
+                open={assignmentDialogOpen}
+                onOpenChange={setAssignmentDialogOpen}
+                onSubmit={handleAssignInspector}
+                currentAssignment={
+                    order.assignment
+                        ? {
+                            inspectorUsername: order.assignment.inspectorUsername,
+                            inspectorName: order.assignment.inspectorName,
+                            scheduleAt: order.assignment.scheduleAt,
+                        }
+                        : null
+                }
             />
 
             <OrderActivitySection activities={order.activities} />

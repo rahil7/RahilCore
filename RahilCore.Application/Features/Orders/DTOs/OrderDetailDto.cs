@@ -16,6 +16,8 @@
         public string CreatedNote { get; set; } = string.Empty;
 
         public bool IsAssigned { get; set; }
+        public bool CanAssign { get; set; }
+        public bool CanReassign { get; set; }
 
         public string? PicName { get; set; }
         public string? PicPhone { get; set; }
@@ -40,6 +42,7 @@
     {
         public string CustomerCode { get; set; } = string.Empty;
         public string CustomerName { get; set; } = string.Empty;
+        public long customerTypeId { get; set; }
         public string CustomerType { get; set; } = string.Empty;
         public string? Email { get; set; }
         public string? Phone { get; set; }

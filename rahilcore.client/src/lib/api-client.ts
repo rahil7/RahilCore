@@ -27,11 +27,13 @@ async function request<T>(
     url: string,
     options: RequestInit = {},
 ): Promise<T> {
+    const isFormData = options.body instanceof FormData;
+
     const response = await fetch(url, {
         ...options,
         credentials: "include",
         headers: {
-            ...(options.body != null
+            ...(options.body != null && !isFormData
                 ? { "Content-Type": "application/json" }
                 : {}),
             ...options.headers,
@@ -63,7 +65,11 @@ export const apiClient = {
         return request<T>(url, {
             method: "POST",
             ...(data !== undefined
-                ? { body: JSON.stringify(data) }
+                ? {
+                    body: data instanceof FormData
+                        ? data
+                        : JSON.stringify(data),
+                }
                 : {}),
         });
     },
@@ -71,7 +77,7 @@ export const apiClient = {
     patch<T>(url: string, data: unknown): Promise<T> {
         return request<T>(url, {
             method: "PATCH",
-            body: JSON.stringify(data),
+            body: data instanceof FormData ? data : JSON.stringify(data),
         });
     },
 

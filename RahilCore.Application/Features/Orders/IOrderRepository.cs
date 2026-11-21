@@ -13,7 +13,7 @@ namespace RahilCore.Application.Features.Orders
         Task<(IReadOnlyList<OrderListDto> Items, int TotalItems)> GetPagedAsync(GetOrderListQuery query, CancellationToken ct = default);
         Task<InspectionOrderEn?> GetByIdAsync(long id, CancellationToken ct = default);
         void AddPayment(InspectionOrderPaymentEn payment);
-        Task<bool> ExistsPaymentAsync(long orderId, CancellationToken ct = default);
+        Task<bool> ExistsPaymentByOrderIdAsync(long orderId, CancellationToken ct = default);
         Task<InspectionOrderPaymentEn?> GetPaymentByIdAsync(long paymentId, CancellationToken ct = default);
         Task<bool> ExistsAssignment(long id, string inspectorUsername, CancellationToken ct = default);
         Task<InspectionOrderAssignmentEn?> GetActiveAssignment(long orderId, CancellationToken ct = default);
@@ -27,5 +27,7 @@ namespace RahilCore.Application.Features.Orders
         Task<OrderPaymentDto?> GetOrderPayment(long orderId, CancellationToken ct = default);
         Task<OrderAssignmentDto?> GetOrderAssignment(long orderId, CancellationToken ct = default);
         Task<InspectionOrderEn?> GetOrderDetail(long id, CancellationToken ct = default);
+        Task<bool> ExistsPaymentAsync(long id, long paymentId, CancellationToken ct = default);
+        Task<InspectionOrderPaymentEn?> GetPayment(long orderId, long paymentId, CancellationToken ct = default);
     }
 }

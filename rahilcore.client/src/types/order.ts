@@ -4,8 +4,8 @@ import type {
     FilterOption,
     QueryFieldOption,
 } from "./common";
-import type { Activity } from "./Activity";
-import type { FormSelectOption } from "../components/common/FormSelect";
+import type { UserLookupDto } from "./user";
+import type { Activity } from "../types/activity";
 
 export interface OrderFilterOptions {
     customerTypes: FilterOption[];
@@ -111,6 +111,21 @@ export interface CreatePaymentRequest {
     paymentProof: File | null;
 }
 
+export interface UpdatePaymentRequest {
+    paymentMethodId?: number | null;
+    subtotalAmount?: number | null;
+    discountAmount?: number | null;
+    paymentDate?: string | null;
+    referenceNo?: string | null;
+    note: string;
+    paymentProof?: File | null;
+}
+
+export interface OrderAssignRequest {
+    scheduleAt: string;
+    inspectorUsername: string;
+    note: string;
+}
 
 export interface OrderDetailResponse {
     id: number;
@@ -123,6 +138,8 @@ export interface OrderDetailResponse {
     createdBy: string;
     createdNote: string;
     isAssigned: boolean;
+    canAssign: boolean;
+    canReassign: boolean;
     picName: string | null;
     picPhone: string | null;
     inspectionFormId: number;
@@ -144,6 +161,7 @@ export interface OrderDetailResponse {
 export interface OrderCustomer {
     customerCode: string;
     customerName: string;
+    customerTypeId: number;
     customerType: string;
     email: string | null;
     phone: string | null;
@@ -187,5 +205,9 @@ export interface OrderAssignment {
 }
 
 export interface OrderPaymentOptions {
-    paymentMethods: FormSelectOption[];
+    paymentMethods: FilterOption[];
+}
+
+export interface OrderAssignmentOptions {
+    inspectors: UserLookupDto[];
 }

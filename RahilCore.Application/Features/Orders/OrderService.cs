@@ -302,6 +302,8 @@ namespace RahilCore.Application.Features.Orders
                     Metadata = ""
                 };
 
+                activityRepo.Add(activity);
+
                 await uow.CommitAsync(ct);
 
                 return order.Id;
@@ -324,7 +326,7 @@ namespace RahilCore.Application.Features.Orders
                 throw new BusinessException(404, $"Order dengan ID '{id}' tidak ditemukan.");
             }
 
-            if(await orderRepo.ExistsPaymentAsync(id, ct))
+            if(await orderRepo.ExistsPaymentByOrderIdAsync(id, ct))
             {
                 throw new BusinessException(409, "Payment already exists.");
             }
@@ -458,6 +460,8 @@ namespace RahilCore.Application.Features.Orders
                     Metadata = ""
                 };
 
+                activityRepo.Add(activity);
+
                 await uow.SaveChangesAsync(ct);
                 await uow.CommitAsync(ct);
 
@@ -473,6 +477,223 @@ namespace RahilCore.Application.Features.Orders
                     try
                     {
                         await objectStorageService.DeleteAsync(uploadedObjectKey,CancellationToken.None);
+                    }
+                    catch
+                    {
+                        // Jangan menutupi exception utama.
+                        // Catat kegagalan cleanup melalui logger.
+                    }
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<long> UpdatePayment(
+            long id,
+            long paymentId,
+            UpdatePaymentRequest request,
+            string createdBy,
+            CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+
+            InspectionOrderEn? order = await orderRepo.GetByIdAsync(id, ct);
+
+            if (order is null)
+            {
+                throw new BusinessException(404, $"Order dengan ID '{id}' tidak ditemukan.");
+            }
+
+            InspectionOrderPaymentEn? payment = await orderRepo.GetPayment(id, paymentId, ct);
+
+            if (payment is null)
+            {
+                throw new BusinessException(404, "Payment not found.");
+            }
+
+            // Validate Payment Method
+            if (request.PaymentMethodId.HasValue)
+            {
+                if (!await masterParameterRepo.ExistsAsync(
+                    request.PaymentMethodId.Value,
+                    MasterParameterTypes.PAYMENT_METHOD,
+                    ct))
+                {
+                    throw new BusinessException(400, "Payment Method tidak valid.");
+                }
+            }
+
+            // Get final values (existing value + requested changes)
+            decimal subtotalAmount = request.SubtotalAmount
+                ?? order.SubtotalAmount
+                ?? 0m;
+
+            decimal discountAmount = request.DiscountAmount
+                ?? order.DiscountAmount
+                ?? 0m;
+
+            // Validate final amount
+            if (subtotalAmount <= 0)
+            {
+                throw new BusinessException(400, "Subtotal amount must be greater than zero.");
+            }
+
+            if (discountAmount < 0)
+            {
+                throw new BusinessException(400, "Discount amount cannot be negative.");
+            }
+
+            if (discountAmount > subtotalAmount)
+            {
+                throw new BusinessException(400, "Discount amount cannot exceed subtotal amount.");
+            }
+
+            decimal totalAmount = subtotalAmount - discountAmount;
+
+            // Validate Payment Proof
+            if (request.PaymentProof is not null)
+            {
+                var file = request.PaymentProof;
+
+                if (file.Length <= 0)
+                {
+                    throw new BusinessException(400, "Payment proof tidak boleh kosong.");
+                }
+
+                if (file.Length > 3 * 1024 * 1024)
+                {
+                    throw new BusinessException(400, "Payment proof maksimal 3 MB.");
+                }
+
+                var allowedTypes = new Dictionary<string, string[]>
+                {
+                    [".jpg"] = ["image/jpeg"],
+                    [".jpeg"] = ["image/jpeg"],
+                    [".png"] = ["image/png"],
+                    [".pdf"] = ["application/pdf"]
+                };
+
+                var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+                if (!allowedTypes.TryGetValue(extension, out var mimeTypes))
+                {
+                    throw new BusinessException(400, "Format payment proof harus JPG, JPEG, PNG, atau PDF.");
+                }
+
+                if (!mimeTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
+                {
+                    throw new BusinessException(400, "Tipe file payment proof tidak valid.");
+                }
+            }
+
+            await uow.BeginTransactionAsync(ct);
+
+            string? uploadedObjectKey = null;
+            bool isNewObjectKey = false;
+
+            try
+            {
+                var now = DateTime.UtcNow;
+                string note = request.Note.Trim();
+
+                // Update order amount
+                order.SubtotalAmount = subtotalAmount;
+                order.DiscountAmount = discountAmount;
+
+                // Update order audit
+                order.UpdatedAt = now;
+                order.UpdatedBy = createdBy;
+
+                if (note is not null)
+                {
+                    order.UpdatedNote = note;
+                }
+
+                // Update payment only for fields sent in request
+                if (request.PaymentMethodId.HasValue)
+                {
+                    payment.PaymentMethodId = request.PaymentMethodId.Value;
+                }
+
+                payment.Amount = totalAmount;
+
+                if (request.PaymentDate.HasValue)
+                {
+                    payment.PaymentDate = DateTimeHelper.JakartaToUtc(
+                        request.PaymentDate.Value);
+                }
+
+                if (request.ReferenceNo is not null)
+                {
+                    payment.ReferenceNo = request.ReferenceNo.Trim();
+                }
+
+                // Upload payment proof if provided
+                if (request.PaymentProof is not null)
+                {
+                    var file = request.PaymentProof;
+                    var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+                    if (!string.IsNullOrWhiteSpace(payment.StorageKey))
+                    {
+                        // Replace existing file using the same object key
+                        uploadedObjectKey = payment.StorageKey;
+                    }
+                    else
+                    {
+                        // Generate a new object key if no existing file
+                        uploadedObjectKey = $"payments/{now:yyyy/MM}/{Guid.NewGuid()}{extension}";
+                        isNewObjectKey = true;
+                    }
+
+                    await using var stream = file.OpenReadStream();
+
+                    await objectStorageService.UploadAsync(
+                        stream,
+                        uploadedObjectKey,
+                        file.ContentType,
+                        ct);
+
+                    payment.StorageKey = uploadedObjectKey;
+                    payment.FileName = Path.GetFileName(file.FileName);
+                    payment.FileSize = file.Length;
+                    payment.FileType = file.ContentType;
+                }
+
+                // Activity Log
+                var activity = new ActivityLogEn
+                {
+                    OrderId = order.Id,
+                    EntityId = payment.Id,
+                    EntityTypeId = ActivityEntityType.PAYMENT,
+                    ActionCodeId = ActivityActionCode.PAYMENT_UPDATED,
+                    Description = "Pembayaran berhasil diperbarui",
+                    ActorUsername = createdBy,
+                    CreatedAt = now,
+                    Metadata = null
+                };
+
+                activityRepo.Add(activity);
+
+                await uow.SaveChangesAsync(ct);
+                await uow.CommitAsync(ct);
+
+                return payment.Id;
+            }
+            catch
+            {
+                await uow.RollbackAsync(CancellationToken.None);
+
+                // Cleanup only newly created file
+                // Existing file must not be deleted because it may have been overwritten.
+                if (isNewObjectKey && uploadedObjectKey is not null)
+                {
+                    try
+                    {
+                        await objectStorageService.DeleteAsync(
+                            uploadedObjectKey,
+                            CancellationToken.None);
                     }
                     catch
                     {
@@ -615,7 +836,7 @@ namespace RahilCore.Application.Features.Orders
             );
         }
 
-        public async Task<long> Assign(long id, AssignOrderRequest request,string createdBy, CancellationToken ct)
+        public async Task<long> Assign(long id, OrderAssignRequest request,string createdBy, CancellationToken ct)
         {
             ArgumentNullException.ThrowIfNull(request);
 
@@ -872,10 +1093,13 @@ namespace RahilCore.Application.Features.Orders
             if (order.Customer is null) return null;
             if (orderItems.Count == 0) return null;
 
+            var canReassign = assignment != null && !await orderRepo.HasSubmittedInspectionAsync(id, ct);
+
             var customer = new OrderCustomerDto
             {
                 CustomerCode = order.Customer.CustCode,
                 CustomerName = order.Customer.CustName,
+                customerTypeId = order.Customer.CustTypeId,
                 CustomerType = order.Customer.CustType?.ParamName ?? string.Empty,
                 Email = order.Customer.Email,
                 Phone = order.Customer.Phone,
@@ -900,6 +1124,8 @@ namespace RahilCore.Application.Features.Orders
                 .OrderBy(x => x.VehicleId)
                 .ToList();
 
+            var canAssign = order.Customer.CustTypeId == 1 || (order.Customer.CustTypeId == 2 && order.PaymentStatusId == 15);
+
             return new OrderDetailDto
             {
                 Id = order.Id,
@@ -917,6 +1143,8 @@ namespace RahilCore.Application.Features.Orders
                 Note = order.CreatedNote,
                 InspectionFormId = inspectionForm!.Id,
                 InspectionFormName = inspectionForm!.Name,
+                CanAssign = canAssign,
+                CanReassign = canReassign,
 
                 Customer = customer,
                 Vehicles = vehicles,

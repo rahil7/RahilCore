@@ -4,6 +4,7 @@ import { Button } from "../../../../components/ui/button";
 import type { OrderPayment } from "../../../../types/order";
 import StatusBadge from "../../../../components/shared/StatusBadge";
 import { paymentStatusConfig } from "../../../../config/status-config";
+import { formatDateTime } from "../../../../utils/date-utils";
 
 interface OrderPaymentSectionProps {
     payment: OrderPayment | null;
@@ -78,7 +79,7 @@ export default function OrderPaymentSection({
                         <div>
                             <p className="text-sm text-muted-foreground">Payment Date</p>
                             <p className="mt-1 text-sm font-medium">
-                                {payment.paymentDate}
+                                {formatDateTime(payment.paymentDate)}
                             </p>
                         </div>
 

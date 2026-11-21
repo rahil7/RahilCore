@@ -45,7 +45,7 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 ct);
         }
 
-        public async Task<bool> ExistsPaymentAsync(long orderId, CancellationToken ct = default)
+        public async Task<bool> ExistsPaymentByOrderIdAsync(long orderId, CancellationToken ct = default)
         {
             return await context.InspectionOrderPayments.AnyAsync(x => x.OrderId == orderId, ct);
         }
@@ -355,6 +355,18 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 .Include(x => x.Status)
                 .Include(x => x.PaymentStatus)
                 .FirstOrDefaultAsync(x => x.Id == id, ct);
+        }
+
+        public async Task<bool> ExistsPaymentAsync(long orderId, long paymentId, CancellationToken ct = default)
+        {
+            return await context.InspectionOrderItems.AnyAsync(x => x.OrderId == orderId && x.Id == paymentId,ct);
+        }
+
+        public async Task<InspectionOrderPaymentEn?> GetPayment(long orderId, long paymentId, CancellationToken ct = default)
+        {
+            return await context.InspectionOrderPayments
+                .Where(x => x.OrderId == orderId && x.Id == paymentId)
+                .FirstOrDefaultAsync(ct);
         }
     }
 }

@@ -178,6 +178,30 @@ namespace RahilCore.Server.Controllers
                     Data: new { Id = id }));
         }
 
+        [HttpPatch("{id:long}/payments/{paymentId:long}")]
+        public async Task<IActionResult> UpdatePayment([FromRoute] long id, [FromRoute] long paymentId, [FromForm] UpdatePaymentRequest request,CancellationToken ct)
+        {
+            var createdBy = User.FindFirstValue("username");
+
+            if (string.IsNullOrWhiteSpace(createdBy))
+            {
+                return Unauthorized(
+                    new ApiResponse<object>(
+                        Success: false,
+                        Message: "User identity not found.",
+                        Data: null));
+            }
+
+            long resultId = await orderService.UpdatePayment(id, paymentId, request, createdBy, ct);
+
+            return StatusCode(
+                StatusCodes.Status201Created,
+                new ApiResponse<object>(
+                    Success: true,
+                    Message: "Payment update successfully.",
+                    Data: new { Id = id }));
+        }
+
         [HttpGet("payments/{paymentId:long}/proof")]
         public async Task<IActionResult> GetPaymentProof([FromRoute] long paymentId,CancellationToken ct)
         {
@@ -187,7 +211,7 @@ namespace RahilCore.Server.Controllers
         }
 
         [HttpPost("{id:long}/assign")]
-        public async Task<IActionResult> Assign([FromRoute] long id,[FromBody] AssignOrderRequest request,CancellationToken ct)
+        public async Task<IActionResult> Assign([FromRoute] long id,[FromBody] OrderAssignRequest request,CancellationToken ct)
         {
             var createdBy = User.FindFirstValue("username");
 

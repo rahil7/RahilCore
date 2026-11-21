@@ -2,7 +2,7 @@ import { apiClient } from "../lib/api-client";
 
 import type { ApiResponse } from "../types/api";
 import type { FileAccess } from "../types/file";
-import type { CreateOrderCustomerRequest, CreateOrderDealerRequest, CreatePaymentRequest, GetOrdersParams, OrderCreateOptions, OrderDetailResponse, OrderFilterOptions, OrderListItem, OrderPaymentOptions } from "../types/order";
+import type { OrderAssignRequest, CreateOrderCustomerRequest, CreateOrderDealerRequest, CreatePaymentRequest, GetOrdersParams, OrderAssignment, OrderAssignmentOptions, OrderCreateOptions, OrderDetailResponse, OrderFilterOptions, OrderListItem, OrderPaymentOptions, UpdatePaymentRequest } from "../types/order";
 import type { PagedResponse } from "../types/pagination";
 
 function buildQueryString(params: GetOrdersParams): string {
@@ -119,6 +119,13 @@ export const orderService = {
         );
     },
 
+    assignment(orderId: number, data: OrderAssignRequest) {
+        return apiClient.post<ApiResponse<unknown>>(
+            `/api/orders/${orderId}/assign`,
+            data,
+        );
+    },
+
     getDetail(id: number) {
         return apiClient.get<ApiResponse<OrderDetailResponse>>(
             `/api/orders/${id}`,
@@ -134,6 +141,51 @@ export const orderService = {
     getPaymentOptions() {
         return apiClient.get<ApiResponse<OrderPaymentOptions>>(
             "/api/orders/payment-options"
+        );
+    },
+
+    getAssignmentOptions() {
+        return apiClient.get<ApiResponse<OrderAssignmentOptions>>(
+            "/api/orders/assign-options"
+        );
+    },
+
+    updatePayment(
+        orderId: number,
+        paymentId: number,
+        request: UpdatePaymentRequest
+    ) {
+        const formData = new FormData();
+
+        if (request.paymentMethodId != null) {
+            formData.append("PaymentMethodId", String(request.paymentMethodId));
+        }
+
+        if (request.subtotalAmount != null) {
+            formData.append("SubtotalAmount", String(request.subtotalAmount));
+        }
+
+        if (request.discountAmount != null) {
+            formData.append("DiscountAmount", String(request.discountAmount));
+        }
+
+        if (request.paymentDate != null) {
+            formData.append("PaymentDate", request.paymentDate);
+        }
+
+        if (request.referenceNo != null) {
+            formData.append("ReferenceNo", request.referenceNo);
+        }
+
+        formData.append("Note", request.note);
+
+        if (request.paymentProof) {
+            formData.append("PaymentProof", request.paymentProof);
+        }
+
+        return apiClient.patch<ApiResponse<unknown>>(
+            `/api/orders/${orderId}/payments/${paymentId}`,
+            formData
         );
     },
 }
