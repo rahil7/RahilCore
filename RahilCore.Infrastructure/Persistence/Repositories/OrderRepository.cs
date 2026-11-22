@@ -127,11 +127,6 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id, ct);
         }
 
-        public async Task<InspectionOrderItemEn?> GetOrderItemByOrderId(long orderId, CancellationToken ct = default)
-        {
-            return await context.InspectionOrderItems.FirstOrDefaultAsync(x => x.OrderId == orderId, ct);
-        }
-
         public async Task<InspectionOrderItemEn?> GetOrderItem(long orderId, long itemId, CancellationToken ct = default)
         {
             return await context.InspectionOrderItems
@@ -403,6 +398,13 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 .AsNoTracking()
                 .Where(x => x.OrderItem!.OrderId == orderId && x.SubmittedAt != null)
                 .Select(x => x.OrderItemId)
+                .ToListAsync(ct);
+        }
+
+        public async Task<IReadOnlyList<InspectionOrderItemEn>> GetOrderItemsByOrderId(long orderId, CancellationToken ct = default)
+        {
+            return await context.InspectionOrderItems
+                .Where(x => x.OrderId == orderId)
                 .ToListAsync(ct);
         }
     }

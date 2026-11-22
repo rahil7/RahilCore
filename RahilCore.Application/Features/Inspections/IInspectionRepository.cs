@@ -7,6 +7,9 @@ namespace RahilCore.Application.Features.Inspections
     {
         void AddRange(IEnumerable<InspectionEn> inspections);
         void Add(InspectionEn inspection);
-        Task<IReadOnlyList<FilterOptionDto>> GetInspFormsForFilter(CancellationToken ct);
+        Task<IReadOnlyList<FilterOptionDto>> GetInspFormsForFilter(CancellationToken ct = default);
+        Task<InspectionEn?> GetByOrderItemId(long orderItemId, CancellationToken ct = default);
+        void Delete(InspectionEn inspection);
+        Task DeleteByOrderItemId(long orderItemId, CancellationToken ct = default);
     }
 }

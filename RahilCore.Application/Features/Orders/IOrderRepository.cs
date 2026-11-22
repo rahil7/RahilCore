@@ -23,7 +23,6 @@ namespace RahilCore.Application.Features.Orders
 
         Task<bool> HasSubmittedInspectionAsync(long orderId, CancellationToken ct = default);
         Task<bool> HasSubmittedInspectionItemAsync(long orderId, long itemId, CancellationToken ct = default);
-        Task<InspectionOrderItemEn?> GetOrderItemByOrderId(long orderId, CancellationToken ct = default);
         Task<string> GenerateInspectionNo(long custType, CancellationToken ct = default);
         Task<IReadOnlyList<InspectionOrderItemEn>> GetOrderDetailItems(long orderId, CancellationToken ct = default);
         Task<OrderPaymentDto?> GetOrderPayment(long orderId, CancellationToken ct = default);
@@ -35,5 +34,6 @@ namespace RahilCore.Application.Features.Orders
         Task<int> CountOrderItems(long orderId, CancellationToken ct = default);
         void DeleteOrderItem(InspectionOrderItemEn item);
         Task<IReadOnlyList<long>> GetSubmittedOrderItemIds(long orderId, CancellationToken ct = default);
+        Task<IReadOnlyList<InspectionOrderItemEn>> GetOrderItemsByOrderId(long orderId, CancellationToken ct = default);
     }
 }

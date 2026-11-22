@@ -882,10 +882,13 @@ namespace RahilCore.Application.Features.Orders
             if (inspector is null)
                 throw new BusinessException(404, "Inspector tidak ditemukan.");
 
-            var orderItem = await orderRepo.GetOrderItemByOrderId(id, ct);
+            IReadOnlyList<InspectionOrderItemEn> orderItems = await orderRepo.GetOrderItemsByOrderId(id, ct);
 
-            if (orderItem is null)
+            if (orderItems.Count == 0)
                 throw new BusinessException(404, "Order item tidak ditemukan.");
+
+            if (orderItems.Count != order.TotalUnit)
+                throw new BusinessException(400, "Jumlah unit pada order tidak sesuai.");
 
             var activeAssignment = await orderRepo.GetActiveAssignment(id, ct);
 
@@ -975,7 +978,7 @@ namespace RahilCore.Application.Features.Orders
                 {
                     var inspections = new List<InspectionEn>();
 
-                    for (var unit = 0; unit < order.TotalUnit; unit++)
+                    foreach (var item in orderItems)
                     {
                         var inspectionNo = await orderRepo.GenerateInspectionNo(
                             order.Customer.CustTypeId,
@@ -984,7 +987,7 @@ namespace RahilCore.Application.Features.Orders
 
                         inspections.Add(new InspectionEn
                         {
-                            OrderItemId = orderItem.Id,
+                            OrderItemId = item.Id,
                             InspectionNo = inspectionNo,
                             CreatedAt = now,
                             CreatedBy = createdBy
@@ -1199,6 +1202,7 @@ namespace RahilCore.Application.Features.Orders
                 );
             }
 
+
             VehicleEn? vehicle = await vehicleRepo.GetByIdAsync(item.VehicleId, ct);
 
             if (vehicle is null)
@@ -1210,8 +1214,9 @@ namespace RahilCore.Application.Features.Orders
 
             try
             {
-                orderRepo.DeleteOrderItem(item);
+                await inspectionRepo.DeleteByOrderItemId(item.Id, ct);
 
+                orderRepo.DeleteOrderItem(item);
                 vehicleRepo.DeleteVehicle(vehicle);
 
                 order.TotalUnit = totalItems - 1;

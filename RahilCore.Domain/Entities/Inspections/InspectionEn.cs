@@ -12,6 +12,6 @@ namespace RahilCore.Domain.Entities.Inspections
         public DateTime? StartedAt { get; set; }
         public DateTime? ReceivedAt { get; set; }
         public DateTime? SubmittedAt { get; set; }
-        public string SubmittedBy { get; set; } = null!;
+        public string? SubmittedBy { get; set; }
     }
 }
