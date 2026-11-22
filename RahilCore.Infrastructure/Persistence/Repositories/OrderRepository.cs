@@ -37,14 +37,6 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             context.InspectionOrderPayments.Add(payment);
         }
 
-        public async Task<bool> ExistsAssignment(long id, string inspectorUsername, CancellationToken ct)
-        {
-            return await context.InspectionOrderAssignments.AnyAsync(x => 
-                x.OrderId == id && 
-                x.InspectorUsername == inspectorUsername, 
-                ct);
-        }
-
         public async Task<bool> ExistsPaymentByOrderIdAsync(long orderId, CancellationToken ct = default)
         {
             return await context.InspectionOrderPayments.AnyAsync(x => x.OrderId == orderId, ct);
@@ -118,13 +110,9 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                     ct);
         }
 
-        public async Task<InspectionOrderEn?> GetByIdAsync(long id, CancellationToken ct = default)
+        public async Task<InspectionOrderEn?> GetOrderAsync(long id, CancellationToken ct = default)
         {
-            return await context.InspectionOrders
-                .Include(x => x.Customer)
-                .Include(x => x.Status)
-                .Include(x => x.PaymentStatus)
-                .FirstOrDefaultAsync(x => x.Id == id, ct);
+            return await context.InspectionOrders.FirstOrDefaultAsync(x => x.Id == id, ct);
         }
 
         public async Task<InspectionOrderItemEn?> GetOrderItem(long orderId, long itemId, CancellationToken ct = default)
@@ -370,11 +358,6 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id, ct);
         }
 
-        public async Task<bool> ExistsPaymentAsync(long orderId, long paymentId, CancellationToken ct = default)
-        {
-            return await context.InspectionOrderItems.AnyAsync(x => x.OrderId == orderId && x.Id == paymentId,ct);
-        }
-
         public async Task<InspectionOrderPaymentEn?> GetPayment(long orderId, long paymentId, CancellationToken ct = default)
         {
             return await context.InspectionOrderPayments
@@ -406,6 +389,13 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             return await context.InspectionOrderItems
                 .Where(x => x.OrderId == orderId)
                 .ToListAsync(ct);
+        }
+
+        public async Task<InspectionOrderEn?> GetOrderWithCustomer(long id, CancellationToken ct = default)
+        {
+            return await context.InspectionOrders
+                .Include(x => x.Customer)
+                .FirstOrDefaultAsync(x => x.Id == id, ct);
         }
     }
 }

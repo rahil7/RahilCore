@@ -1,8 +1,6 @@
-﻿using Amazon.Runtime.Internal;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RahilCore.Application.Common.DTOs;
-using RahilCore.Application.Features.Customers.DTOs;
 using RahilCore.Application.Features.Orders;
 using RahilCore.Application.Features.Orders.DTOs;
 using RahilCore.Application.Features.Orders.Queries;
@@ -59,6 +57,29 @@ namespace RahilCore.Server.Controllers
                     Data: order));
         }
 
+        [HttpPut("{id:long}")]
+        public async Task<ActionResult> Update([FromRoute] long id, [FromBody] UpdateOrderRequest request, CancellationToken ct)
+        {
+            var username = User.FindFirstValue("username");
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return Unauthorized(
+                    new ApiResponse<object>(
+                        Success: false,
+                        Message: "User identity not found.",
+                        Data: null));
+            }
+
+            await orderService.Update(id, request, username, ct);
+
+            return Ok(
+                new ApiResponse<object>(
+                    Success: true,
+                    Message: "Order berhasi di update.",
+                    Data: null));
+        }
+
         [HttpGet("filter-options")]
         public async Task<ActionResult<ApiResponse<OrderFilterOptions>>> GetFilterOptions(CancellationToken ct)
         {
@@ -110,9 +131,9 @@ namespace RahilCore.Server.Controllers
         [HttpPost("create-dealer")]
         public async Task<IActionResult> CreateOrderDealer([FromBody] CreateOrderDealerRequest request, CancellationToken ct)
         {
-            var createdBy = User.FindFirstValue("username");
+            var username = User.FindFirstValue("username");
 
-            if (string.IsNullOrWhiteSpace(createdBy))
+            if (string.IsNullOrWhiteSpace(username))
             {
                 return Unauthorized(
                     new ApiResponse<object>(
@@ -121,7 +142,7 @@ namespace RahilCore.Server.Controllers
                         Data: null));
             }
 
-            long id = await orderService.CreateOrderForDealer(request, createdBy, ct);
+            long id = await orderService.CreateOrderForDealer(request, username, ct);
 
             return StatusCode(
                 StatusCodes.Status201Created,
@@ -134,9 +155,9 @@ namespace RahilCore.Server.Controllers
         [HttpPost("create-customer")]
         public async Task<IActionResult> CreateOrderCustomer([FromBody] CreateOrderCustomerRequest request, CancellationToken ct)
         {
-            var createdBy = User.FindFirstValue("username");
+            var username = User.FindFirstValue("username");
 
-            if (string.IsNullOrWhiteSpace(createdBy))
+            if (string.IsNullOrWhiteSpace(username))
             {
                 return Unauthorized(
                     new ApiResponse<object>(
@@ -145,7 +166,7 @@ namespace RahilCore.Server.Controllers
                         Data: null));
             }
 
-            long id = await orderService.CreateOrderForCustomer(request, createdBy, ct);
+            long id = await orderService.CreateOrderForCustomer(request, username, ct);
 
             return StatusCode(
                 StatusCodes.Status201Created,
@@ -158,9 +179,9 @@ namespace RahilCore.Server.Controllers
         [HttpPost("{id:long}/payments")]
         public async Task<IActionResult> CreatePayment([FromRoute] long id, [FromForm] CreatePaymentRequest request, CancellationToken ct)
         {
-            var createdBy = User.FindFirstValue("username");
+            var username = User.FindFirstValue("username");
 
-            if (string.IsNullOrWhiteSpace(createdBy))
+            if (string.IsNullOrWhiteSpace(username))
             {
                 return Unauthorized(
                     new ApiResponse<object>(
@@ -169,7 +190,7 @@ namespace RahilCore.Server.Controllers
                         Data: null));
             }
 
-            long resultId = await orderService.CreatePayment(id, request, createdBy, ct);
+            long resultId = await orderService.CreatePayment(id, request, username, ct);
 
             return StatusCode(
                 StatusCodes.Status201Created,
@@ -182,9 +203,9 @@ namespace RahilCore.Server.Controllers
         [HttpPatch("{id:long}/payments/{paymentId:long}")]
         public async Task<IActionResult> UpdatePayment([FromRoute] long id, [FromRoute] long paymentId, [FromForm] UpdatePaymentRequest request,CancellationToken ct)
         {
-            var createdBy = User.FindFirstValue("username");
+            var username = User.FindFirstValue("username");
 
-            if (string.IsNullOrWhiteSpace(createdBy))
+            if (string.IsNullOrWhiteSpace(username))
             {
                 return Unauthorized(
                     new ApiResponse<object>(
@@ -193,7 +214,7 @@ namespace RahilCore.Server.Controllers
                         Data: null));
             }
 
-            long resultId = await orderService.UpdatePayment(id, paymentId, request, createdBy, ct);
+            long resultId = await orderService.UpdatePayment(id, paymentId, request, username, ct);
 
             return StatusCode(
                 StatusCodes.Status201Created,
@@ -214,9 +235,9 @@ namespace RahilCore.Server.Controllers
         [HttpPost("{id:long}/assign")]
         public async Task<IActionResult> Assign([FromRoute] long id,[FromBody] OrderAssignRequest request,CancellationToken ct)
         {
-            var createdBy = User.FindFirstValue("username");
+            var username = User.FindFirstValue("username");
 
-            if (string.IsNullOrWhiteSpace(createdBy))
+            if (string.IsNullOrWhiteSpace(username))
             {
                 return Unauthorized(
                     new ApiResponse<object>(
@@ -225,7 +246,7 @@ namespace RahilCore.Server.Controllers
                         Data: null));
             }
 
-            long resultId = await orderService.Assign(id, request, createdBy, ct);
+            long resultId = await orderService.Assign(id, request, username, ct);
 
             return StatusCode(
                 StatusCodes.Status201Created,
@@ -242,9 +263,9 @@ namespace RahilCore.Server.Controllers
             [FromBody] DeleteOrderItemRequest request,
             CancellationToken ct)
         {
-            var createdBy = User.FindFirstValue("username");
+            var username = User.FindFirstValue("username");
 
-            if (string.IsNullOrWhiteSpace(createdBy))
+            if (string.IsNullOrWhiteSpace(username))
             {
                 return Unauthorized(
                     new ApiResponse<object>(
@@ -253,7 +274,7 @@ namespace RahilCore.Server.Controllers
                         Data: null));
             }
 
-            await orderService.DeleteOrderItem(id, itemId, request, createdBy, ct);
+            await orderService.DeleteOrderItem(id, itemId, request, username, ct);
 
             return Ok(
                 new ApiResponse<object>(

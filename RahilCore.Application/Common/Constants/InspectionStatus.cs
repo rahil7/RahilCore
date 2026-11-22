@@ -13,6 +13,13 @@
         public const long COMPLETED = 12;
         public const long CANCELLED = 13;
 
+        public static readonly long[] ALLOWED_ORDER_ASSIGNED =
+        [
+            ORDER_CREATED,
+            AWAITING_ASSIGNMENT,
+            INSPECTOR_ASSIGNED
+        ];
+
         public static readonly long[] ALLOWED_DELETE_ITEM =
         [
             ORDER_CREATED,
@@ -20,11 +27,10 @@
             INSPECTOR_ASSIGNED
         ];
 
-        public static readonly long[] ALLOWED_ASSIGN =
+        public static readonly long[] ALLOWED_ORDER_EDIT_SCHEDULE =
         [
             ORDER_CREATED,
-            AWAITING_ASSIGNMENT,
-            INSPECTOR_ASSIGNED
+            AWAITING_ASSIGNMENT
         ];
     }
 }
