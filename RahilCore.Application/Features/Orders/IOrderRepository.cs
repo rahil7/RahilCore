@@ -1,5 +1,6 @@
 ﻿using RahilCore.Application.Features.Orders.DTOs;
 using RahilCore.Application.Features.Orders.Queries;
+using RahilCore.Domain.Entities;
 using RahilCore.Domain.Entities.Orders;
 
 namespace RahilCore.Application.Features.Orders
@@ -21,6 +22,7 @@ namespace RahilCore.Application.Features.Orders
         void AddAssignment(InspectionOrderAssignmentEn assignment);
 
         Task<bool> HasSubmittedInspectionAsync(long orderId, CancellationToken ct = default);
+        Task<bool> HasSubmittedInspectionItemAsync(long orderId, long itemId, CancellationToken ct = default);
         Task<InspectionOrderItemEn?> GetOrderItemByOrderId(long orderId, CancellationToken ct = default);
         Task<string> GenerateInspectionNo(long custType, CancellationToken ct = default);
         Task<IReadOnlyList<InspectionOrderItemEn>> GetOrderDetailItems(long orderId, CancellationToken ct = default);
@@ -29,5 +31,9 @@ namespace RahilCore.Application.Features.Orders
         Task<InspectionOrderEn?> GetOrderDetail(long id, CancellationToken ct = default);
         Task<bool> ExistsPaymentAsync(long id, long paymentId, CancellationToken ct = default);
         Task<InspectionOrderPaymentEn?> GetPayment(long orderId, long paymentId, CancellationToken ct = default);
+        Task<InspectionOrderItemEn?> GetOrderItem(long orderId, long itemId, CancellationToken ct = default);
+        Task<int> CountOrderItems(long orderId, CancellationToken ct = default);
+        void DeleteOrderItem(InspectionOrderItemEn item);
+        Task<IReadOnlyList<long>> GetSubmittedOrderItemIds(long orderId, CancellationToken ct = default);
     }
 }

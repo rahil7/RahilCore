@@ -132,6 +132,12 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             return await context.InspectionOrderItems.FirstOrDefaultAsync(x => x.OrderId == orderId, ct);
         }
 
+        public async Task<InspectionOrderItemEn?> GetOrderItem(long orderId, long itemId, CancellationToken ct = default)
+        {
+            return await context.InspectionOrderItems
+                .FirstOrDefaultAsync(x => x.OrderId == orderId && x.Id==itemId, ct);
+        }
+
         public async Task<(IReadOnlyList<OrderListDto> Items, int TotalItems)> GetPagedAsync(GetOrderListQuery query, CancellationToken ct = default)
         {
             var orders = context.InspectionOrders
@@ -296,6 +302,16 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                     ct);
         }
 
+        public async Task<bool> HasSubmittedInspectionItemAsync(long orderId, long itemId, CancellationToken ct = default)
+        {
+            return await context.Inspections
+                .AnyAsync(x =>
+                    x.OrderItem!.OrderId == orderId &&
+                    x.SubmittedAt != null &&
+                    x.OrderItemId == itemId,
+                    ct);
+        }
+
         public async Task<IReadOnlyList<InspectionOrderItemEn>> GetOrderDetailItems(long orderId, CancellationToken ct = default)
         {
             return await context.InspectionOrderItems
@@ -369,6 +385,25 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             return await context.InspectionOrderPayments
                 .Where(x => x.OrderId == orderId && x.Id == paymentId)
                 .FirstOrDefaultAsync(ct);
+        }
+
+        public async Task<int> CountOrderItems(long orderId, CancellationToken ct = default)
+        {
+            return await context.InspectionOrderItems.CountAsync(x => x.OrderId == orderId, ct);
+        }
+
+        public void DeleteOrderItem(InspectionOrderItemEn item)
+        {
+            context.InspectionOrderItems.Remove(item);
+        }
+
+        public async Task<IReadOnlyList<long>> GetSubmittedOrderItemIds(long orderId, CancellationToken ct = default)
+        {
+            return await context.Inspections
+                .AsNoTracking()
+                .Where(x => x.OrderItem!.OrderId == orderId && x.SubmittedAt != null)
+                .Select(x => x.OrderItemId)
+                .ToListAsync(ct);
         }
     }
 }

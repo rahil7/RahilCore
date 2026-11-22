@@ -53,20 +53,12 @@
     {
         public long VehicleId { get; set; }
         public string? PlateNo { get; set; }
-        
-        public long BrandId { get; set; }
         public string? Brand { get; set; }
-        
-        public long ModelId { get; set; }
         public string? Model { get; set; }
-
-        public long VariantId { get; set; }
         public string? Variant { get; set; }
-
         public int? YearOfManufacture { get; set; }
-
-        public long ExteriorColorId { get; set; }
         public string? ExteriorColor { get; set; }
+        public bool CanDelete { get; set; }
     }
 
     public sealed class OrderPaymentDto

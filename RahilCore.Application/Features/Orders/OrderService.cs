@@ -1112,6 +1112,9 @@ namespace RahilCore.Application.Features.Orders
                 .Select(x => x.InspectionForm)
                 .FirstOrDefault(x => x != null);
 
+            var submittedOrderItemIds = (await orderRepo.GetSubmittedOrderItemIds(id, ct)).ToHashSet();
+            bool isPaid = order.PaymentStatusId == PaymentStatus.PAID;
+
             IReadOnlyList<OrderVehicleDto> vehicles = orderItems
                 .Select(x => new OrderVehicleDto
                 {
@@ -1121,7 +1124,8 @@ namespace RahilCore.Application.Features.Orders
                     Model = x.Vehicle?.Model?.Name,
                     Variant = x.Vehicle?.Variant?.Name,
                     YearOfManufacture = x.Vehicle?.YearOfManufacture,
-                    ExteriorColor = x.Vehicle?.ExteriorColor?.Name
+                    ExteriorColor = x.Vehicle?.ExteriorColor?.Name,
+                    CanDelete = !isPaid && !submittedOrderItemIds.Contains(x.Id)
                 })
                 .OrderBy(x => x.VehicleId)
                 .ToList();
@@ -1155,6 +1159,98 @@ namespace RahilCore.Application.Features.Orders
                 IsAssigned = assignment != null,
                 Activities = activities
             };
+        }
+
+        public async Task DeleteOrderItem(long id, long itemId, DeleteOrderItemRequest request, string createdBy, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+
+            InspectionOrderEn? order = await orderRepo.GetByIdAsync(id, ct);
+
+            if (order is null)
+            {
+                throw new BusinessException(404, $"Order tidak ditemukan.");
+            }
+
+            if (!InspectionStatus.ALLOWED_DELETE_ITEM.Contains(order.StatusId))
+            {
+                throw new BusinessException(400, "Order tidak dapat dihapus pada status ini.");
+            }
+
+            int totalItems = await orderRepo.CountOrderItems(order.Id, ct);
+
+            if (totalItems <= 1)
+            {
+                throw new BusinessException(400, "Order harus memiliki minimal 1 unit.");
+            }
+
+            InspectionOrderItemEn? item = await orderRepo.GetOrderItem(id, itemId, ct);
+
+            if (item is null)
+            {
+                throw new BusinessException(404, $"Order item tidak ditemukan.");
+            }
+
+            if(await orderRepo.HasSubmittedInspectionItemAsync(order.Id, item.Id,ct))
+            {
+                throw new BusinessException(
+                    400,
+                    "Unit tidak dapat dihapus karena inspection sudah di-submit oleh Inspector."
+                );
+            }
+
+            VehicleEn? vehicle = await vehicleRepo.GetByIdAsync(item.VehicleId, ct);
+
+            if (vehicle is null)
+            {
+                throw new BusinessException(404, "Vehicle tidak ditemukan.");
+            }
+
+            await uow.BeginTransactionAsync(ct);
+
+            try
+            {
+                orderRepo.DeleteOrderItem(item);
+
+                vehicleRepo.DeleteVehicle(vehicle);
+
+                order.TotalUnit = totalItems - 1;
+
+                var now = DateTime.UtcNow;
+                order.UpdatedAt = now;
+                order.UpdatedBy = createdBy;
+                order.UpdatedNote = request.Note.Trim();
+
+                var activity = new ActivityLogEn
+                {
+                    OrderId = order.Id,
+                    EntityId = item.Id,
+                    EntityTypeId = ActivityEntityType.ORDER_ITEM,
+                    ActionCodeId = ActivityActionCode.ORDER_ITEM_DELETED,
+                    Description = $"Unit {vehicle.PlateNo} berhasil dihapus dari order.",
+                    ActorUsername = createdBy,
+                    CreatedAt = now,
+                    Metadata = JsonSerializer.Serialize(new
+                    {
+                        vehicleId = vehicle.Id,
+                        plateNo = vehicle?.PlateNo,
+                        brand = vehicle?.Brand?.Name,
+                        model = vehicle?.Model?.Name,
+                        variant = vehicle?.Variant?.Name
+                    })
+                };
+
+                activityRepo.Add(activity);
+
+                await uow.SaveChangesAsync(ct);
+                await uow.CommitAsync(ct);
+            }
+            catch
+            {
+                await uow.RollbackAsync(CancellationToken.None);
+
+                throw;
+            }
         }
     }
 }

@@ -16,7 +16,12 @@ async function readError(response: Response): Promise<string> {
     const body = await response.json().catch(() => null) as {
         message?: string;
         Message?: string;
+        data?: string[];
     } | null;
+
+    if (body?.data?.length) {
+        return body.data.join("\n");
+    }
 
     return body?.message
         ?? body?.Message
@@ -88,9 +93,14 @@ export const apiClient = {
         });
     },
 
-    delete<T>(url: string): Promise<T> {
+    delete<T>(url: string, data?: unknown): Promise<T> {
         return request<T>(url, {
             method: "DELETE",
+            ...(data !== undefined
+                ? {
+                    body: JSON.stringify(data),
+                }
+                : {}),
         });
     },
 };

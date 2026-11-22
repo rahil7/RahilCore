@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Amazon.Runtime.Internal;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RahilCore.Application.Common.DTOs;
 using RahilCore.Application.Features.Customers.DTOs;
@@ -232,6 +233,33 @@ namespace RahilCore.Server.Controllers
                     Success: true,
                     Message: "Order assigned successfully.",
                     Data: new { Id = id }));
+        }
+
+        [HttpDelete("{id:long}/items/{itemId:long}")]
+        public async Task<IActionResult> DeleteOrderItem(
+            [FromRoute] long id,
+            [FromRoute] long itemId,
+            [FromBody] DeleteOrderItemRequest request,
+            CancellationToken ct)
+        {
+            var createdBy = User.FindFirstValue("username");
+
+            if (string.IsNullOrWhiteSpace(createdBy))
+            {
+                return Unauthorized(
+                    new ApiResponse<object>(
+                        Success: false,
+                        Message: "User identity not found.",
+                        Data: null));
+            }
+
+            await orderService.DeleteOrderItem(id, itemId, request, createdBy, ct);
+
+            return Ok(
+                new ApiResponse<object>(
+                    Success: true,
+                    Message: "Unit deleted successfully.",
+                    Data: null));
         }
     }
 }

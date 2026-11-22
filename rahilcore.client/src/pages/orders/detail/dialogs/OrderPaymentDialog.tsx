@@ -116,7 +116,6 @@ export default function OrderPaymentDialog({
         setReferenceNo(payment?.referenceNo ?? "");
         setSubtotalAmount(payment ? String(payment.subtotalAmount) : "");
         setDiscountAmount(payment ? String(payment.discountAmount ?? 0) : "");
-        setNote(payment?.paymentNote ?? "");
         setPaymentProof(null);
         setErrors({});
         setFileError("");

@@ -209,8 +209,20 @@ export default function OrderDetail() {
 
             <OrderVehicleSection
                 vehicles={order.vehicles}
-                canDeleteVehicle={() => true}
-                onDeleteVehicle={async () => { }}
+                onDeleteVehicle={async (vehicleId, note) => {
+                    const response = await orderService.deleteOrderItem(
+                        Number(id),
+                        vehicleId,
+                        { note }
+                    );
+
+                    const detail = await orderService.getDetail(Number(id));
+
+                    setOrder(detail.data);
+                    setShouldRefresh(true);
+
+                    return response.message;
+                }}
             />
 
             <OrderPaymentSection

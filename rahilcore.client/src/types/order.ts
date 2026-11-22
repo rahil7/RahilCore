@@ -171,15 +171,12 @@ export interface OrderCustomer {
 export interface OrderVehicle {
     vehicleId: number;
     plateNo: string | null;
-    brandId: number | null;
     brand: string | null;
-    modelId: number | null;
     model: string | null;
-    variantId: number | null;
     variant: string | null;
     yearOfManufacture: number | null;
-    exteriorColorId: number | null;
     exteriorColor: string | null;
+    canDelete: boolean
 }
 
 export interface OrderPayment {
@@ -212,4 +209,8 @@ export interface OrderPaymentOptions {
 
 export interface OrderAssignmentOptions {
     inspectors: UserLookupDto[];
+}
+
+export interface DeleteOrderItemRequest {
+    note: string;
 }

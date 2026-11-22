@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Loader2, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import { getApiErrorMessage  } from "../../../../utils/api-error";
+
 import type { OrderVehicle } from "../../../../types/order";
 import { Button } from "../../../../components/ui/button";
 import {
@@ -12,53 +15,69 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "../../../../components/ui/alert-dialog";
+import { Label } from "../../../../components/ui/label";
+import { Textarea } from "../../../../components/ui/textarea";
 
 interface OrderVehicleSectionProps {
     vehicles: OrderVehicle[];
-    canDeleteVehicle: (vehicle: OrderVehicle) => boolean;
-    onDeleteVehicle: (vehicleId: number) => Promise<void>;
+    onDeleteVehicle: (
+        vehicleId: number,
+        note: string
+    ) => Promise<string>;
 }
 
 export default function OrderVehicleSection({
     vehicles,
-    canDeleteVehicle,
     onDeleteVehicle,
 }: OrderVehicleSectionProps) {
     const [selectedVehicle, setSelectedVehicle] =
         useState<OrderVehicle | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [deleteError, setDeleteError] = useState<string | null>(null);
 
-    const displayValue = (value: string | number | null | undefined) =>
+    const [note, setNote] = useState("");
+
+    const displayValue = (
+        value: string | number | null | undefined
+    ) =>
         value !== null && value !== undefined && value !== "" && value !== 0
             ? value
             : "—";
 
     const handleDeleteClick = (vehicle: OrderVehicle) => {
+        if (!vehicle.canDelete) {
+            toast.error("This vehicle cannot be removed.");
+            return;
+        }
+        setNote("");
         setSelectedVehicle(vehicle);
-        setDeleteError(null);
     };
 
     const handleConfirmDelete = async () => {
         if (!selectedVehicle || isDeleting) return;
 
+        if (!note.trim()) {
+            toast.error("Please enter a reason for removal.");
+            return;
+        }
+
         setIsDeleting(true);
-        setDeleteError(null);
 
         try {
-            await onDeleteVehicle(selectedVehicle.vehicleId);
+            const message = await onDeleteVehicle(
+                selectedVehicle.vehicleId,
+                note.trim()
+            );
+
             setSelectedVehicle(null);
-        } catch {
-            setDeleteError("Failed to remove vehicle. Please try again.");
+            setNote("");
+
+            toast.success(message);
+        } catch (error) {
+            toast.error(
+                getApiErrorMessage(error, "Failed to remove vehicle.")
+            );
         } finally {
             setIsDeleting(false);
-        }
-    };
-
-    const handleDialogChange = (open: boolean) => {
-        if (!open && !isDeleting) {
-            setSelectedVehicle(null);
-            setDeleteError(null);
         }
     };
 
@@ -80,7 +99,7 @@ export default function OrderVehicleSection({
                 {vehicles.length > 0 ? (
                     <>
                         {/* Desktop Table */}
-                        <div className="hidden overflow-auto md:block">
+                        <div className="hidden overflow-x-auto md:block">
                             <table className="w-full text-sm">
                                 <thead>
                                     <tr className="text-left">
@@ -96,7 +115,9 @@ export default function OrderVehicleSection({
                                         ].map((header) => (
                                             <th
                                                 key={header}
-                                                className={`sticky top-0 z-20 whitespace-nowrap border-b bg-muted px-3 py-3 font-medium text-muted-foreground ${header === "Action" ? "w-[80px]" : ""
+                                                className={`sticky top-0 z-20 whitespace-nowrap border-b bg-muted px-3 py-3 font-medium text-muted-foreground ${header === "Action"
+                                                    ? "w-[80px]"
+                                                    : ""
                                                     }`}
                                             >
                                                 {header}
@@ -143,22 +164,32 @@ export default function OrderVehicleSection({
                                                 )}
                                             </td>
 
+                                            {/* Action */}
                                             <td className="w-[80px] px-3 py-2 text-center">
-                                                {canDeleteVehicle(vehicle) && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                                                        aria-label={`Remove ${ vehicle.plateNo } `}
-                                                        onClick={() =>
-                                                            handleDeleteClick(
-                                                                vehicle
-                                                            )
-                                                        }
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                )}
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    title={
+                                                        vehicle.canDelete
+                                                            ? "Remove vehicle"
+                                                            : "Vehicle cannot be removed"
+                                                    }
+                                                    aria-disabled={
+                                                        !vehicle.canDelete
+                                                    }
+                                                    className={`h-8 w-8 ${vehicle.canDelete
+                                                        ? "text-muted-foreground hover:text-destructive"
+                                                        : "cursor-not-allowed text-muted-foreground opacity-40"
+                                                        }`}
+                                                    onClick={() =>
+                                                        handleDeleteClick(
+                                                            vehicle
+                                                        )
+                                                    }
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
                                             </td>
                                         </tr>
                                     ))}
@@ -173,7 +204,7 @@ export default function OrderVehicleSection({
                                     key={vehicle.vehicleId}
                                     className="rounded-lg border p-4"
                                 >
-                                    {/* Plate & Action */}
+                                    {/* Plate No. & Action */}
                                     <div className="flex items-start justify-between gap-3">
                                         <div className="min-w-0">
                                             <p className="text-xs text-muted-foreground">
@@ -185,22 +216,29 @@ export default function OrderVehicleSection({
                                             </p>
                                         </div>
 
-                                        {canDeleteVehicle(vehicle) && (
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
-                                                aria-label={`Remove ${ vehicle.plateNo } `}
-                                                onClick={() =>
-                                                    handleDeleteClick(vehicle)
-                                                }
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        )}
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            title={
+                                                vehicle.canDelete
+                                                    ? "Remove vehicle"
+                                                    : "Vehicle cannot be removed"
+                                            }
+                                            aria-disabled={!vehicle.canDelete}
+                                            className={`h-8 w-8 shrink-0 ${vehicle.canDelete
+                                                ? "text-muted-foreground hover:text-destructive"
+                                                : "cursor-not-allowed text-muted-foreground opacity-40"
+                                                }`}
+                                            onClick={() =>
+                                                handleDeleteClick(vehicle)
+                                            }
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
                                     </div>
 
-                                    {/* Vehicle Description */}
+                                    {/* Vehicle */}
                                     <p className="mt-1 text-sm text-muted-foreground">
                                         {displayValue(vehicle.brand)}
                                         {" · "}
@@ -247,28 +285,41 @@ export default function OrderVehicleSection({
             {/* Delete Confirmation */}
             <AlertDialog
                 open={!!selectedVehicle}
-                onOpenChange={handleDialogChange}
+                onOpenChange={(open) => {
+                    if (!open && !isDeleting) {
+                        setSelectedVehicle(null);
+                    }
+                }}
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
                             Remove Vehicle?
-                        </AlertDialogTitle>
+                            </AlertDialogTitle>
 
                         <AlertDialogDescription>
                             Are you sure you want to remove vehicle{" "}
                             <span className="font-medium text-foreground">
                                 {selectedVehicle?.plateNo}
                             </span>{" "}
-                            from this order? This action cannot be undone.
+                            from this order?
                         </AlertDialogDescription>
-                    </AlertDialogHeader>
 
-                    {deleteError && (
-                        <p className="text-sm text-destructive">
-                            {deleteError}
-                        </p>
-                    )}
+                        <div className="w-full space-y-2">
+                            <Label>
+                                Note <span className="text-destructive">*</span>
+                            </Label>
+
+                            <Textarea
+                                className="w-full"
+                                value={note}
+                                onChange={(e) => setNote(e.target.value)}
+                                placeholder="Note..."
+                                rows={3}
+                                disabled={isDeleting}
+                            />
+                        </div>
+                    </AlertDialogHeader>
 
                     <AlertDialogFooter>
                         <AlertDialogCancel disabled={isDeleting}>

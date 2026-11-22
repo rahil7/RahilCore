@@ -12,5 +12,19 @@
         public const long APPROVED = 11;
         public const long COMPLETED = 12;
         public const long CANCELLED = 13;
+
+        public static readonly long[] ALLOWED_DELETE_ITEM =
+        [
+            ORDER_CREATED,
+            AWAITING_ASSIGNMENT,
+            INSPECTOR_ASSIGNED
+        ];
+
+        public static readonly long[] ALLOWED_ASSIGN =
+        [
+            ORDER_CREATED,
+            AWAITING_ASSIGNMENT,
+            INSPECTOR_ASSIGNED
+        ];
     }
 }

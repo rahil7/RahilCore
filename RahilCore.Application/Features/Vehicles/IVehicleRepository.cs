@@ -14,5 +14,7 @@ namespace RahilCore.Application.Features.Vehicles
         Task<IReadOnlyList<FilterOptionDto>> GetBarndLookup(CancellationToken ct = default);
         Task<IReadOnlyList<FilterOptionDto>?> GetModelLookup(long brandId, CancellationToken ct = default);
         Task<IReadOnlyList<FilterOptionDto>?> GetVariantLookup(long modelId, CancellationToken ct = default);
+        Task<VehicleEn?> GetByIdAsync(long vehicleId, CancellationToken ct=default);
+        void DeleteVehicle(VehicleEn vehicle);
     }
 }
