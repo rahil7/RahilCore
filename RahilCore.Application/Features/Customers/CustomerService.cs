@@ -7,7 +7,7 @@ using RahilCore.Application.Features.Customers.DTOs;
 using RahilCore.Application.Features.Customers.Queries;
 using RahilCore.Application.Features.Customers.Requests;
 using RahilCore.Application.Features.MasterParameters;
-using RahilCore.Application.Features.Orders;
+using RahilCore.Application.Features.Orders.Queries;
 using RahilCore.Domain.Entities.Customers;
 
 namespace RahilCore.Application.Features.Customers

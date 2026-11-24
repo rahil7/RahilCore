@@ -199,12 +199,12 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                     : orders.OrderBy(x => x.TotalUnit),
 
                 "statusid" => descending
-                    ? orders.OrderByDescending(x => x.StatusId)
-                    : orders.OrderBy(x => x.StatusId),
+                    ? orders.OrderByDescending(x => x.Status!.ParamName)
+                    : orders.OrderBy(x => x.Status!.ParamName),
 
                 "paymentstatusid" => descending
-                    ? orders.OrderByDescending(x => x.PaymentStatusId)
-                    : orders.OrderBy(x => x.PaymentStatusId),
+                    ? orders.OrderByDescending(x => x.PaymentStatus!.ParamName)
+                    : orders.OrderBy(x => x.PaymentStatus!.ParamName),
 
                 "custcode" => descending
                     ? orders.OrderByDescending(x => x.Customer!.CustCode)
@@ -236,7 +236,6 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 : orderedResult.ThenBy(x => x.Id);
 
             // 5. Projection ke DTO.
-
             var page = Math.Max(1, query.Page);
             var pageSize = Math.Clamp(query.PageSize, 1, 100);
 

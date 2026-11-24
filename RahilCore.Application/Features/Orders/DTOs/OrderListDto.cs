@@ -8,7 +8,7 @@ namespace RahilCore.Application.Features.Orders.DTOs
         public long TotalUnit { get; set; }
 
         public long StatusId { get; set; }
-        public string? StatusName { get; set; } = null!;
+        public string? StatusName { get; set; }
 
         public long PaymentStatusId { get; set; }
         public string? PaymentStatusName { get; set; }

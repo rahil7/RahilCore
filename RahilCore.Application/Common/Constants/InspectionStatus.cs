@@ -13,6 +13,12 @@
         public const long COMPLETED = 12;
         public const long CANCELLED = 13;
 
+        public static readonly long[] ALLOWED_ORDER_EDIT =
+        [
+            ORDER_CREATED,
+            AWAITING_ASSIGNMENT
+        ];
+
         public static readonly long[] ALLOWED_ORDER_ASSIGNED =
         [
             ORDER_CREATED,
@@ -31,6 +37,12 @@
         [
             ORDER_CREATED,
             AWAITING_ASSIGNMENT
+        ];
+
+        public static readonly long[] ALLOWED_CANCEL_ORDER =
+        [
+            ORDER_CREATED,
+            AWAITING_ASSIGNMENT,
         ];
     }
 }

@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { PageDetailHeader } from "../../../components/layout/PageDetailHeader";
 import type {
     CreatePaymentRequest,
     OrderAssignRequest,
     OrderDetailResponse,
+    UpdateOrderRequest,
     UpdatePaymentRequest
 } from "../../../types/order";
 
@@ -20,15 +21,26 @@ import type { CachedFileAccess } from "../../../types/file";
 import OrderPaymentDialog from "./dialogs/OrderPaymentDialog";
 import OrderAssignmentDialog from "./dialogs/OrderAssignmentDialog";
 import { useOrderContext } from "../../../contexts/orders/useOrderContext";
+import OrderEditDialog from "./dialogs/OrderEditDialog";
 
 export default function OrderDetail() {
-    const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const { setShouldRefresh } = useOrderContext();
 
     const [order, setOrder] = useState<OrderDetailResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+
+    const handleUpdateOrder = async (request: UpdateOrderRequest) => {
+        await orderService.updateOrder(Number(id), request);
+
+        const response = await orderService.getDetail(Number(id));
+
+        setOrder(response.data);
+        setShouldRefresh(true);
+    };
 
     const [paymentDialogKey, setPaymentDialogKey] = useState(0);
     const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
@@ -189,8 +201,21 @@ export default function OrderDetail() {
                 paymentStatusName={order.paymentStatusName}
                 createdAt={order.createdAt}
                 createdBy={order.createdBy}
-                canEdit={!order.isAssigned}
-                onEdit={() => navigate(`/orders/${order.id}/edit`)}
+                canEdit={order.canEdit}
+                onEdit={() => setEditDialogOpen(true)}
+            />
+
+            <OrderEditDialog
+                open={editDialogOpen}
+                canEditSchedule={order.canEditSchedule}
+                onOpenChange={setEditDialogOpen}
+                order={{
+                    scheduleAt: order.scheduleAt,
+                    picName: order.picName,
+                    picPhone: order.picPhone,
+                    note: order.note,
+                }}
+                onSubmit={handleUpdateOrder}
             />
 
             <div className="grid gap-4 lg:grid-cols-2">

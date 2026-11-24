@@ -80,6 +80,29 @@ namespace RahilCore.Server.Controllers
                     Data: null));
         }
 
+        [HttpPut("{id:long}/cancel")]
+        public async Task<ActionResult> Cancel([FromRoute] long id, [FromBody] CancelOrderRequest request, CancellationToken ct)
+        {
+            var username = User.FindFirstValue("username");
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return Unauthorized(
+                    new ApiResponse<object>(
+                        Success: false,
+                        Message: "User identity not found.",
+                        Data: null));
+            }
+
+            await orderService.Cancel(id, request, username, ct);
+
+            return Ok(
+                new ApiResponse<object>(
+                    Success: true,
+                    Message: "Cancel berhasi di update.",
+                    Data: null));
+        }
+
         [HttpGet("filter-options")]
         public async Task<ActionResult<ApiResponse<OrderFilterOptions>>> GetFilterOptions(CancellationToken ct)
         {

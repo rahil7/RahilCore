@@ -1,4 +1,6 @@
 ﻿using RahilCore.Application.Common.DTOs;
+using RahilCore.Application.Features.Inspections.DTOs;
+using RahilCore.Application.Features.Inspections.Queries;
 using RahilCore.Domain.Entities.Inspections;
 
 namespace RahilCore.Application.Features.Inspections
@@ -11,5 +13,6 @@ namespace RahilCore.Application.Features.Inspections
         Task<InspectionEn?> GetByOrderItemId(long orderItemId, CancellationToken ct = default);
         void Delete(InspectionEn inspection);
         Task DeleteByOrderItemId(long orderItemId, CancellationToken ct = default);
+        Task<(IReadOnlyList<InspectionListDto> items, int totalItems)> GetPagedAsync(InspectionListQuery query, CancellationToken ct=default);
     }
 }

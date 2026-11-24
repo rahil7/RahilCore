@@ -2,7 +2,23 @@ import { apiClient } from "../lib/api-client";
 
 import type { ApiResponse } from "../types/api";
 import type { FileAccess } from "../types/file";
-import type { OrderAssignRequest, CreateOrderCustomerRequest, CreateOrderDealerRequest, CreatePaymentRequest, GetOrdersParams, OrderAssignment, OrderAssignmentOptions, OrderCreateOptions, OrderDetailResponse, OrderFilterOptions, OrderListItem, OrderPaymentOptions, UpdatePaymentRequest, DeleteOrderItemRequest } from "../types/order";
+import type {
+    OrderAssignRequest,
+    CreateOrderCustomerRequest,
+    CreateOrderDealerRequest,
+    CreatePaymentRequest,
+    GetOrdersParams,
+    OrderAssignmentOptions,
+    OrderCreateOptions,
+    OrderDetailResponse,
+    OrderFilterOptions,
+    OrderListItem,
+    OrderPaymentOptions,
+    UpdatePaymentRequest,
+    DeleteOrderItemRequest,
+    UpdateOrderRequest,
+    CancelOrderRequest
+} from "../types/order";
 import type { PagedResponse } from "../types/pagination";
 
 function buildQueryString(params: GetOrdersParams): string {
@@ -196,6 +212,20 @@ export const orderService = {
     ) {
         return apiClient.delete<ApiResponse<unknown>>(
             `/api/orders/${orderId}/items/${itemId}`,
+            data
+        );
+    },
+
+    updateOrder(orderId: number, data: UpdateOrderRequest) {
+        return apiClient.put<ApiResponse<unknown>>(
+            `/api/orders/${orderId}`,
+            data
+        );
+    },
+
+    cancelOrder(orderId: number, data: CancelOrderRequest) {
+        return apiClient.put<ApiResponse<unknown>>(
+            `/api/orders/${orderId}/cancel`,
             data
         );
     },

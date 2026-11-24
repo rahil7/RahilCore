@@ -1,6 +1,6 @@
 ﻿using RahilCore.Application.Common.Querying;
 
-namespace RahilCore.Application.Features.Customers
+namespace RahilCore.Application.Features.Customers.Queries
 {
     public static class CustomerQueryMetadata
     {
@@ -13,7 +13,7 @@ namespace RahilCore.Application.Features.Customers
             new("custName", "Customer CustomerName", CanSearch: true, CanSort: true),
             new("custTypeName", "Customer CustomerType", CanSearch: true, CanSort: true),
             new("cityName", "City", CanSearch: true, CanSort: true),
-            new("createdAt", "Date Created", CanSearch: false, CanSort: true),
+            new("createdAt", "Created Date", CanSearch: false, CanSort: true),
             new("lastActivityAt", "Last Activity", CanSearch: false, CanSort: true)
         ];
 

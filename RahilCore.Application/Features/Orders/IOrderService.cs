@@ -7,7 +7,8 @@ namespace RahilCore.Application.Features.Orders
 {
     public interface IOrderService
     {
-        Task<long> Assign(long id, OrderAssignRequest request, string username, CancellationToken ct);
+        Task<long> Assign(long id, OrderAssignRequest request, string username, CancellationToken ct = default);
+        Task Cancel(long id, CancelOrderRequest request, string username, CancellationToken ct = default);
         Task<long> CreateOrderForCustomer(CreateOrderCustomerRequest request, string username, CancellationToken ct = default);
         Task<long> CreateOrderForDealer(CreateOrderDealerRequest request, string username, CancellationToken ct = default);
         Task<long> CreatePayment(long id,CreatePaymentRequest request, string username, CancellationToken ct = default);

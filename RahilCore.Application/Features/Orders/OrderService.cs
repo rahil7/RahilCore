@@ -251,6 +251,9 @@ namespace RahilCore.Application.Features.Orders
 
             var canAssign = order.Customer.CustTypeId == 1 || (order.Customer.CustTypeId == 2 && order.PaymentStatusId == 15);
 
+            bool canEdit = InspectionStatus.ALLOWED_ORDER_EDIT.Contains(order.StatusId);
+            bool canEditSchedule = InspectionStatus.ALLOWED_ORDER_EDIT_SCHEDULE.Contains(order.StatusId);
+
             return new OrderDetailDto
             {
                 Id = order.Id,
@@ -275,7 +278,8 @@ namespace RahilCore.Application.Features.Orders
                 Vehicles = vehicles,
                 Payment = payment,
                 Assignment = assignment,
-                IsAssigned = assignment != null,
+                CanEdit = canEdit,
+                CanEditSchedule = canEditSchedule,
                 Activities = activities
             };
         }
@@ -1294,7 +1298,7 @@ namespace RahilCore.Application.Features.Orders
                     throw new BusinessException(400, "Phone harus diawali 628 dan terdiri dari 10–15 digit.");
                 }
 
-                order.PicName = phone;
+                order.PicPhone = phone;
             }
 
             if (request.ScheduleAt.HasValue && (!InspectionStatus.ALLOWED_ORDER_EDIT_SCHEDULE.Contains(order.StatusId)))
@@ -1318,6 +1322,57 @@ namespace RahilCore.Application.Features.Orders
                     EntityTypeId = ActivityEntityType.ORDER,
                     ActionCodeId = ActivityActionCode.ORDER_UPDATED,
                     Description = "Order berhasil di update",
+                    ActorUsername = username,
+                    CreatedAt = now,
+                    Metadata = null
+                };
+
+                activityRepo.Add(activity);
+
+                await uow.SaveChangesAsync(ct);
+                await uow.CommitAsync(ct);
+            }
+            catch
+            {
+                await uow.RollbackAsync(CancellationToken.None);
+
+                throw;
+            }
+        }
+
+        public async Task Cancel(long id, CancelOrderRequest request, string username, CancellationToken ct = default)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+
+            InspectionOrderEn? order = await orderRepo.GetOrderAsync(id, ct);
+
+            if (order is null)
+            {
+                throw new BusinessException(404, $"Order tidak ditemukan.");
+            }
+
+            if (!InspectionStatus.ALLOWED_CANCEL_ORDER.Contains(order.StatusId))
+            {
+                throw new BusinessException(409, "Order tidak dapat di cancel karena status order tidak valid.");
+            }
+
+            var now = DateTime.UtcNow;
+
+            await uow.BeginTransactionAsync(ct);
+
+            try
+            {
+                order.StatusId = InspectionStatus.CANCELLED;
+                order.UpdatedAt = now;
+                order.UpdatedBy = username;
+                order.UpdatedNote = request.Note.Trim();
+
+                var activity = new ActivityLogEn
+                {
+                    OrderId = order.Id,
+                    EntityTypeId = ActivityEntityType.ORDER,
+                    ActionCodeId = ActivityActionCode.ORDER_CANCELED,
+                    Description = "Order berhasil di cancel",
                     ActorUsername = username,
                     CreatedAt = now,
                     Metadata = null

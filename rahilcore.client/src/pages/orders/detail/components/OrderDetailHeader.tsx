@@ -6,6 +6,7 @@ import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
 import StatusBadge from "../../../../components/shared/StatusBadge";
 import { orderStatusConfig, paymentStatusConfig } from "../../../../config/status-config";
+import { formatDateTime } from "../../../../utils/date-utils";
 
 interface OrderDetailHeaderProps {
     orderNo: string;
@@ -32,10 +33,8 @@ export default function OrderDetailHeader({
     canEdit,
     onEdit,
 }: OrderDetailHeaderProps) {
-    const formattedCreatedAt = createdAt
-        ? format(parseISO(createdAt), "dd MMM yyyy, HH:mm")
-        : "-";
-
+    const formattedCreatedAt = formatDateTime(createdAt);
+    console.log(canEdit);
     return (
         <div className="flex flex-col gap-4 rounded-xl border bg-card p-5">
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">

@@ -137,7 +137,8 @@ export interface OrderDetailResponse {
     createdAt: string;
     createdBy: string;
     createdNote: string;
-    isAssigned: boolean;
+    canEdit: boolean;
+    canEditSchedule: boolean;
     canAssign: boolean;
     canReassign: boolean;
     picName: string | null;
@@ -212,5 +213,16 @@ export interface OrderAssignmentOptions {
 }
 
 export interface DeleteOrderItemRequest {
+    note: string;
+}
+
+export interface UpdateOrderRequest {
+    scheduleAt: string | null;
+    picName: string;
+    picPhone: string;
+    note: string;
+}
+
+export interface CancelOrderRequest {
     note: string;
 }

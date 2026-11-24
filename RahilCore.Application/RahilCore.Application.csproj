@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Inspections\Request\" />
     <Folder Include="Features\Users\Queries\" />
     <Folder Include="Features\Vehicles\DTOs\" />
     <Folder Include="Features\Vehicles\Request\" />
