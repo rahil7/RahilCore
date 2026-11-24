@@ -139,6 +139,7 @@ export interface OrderDetailResponse {
     createdNote: string;
     canEdit: boolean;
     canEditSchedule: boolean;
+    canCancel: boolean;
     canAssign: boolean;
     canReassign: boolean;
     picName: string | null;

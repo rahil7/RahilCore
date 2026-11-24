@@ -15,6 +15,7 @@
         public string CreatedBy { get; set; } = string.Empty;
         public string CreatedNote { get; set; } = string.Empty;
 
+        public bool CanCancel { get; set; }
         public bool CanEdit { get; set; }
         public bool CanEditSchedule { get; set; }
         public bool CanAssign { get; set; }

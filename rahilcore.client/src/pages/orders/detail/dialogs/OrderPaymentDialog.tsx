@@ -229,12 +229,6 @@ export default function OrderPaymentDialog({
                     <DialogTitle>
                         {mode === "edit" ? "Edit Payment" : "Create Payment"}
                     </DialogTitle>
-
-                    <DialogDescription>
-                        {mode === "edit"
-                            ? "Update payment information for this order."
-                            : "Add payment information for this order."}
-                    </DialogDescription>
                 </DialogHeader>
 
                 <form
@@ -371,7 +365,6 @@ export default function OrderPaymentDialog({
                             </div>
                         </div>
 
-                        {/* Payment Proof */}
                         {/* Payment Proof */}
                         <div className="space-y-2">
                             <Label>Payment Proof</Label>

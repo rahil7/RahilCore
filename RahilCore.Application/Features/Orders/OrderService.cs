@@ -253,6 +253,7 @@ namespace RahilCore.Application.Features.Orders
 
             bool canEdit = InspectionStatus.ALLOWED_ORDER_EDIT.Contains(order.StatusId);
             bool canEditSchedule = InspectionStatus.ALLOWED_ORDER_EDIT_SCHEDULE.Contains(order.StatusId);
+            bool canCancel = InspectionStatus.CANCELLED != order.StatusId;
 
             return new OrderDetailDto
             {
@@ -279,6 +280,7 @@ namespace RahilCore.Application.Features.Orders
                 Payment = payment,
                 Assignment = assignment,
                 CanEdit = canEdit,
+                CanCancel = canCancel,
                 CanEditSchedule = canEditSchedule,
                 Activities = activities
             };
@@ -1301,7 +1303,7 @@ namespace RahilCore.Application.Features.Orders
                 order.PicPhone = phone;
             }
 
-            if (request.ScheduleAt.HasValue && (!InspectionStatus.ALLOWED_ORDER_EDIT_SCHEDULE.Contains(order.StatusId)))
+            if (request.ScheduleAt.HasValue && (InspectionStatus.ALLOWED_ORDER_EDIT_SCHEDULE.Contains(order.StatusId)))
             {
                 order.ScheduleAt= DateTimeHelper.JakartaToUtc(request.ScheduleAt.Value);
             }

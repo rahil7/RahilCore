@@ -22,6 +22,7 @@ import OrderPaymentDialog from "./dialogs/OrderPaymentDialog";
 import OrderAssignmentDialog from "./dialogs/OrderAssignmentDialog";
 import { useOrderContext } from "../../../contexts/orders/useOrderContext";
 import OrderEditDialog from "./dialogs/OrderEditDialog";
+import OrderCancelDialog from "./dialogs/OrderCancelDialog";
 
 export default function OrderDetail() {
     const { id } = useParams<{ id: string }>();
@@ -40,6 +41,18 @@ export default function OrderDetail() {
 
         setOrder(response.data);
         setShouldRefresh(true);
+    };
+
+    const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+
+    const handleCancelOrder = async (note: string) => {
+        const response = await orderService.cancelOrder(Number(id), { note });
+
+        const detail = await orderService.getDetail(Number(id));
+        setOrder(detail.data);
+        setShouldRefresh(true);
+
+        return response.message;
     };
 
     const [paymentDialogKey, setPaymentDialogKey] = useState(0);
@@ -202,7 +215,16 @@ export default function OrderDetail() {
                 createdAt={order.createdAt}
                 createdBy={order.createdBy}
                 canEdit={order.canEdit}
+                canCancel={order.canCancel}
                 onEdit={() => setEditDialogOpen(true)}
+                onCancel={() => setCancelDialogOpen(true)}
+            />
+
+            <OrderCancelDialog
+                open={cancelDialogOpen}
+                onOpenChange={setCancelDialogOpen}
+                orderNo={order.orderNo}
+                onSubmit={handleCancelOrder}
             />
 
             <OrderEditDialog

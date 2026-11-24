@@ -16,6 +16,7 @@ import { Label } from "../../../../components/ui/label";
 import { Textarea } from "../../../../components/ui/textarea";
 import { toast } from "sonner";
 import type { UpdateOrderRequest } from "../../../../types/order";
+import { FormDateTimePicker } from "../../../../components/ui/FormDateTimePicker";
 
 interface OrderEditDialogProps {
     open: boolean;
@@ -48,13 +49,12 @@ export default function OrderEditDialog({
     order,
     onSubmit,
 }: OrderEditDialogProps) {
-    const [scheduleAt, setScheduleAt] = useState("");
+    const [scheduleAt, setScheduleAt] = useState<string | null>(null);
     const [picName, setPicName] = useState("");
     const [picPhone, setPicPhone] = useState("");
     const [note, setNote] = useState("");
+    const [errors, setErrors] = useState({note: ""});
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    console.log(canEditSchedule);
 
     useEffect(() => {
         if (!open) return;
@@ -74,6 +74,14 @@ export default function OrderEditDialog({
         >[0]
     ) => {
         e.preventDefault();
+
+        if (!note.trim()) {
+            setErrors((prev) => ({
+                ...prev,
+                note: "Note is required.",
+            }));
+            return;
+        }
 
         setIsSubmitting(true);
 
@@ -114,22 +122,19 @@ export default function OrderEditDialog({
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="scheduleAt">Schedule At</Label>
-                        <Input
-                            id="scheduleAt"
-                            type="datetime-local"
-                            value={scheduleAt}
-                            onChange={(e) => setScheduleAt(e.target.value)}
-                            disabled={isSubmitting || !canEditSchedule}
-                        />
+                    <FormDateTimePicker
+                        label="Schedule At"
+                        value={scheduleAt}
+                        onChange={setScheduleAt}
+                        required
+                        disabled={isSubmitting || !canEditSchedule}
+                    />
 
-                        {!canEditSchedule && (
-                            <p className="text-xs text-muted-foreground">
-                                Schedule cannot be changed at this stage.
-                            </p>
-                        )}
-                    </div>
+                    {!canEditSchedule && (
+                        <p className="text-xs text-muted-foreground">
+                            Schedule cannot be changed at this stage.
+                        </p>
+                    )}
 
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-2">
@@ -155,16 +160,37 @@ export default function OrderEditDialog({
                         </div>
                     </div>
 
+                    {/* Note */}
                     <div className="space-y-2">
-                        <Label htmlFor="note">Note</Label>
+                        <Label>
+                            Note <span className="text-destructive">*</span>
+                        </Label>
                         <Textarea
-                            id="note"
                             value={note}
-                            onChange={(e) => setNote(e.target.value)}
-                            placeholder="Enter order note..."
-                            rows={4}
+                            onChange={(e) => {
+                                setNote(e.target.value);
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    note: "",
+                                }));
+                            }}
+                            placeholder="Enter update reason"
+                            maxLength={500}
+                            rows={3}
                             disabled={isSubmitting}
                         />
+                        <div className="flex justify-between">
+                            {errors.note ? (
+                                <p className="text-xs text-destructive">
+                                    {errors.note}
+                                </p>
+                            ) : (
+                                <span />
+                            )}
+                            <span className="text-xs text-muted-foreground">
+                                {note.length}/500
+                            </span>
+                        </div>
                     </div>
 
                     <DialogFooter>
