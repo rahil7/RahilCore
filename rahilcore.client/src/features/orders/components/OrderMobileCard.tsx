@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Separator } from "../../../components/ui/separator";
-import { orderStatusConfig, paymentStatusConfig } from "../../../config/status-config";
+import { inspectionStatusConfig, paymentStatusConfig } from "../../../config/status-config";
 import StatusBadge from "../../../components/shared/StatusBadge";
 import ActivityCell from "../../../components/shared/ActivityCell";
 import OrderActions from "../../../features/orders/components/OrderActions";
@@ -31,7 +31,7 @@ export default function OrderMobileCard({
                     <StatusBadge
                         statusId={order.statusId}
                         label={order.statusName}
-                        config={orderStatusConfig}
+                        config={inspectionStatusConfig}
                     />
                     <OrderActions id={order.id} />
                 </div>

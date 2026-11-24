@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { formatDate } from "../../../utils/date-utils";
+import { formatFilterLabel } from "../../../utils/filter";
 
 interface OrderActiveFiltersProps {
     createdFrom: string
@@ -26,13 +27,7 @@ export default function OrderActiveFilters({
     onClearAll,
 }: OrderActiveFiltersProps) {
 
-    const visibleStatuses = activeStatuses.slice(0, 2);
-    const hiddenStatusCount = activeStatuses.length - visibleStatuses.length;
-
-    const statusLabel =
-        activeStatuses.length > 0
-            ? `Status: ${visibleStatuses.join(", ")}${hiddenStatusCount > 0 ? ` +${hiddenStatusCount}` : ""}`
-            : "";
+    const statusLabel = formatFilterLabel("Status", activeStatuses);
 
     return (
         <div className="rounded-lg border bg-card p-3">
@@ -64,7 +59,7 @@ export default function OrderActiveFilters({
                     {/* Customer Type */}
                     {activeCustomerTypes.length > 0 && (
                         <ActiveFilterChip
-                            label={`Customer Type: ${activeCustomerTypes.join(", ")}`}
+                            label={`Tipe Customer: ${activeCustomerTypes.join(", ")}`}
                             onRemove={onRemoveCustomerType}
                         />
                     )}

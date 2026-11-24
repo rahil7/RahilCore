@@ -1,6 +1,6 @@
 import { useOrderContext } from "../../contexts/orders/useOrderContext";
 import { PageHeader } from "../../components/layout/PageHeader";
-import OrderListToolbar from "../../features/orders/components/OrderListToolbarProps";
+import OrderListToolbar from "../../features/orders/components/OrderListToolbar";
 import type { OrderFilters } from "../../features/orders/components/OrderFilterContent";
 import { useEffect, useMemo, useState } from "react";
 import { orderService } from "../../services/order-service";

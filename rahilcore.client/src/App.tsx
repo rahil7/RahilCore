@@ -10,6 +10,7 @@ import CustomerList from "./pages/customers/CustomerList";
 import CustomerDetail from "./pages/customers/CustomerDetail";
 import { CustomerProvider } from "./contexts/customers/CustomerProvider";
 import { OrderProvider } from "./contexts/orders/OrderProvider";
+import { InspectionProvider } from "./contexts/inspections/InspectionProvider";
 import Masters from "./pages/masters/Masters";
 import OrderList from "./pages/orders/OrderList";
 import Leasing from "./pages/leasings/Leasing";
@@ -19,6 +20,7 @@ import UserList from "./pages/users/UserList";
 import Profile from "./pages/profile/Profile";
 import CreateOrder from "./pages/orders/OrderCreate";
 import OrderDetail from "./pages/orders/detail/OrderDetail";
+import InspectionDetail from "./pages/inspections/InspectionDetail";
 
 export default function App() {
     return (
@@ -44,7 +46,11 @@ export default function App() {
                             <Route path="/orders/create" element={<CreateOrder />} />
                         </Route>
 
-                        <Route path="/inspections" element={<InspectionList />} />
+                        <Route element={<InspectionProvider />}>
+                            <Route path="/inspections" element={<InspectionList />} />
+                            <Route path="/inspections/:id" element={<InspectionDetail />}/>
+                        </Route>
+
                         <Route path="/reports" element={<Reports />} />
                         <Route path="/users" element={<UserList />} />
                         <Route path="/masters" element={<Masters />} />

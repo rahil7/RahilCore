@@ -3,7 +3,7 @@ import { Ellipsis, Pencil, XCircle } from "lucide-react";
 
 import { Badge } from "../../../../components/ui/badge";
 import StatusBadge from "../../../../components/shared/StatusBadge";
-import { orderStatusConfig, paymentStatusConfig } from "../../../../config/status-config";
+import { inspectionStatusConfig, paymentStatusConfig } from "../../../../config/status-config";
 import { formatDateTime } from "../../../../utils/date-utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../../../../components/ui/dropdown-menu";
 
@@ -111,7 +111,7 @@ export default function OrderDetailHeader({
                 <StatusBadge
                     statusId={statusId}
                     label={statusName}
-                    config={orderStatusConfig}
+                    config={inspectionStatusConfig}
                 />
 
                 <span className="ml-2 text-sm text-muted-foreground">

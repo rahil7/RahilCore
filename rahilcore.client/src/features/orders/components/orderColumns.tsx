@@ -2,10 +2,10 @@ import { Link } from "react-router-dom";
 import ActivityCell from "../../../components/shared/ActivityCell";
 import type { DataTableColumn } from "../../../components/shared/data-table/types";
 import StatusBadge from "../../../components/shared/StatusBadge";
-import { orderStatusConfig, paymentStatusConfig } from "../../../config/status-config";
+import { inspectionStatusConfig, paymentStatusConfig } from "../../../config/status-config";
 import type { OrderListItem } from "../../../types/order";
 import OrderActions from "./OrderActions";
-import OrderCustomerCell from "./OrderCustomerCell";
+import CustomerCell from "../../../components/shared/CustomerCell";
 
 export const orderColumns: DataTableColumn<OrderListItem>[] = [
     {
@@ -22,17 +22,6 @@ export const orderColumns: DataTableColumn<OrderListItem>[] = [
         ),
     },
     {
-        id: "customer",
-        header: "Customer",
-        cell: (row) => (
-            <OrderCustomerCell
-                code={row.customerCode}
-                name={row.customerName}
-                type={row.customerType}
-            />
-        )
-    },
-    {
         id: "status",
         header: "Status",
         align: "center",
@@ -40,9 +29,20 @@ export const orderColumns: DataTableColumn<OrderListItem>[] = [
             <StatusBadge
                 statusId={row.statusId}
                 label={row.statusName}
-                config={orderStatusConfig}
+                config={inspectionStatusConfig}
             />
         ),
+    },
+    {
+        id: "customer",
+        header: "Customer",
+        cell: (row) => (
+            <CustomerCell
+                name={row.customerName}
+                code={row.customerCode}
+                type={row.customerType}
+            />
+        )
     },
     {
         id: "paymentStatus",

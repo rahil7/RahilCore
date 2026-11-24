@@ -48,6 +48,7 @@ export interface GetOrdersParams extends ListQueryParams {
     statusIds?: number[];
     paymentStatusIds?: number[];
 }
+
 export interface CreateOrderDealerRequest {
     customerId: number;
     scheduleAt: string | null;

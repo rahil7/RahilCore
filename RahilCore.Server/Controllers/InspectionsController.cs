@@ -32,5 +32,18 @@ namespace RahilCore.Server.Controllers
 
             return Ok(response);
         }
+
+        [HttpGet("filter-options")]
+        public async Task<ActionResult<ApiResponse<InspectionFilterOptions>>> GetFilterOptions(CancellationToken ct)
+        {
+            var options = await inspectionService.GetFilterOptionsAsync(ct);
+
+            return Ok(
+                new ApiResponse<InspectionFilterOptions>(
+                    Success: true,
+                    Message: "Inspection filter options retrieved successfully.",
+                    Data: options));
+        }
+
     }
 }

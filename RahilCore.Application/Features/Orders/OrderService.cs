@@ -104,6 +104,7 @@ namespace RahilCore.Application.Features.Orders
         public async Task<OrderAssignOption?> GetAssignOptionsAsync(CancellationToken ct = default)
         {
             var inspectorLookup = await userRepo.GetInspectorLookup(ct);
+            
             return new OrderAssignOption
             {
                 Inspectors = inspectorLookup

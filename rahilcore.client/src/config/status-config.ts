@@ -1,4 +1,4 @@
-export const orderStatusConfig: Record<number, string> = {
+export const inspectionStatusConfig: Record<number, string> = {
     4: "bg-blue-50 text-blue-700 border-blue-200",       // ORDER_CREATED
     5: "bg-amber-50 text-amber-700 border-amber-200",    // AWAITING_ASSIGNMENT
     6: "bg-indigo-50 text-indigo-700 border-indigo-200", // INSPECTOR_ASSIGNED

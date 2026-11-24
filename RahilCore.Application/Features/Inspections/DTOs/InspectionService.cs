@@ -1,11 +1,57 @@
 ﻿using RahilCore.Application.Common.Exceptions;
+using RahilCore.Application.Features.Customers;
 using RahilCore.Application.Features.Inspections.Queries;
+using RahilCore.Application.Features.MasterParameters;
 using RahilCore.Application.Features.Orders.Queries;
+using RahilCore.Application.Features.Users;
 
 namespace RahilCore.Application.Features.Inspections.DTOs
 {
-    public class InspectionService(IInspectionRepository inspectionRepo) : IInspectionService
+    public class InspectionService(
+            IInspectionRepository inspectionRepo,
+            IUserRepository userRepo,
+            IMasterParameterRepository masterParameterRepo
+        ) : IInspectionService
     {
+        // options
+        public async Task<InspectionFilterOptions?> GetFilterOptionsAsync(CancellationToken ct = default)
+        {
+            var customerTypes = await masterParameterRepo
+                .GetFilterOptionsAsync(MasterParameterTypes.CUST_TYPE, ct);
+
+            var inspectionStatus = await masterParameterRepo
+                .GetFilterOptionsAsync(MasterParameterTypes.INSP_STATUS, ct);
+
+            var inspectorLookup = await userRepo.GetInspectorLookup(ct);
+
+            var searchFields = InspectionQueryMetadata.Fields
+                .Where(x => x.CanSearch)
+                .Select(x => new QueryFieldOptionDto
+                {
+                    Value = x.Field,
+                    Label = x.Label
+                })
+                .ToList();
+
+            var sortFields = InspectionQueryMetadata.Fields
+                .Where(x => x.CanSort)
+                .Select(x => new QueryFieldOptionDto
+                {
+                    Value = x.Field,
+                    Label = x.Label
+                })
+                .ToList();
+
+            return new InspectionFilterOptions
+            {
+                CustomerTypes = customerTypes,
+                InspectionStatus = inspectionStatus,
+                Inspectors = inspectorLookup,
+                SearchFields = searchFields,
+                SortFields = sortFields
+            };
+        }
+
         // queries
         public async Task<(IReadOnlyList<InspectionListDto> items, int totalItems)> GetPagedAsync(InspectionListQuery query, CancellationToken ct = default)
         {
