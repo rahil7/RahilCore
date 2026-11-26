@@ -1,5 +1,5 @@
 import { apiClient, type ApiResponse } from "../lib/api-client";
-import type { GetInspectionsParams, InspectionFilterOptions, InspectionListItem } from "../types/inspection";
+import type { GetInspectionsParams, InspectionDetailResponse, InspectionFilterOptions, InspectionListItem } from "../types/inspection";
 import type { PagedResponse } from "../types/pagination";
 
 function buildQueryString(params: GetInspectionsParams): string {
@@ -66,5 +66,11 @@ export const inspectionService = {
             : "/api/inspections";
 
         return apiClient.get<PagedResponse<InspectionListItem>>(url);
+    },
+
+    getDetail(id: number) {
+        return apiClient.get<ApiResponse<InspectionDetailResponse>>(
+            `/api/inspections/${id}`,
+        );
     },
 }

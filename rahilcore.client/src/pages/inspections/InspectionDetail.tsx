@@ -1,30 +1,68 @@
+import { useEffect, useState } from "react";
 import { PageDetailHeader } from "../../components/layout/PageDetailHeader";
-import InspectionActivitySection from "./details/components/InspectionActivitySection";
-import InspectionCustomerSection from "./details/components/InspectionCustomerSection";
+import type { InspectionDetailResponse } from "../../types/inspection";
 import InspectionDetailHeader from "./details/components/InspectionDetailHeader";
-import InspectionInformationSection from "./details/components/InspectionInformationSection";
-import InspectionResultSection from "./details/components/InspectionResultSection";
-import InspectionScoringSection from "./details/components/InspectionScoringSection";
-import InspectionVehicleSection from "./details/components/InspectionVehicleSection";
-import { inspectionDetailMock } from "./details/mock/inspection-detail-mock";
+import { inspectionService } from "../../services/inspection-service";
+import { useInspectionContext } from "../../contexts/inspections/useInspectionContext";
 
 export default function InspectionDetail() {
-    const inspection = inspectionDetailMock;
+    const title: string = "Inspection Detail";
+    const backTo: string = "/inspections";
 
-    // Mock permission/status:
-    // Inspection Submitted -> scoring can be started
-    const canStartScoring = inspection.statusName === "Inspection Submitted";
+    const { id } = useParams<{ id: string }>();
+    const { setShouldRefresh } = useInspectionContext();
 
-    const handleStartScoring = () => {
-        console.log("Start scoring:", inspection.id);
-    };
+    const [inspection, setInspection] = useState<InspectionDetailResponse | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!id) return;
+
+        const fetchDetail = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                const response = await inspectionService.getDetail(Number(id));
+
+                console.log(response.data);
+
+                setInspection(response.data);
+            } catch (err) {
+                console.error("Failed to fetch order detail:", err);
+                setError("Failed to load order detail.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchDetail();
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="space-y-5">
+                <PageDetailHeader title={title} backTo={ backTo } />
+                <p className="text-sm text-muted-foreground">Loading order detail...</p>
+            </div>
+        );
+    }
+
+    if (error || !inspection) {
+        return (
+            <div className="space-y-5">
+                <PageDetailHeader title={title} backTo={backTo} />
+                <p className="text-sm text-destructive">
+                    {error ?? "Inspection not found."}
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full min-w-0 space-y-5">
-            <PageDetailHeader
-                title="Inspection Detail"
-                backTo="/inspections"
-            />
+            <PageDetailHeader title={title} backTo={backTo} />
 
             {/* Header */}
             <InspectionDetailHeader
@@ -42,7 +80,7 @@ export default function InspectionDetail() {
             />
 
             {/* Customer & Inspection Information */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+{/*             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <InspectionCustomerSection
                     customer={inspection.customer}
                 />
@@ -54,25 +92,25 @@ export default function InspectionDetail() {
                     assignedAt={inspection.assignedAt}
                     submittedAt={inspection.submittedAt}
                 />
-            </div>
+            </div> */}
 
             {/* Vehicle */}
-            <InspectionVehicleSection
+{/*             <InspectionVehicleSection
                 vehicle={inspection.vehicle}
-            />
+            /> */}
 
             {/* Result & Scoring */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+{/*             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <InspectionResultSection />
 
                 <InspectionScoringSection
                     canStartScoring={canStartScoring}
                     onStartScoring={handleStartScoring}
                 />
-            </div>
+            </div> */}
 
             {/* Activity */}
-            <InspectionActivitySection />
+            {/* <InspectionActivitySection /> */}
         </div>
     );
 }

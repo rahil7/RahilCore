@@ -4,8 +4,10 @@ namespace RahilCore.Application.Features.Inspections.DTOs
 {
     public class InspectionDetailDto
     {
-        public long Id { get; set; }
+        public long InspectionId { get; set; }
         public string InspectionNo { get; set; } = string.Empty;
+
+        public long OrderId { get; set; }
         public string OrderNo { get; set; } = string.Empty;
 
         public long StatusId { get; set; }
@@ -30,7 +32,7 @@ namespace RahilCore.Application.Features.Inspections.DTOs
 
         public BaseAssignmentDto? Assignment { get; set; }
 
-        public InspectionVehicleDto? vehicle { get; set; }
+        public InspectionVehicleDto? Vehicle { get; set; }
 
         public IReadOnlyList<BaseActivityDto> Activities { get; set; } = [];
     }

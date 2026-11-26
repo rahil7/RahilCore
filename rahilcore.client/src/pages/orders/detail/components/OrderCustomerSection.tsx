@@ -1,7 +1,7 @@
-import type { OrderCustomer } from "../../../../types/order";
+import type { Customer } from "../../../../types/base";
 
 interface OrderCustomerSectionProps {
-    customer: OrderCustomer;
+    customer: Customer;
     picName?: string | null;
     picPhone?: string | null;
 }

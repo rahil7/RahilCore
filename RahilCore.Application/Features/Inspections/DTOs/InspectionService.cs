@@ -4,8 +4,6 @@ using RahilCore.Application.Features.Customers;
 using RahilCore.Application.Features.Inspections.Queries;
 using RahilCore.Application.Features.MasterParameters;
 using RahilCore.Application.Features.Orders;
-using RahilCore.Application.Features.Orders.DTOs;
-using RahilCore.Application.Features.Orders.Queries;
 using RahilCore.Application.Features.Users;
 using RahilCore.Application.Features.Vehicles;
 using RahilCore.Domain.Entities;
@@ -174,37 +172,38 @@ namespace RahilCore.Application.Features.Inspections.DTOs
                 FirstOwnership = vehicle.FirstOwnership,
 
                 BrandId = vehicle.BrandId,
-                Brand = vehicle.Brand!.Name,
+                Brand = vehicle.Brand?.Name,
 
                 ModelId = vehicle.ModelId,
-                Model = vehicle.Model!.Name,
+                Model = vehicle.Model?.Name,
 
                 VariantId = vehicle.VariantId,
-                Variant = vehicle.Variant!.Name,
+                Variant = vehicle.Variant?.Name,
 
                 ExteriorColorId = vehicle.ExteriorColorId,
-                ExteriorColor = vehicle.ExteriorColor!.Name,
+                ExteriorColor = vehicle.ExteriorColor?.Name,
 
                 BodyTypeId = vehicle.BodyTypeId,
-                BodyType = vehicle.BodyType!.ParamName,
+                BodyType = vehicle.BodyType?.ParamName,
 
                 InteriorColorId = vehicle.InteriorColorId,
-                InteriorColor = vehicle.InteriorColor!.Name,
+                InteriorColor = vehicle.InteriorColor?.Name,
 
                 FuelTypeId = vehicle.FuelTypeId,
-                FuelType = vehicle.FuelType!.ParamName,
+                FuelType = vehicle.FuelType?.ParamName,
 
                 TransmissionId = vehicle.TransmissionId,
-                Transmission = vehicle.Transmission!.ParamName,
+                Transmission = vehicle.Transmission?.ParamName,
 
                 OwnershipTypeId = vehicle.OwnershipTypeId,
-                OwnershipType = vehicle.OwnershipType!.ParamName,
+                OwnershipType = vehicle.OwnershipType?.ParamName,
             };
 
             return new InspectionDetailDto
             {
-                Id = inspection.Id,
+                InspectionId = inspection.Id,
                 InspectionNo = inspection.InspectionNo,
+                OrderId = inspection.OrderItem.OrderId,
                 OrderNo = inspection.OrderItem.Order.OrderNo,
                 StatusId = inspection.OrderItem.Order.StatusId,
                 StatusName = inspection.OrderItem.Order.Status!.ParamName!,
@@ -219,13 +218,10 @@ namespace RahilCore.Application.Features.Inspections.DTOs
                 LastActivityAt = inspection.OrderItem.Order.UpdatedAt ?? inspection.OrderItem.Order.CreatedAt,
                 LastActivityBy = inspection.OrderItem.Order.UpdatedBy ?? inspection.OrderItem.Order.CreatedBy ?? string.Empty,
                 LastActivityNote = inspection.OrderItem.Order.UpdatedNote ?? inspection.OrderItem.Order.CreatedNote,
-
                 Assignment = assignment,
                 Activities = activities,
-
                 Customer = inspectionCustomer,
-
-                vehicle = inspectionVehicle
+                Vehicle = inspectionVehicle
             };
         }
     }

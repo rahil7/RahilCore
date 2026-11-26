@@ -6,6 +6,7 @@ import type {
 } from "./common";
 import type { UserLookupDto } from "./user";
 import type { Activity } from "../types/activity";
+import type { Assignment, Customer, Vehicle } from "./base";
 
 export interface OrderFilterOptions {
     customerTypes: FilterOption[];
@@ -150,35 +151,18 @@ export interface OrderDetailResponse {
     scheduleAt: string;
     note: string;
 
-    customer: OrderCustomer;
+    customer: Customer;
 
     vehicles: OrderVehicle[];
 
     payment: OrderPayment | null;
 
-    assignment: OrderAssignment | null;
+    assignment: Assignment | null;
 
     activities: Activity[];
 }
 
-export interface OrderCustomer {
-    customerCode: string;
-    customerName: string;
-    customerTypeId: number;
-    customerType: string;
-    email: string | null;
-    phone: string | null;
-    address: string | null;
-}
-
-export interface OrderVehicle {
-    vehicleId: number;
-    plateNo: string | null;
-    brand: string | null;
-    model: string | null;
-    variant: string | null;
-    yearOfManufacture: number | null;
-    exteriorColor: string | null;
+export interface OrderVehicle extends Vehicle {
     canDelete: boolean
 }
 
@@ -195,15 +179,6 @@ export interface OrderPayment {
     lastActivityAt: string;
     lastActivityBy: string;
     lastActivityNote: string;
-}
-
-export interface OrderAssignment {
-    inspectorUsername: string;
-    inspectorName: string;
-    scheduleAt: string;
-    assignedAt: string;
-    assignedBy: string | null;
-    assignedNote: string | null;
 }
 
 export interface OrderPaymentOptions {

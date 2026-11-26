@@ -1,11 +1,11 @@
 import { UserRoundSearch, UserRound, Pencil } from "lucide-react";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
-import type { OrderAssignment } from "../../../../types/order";
 import { formatDateTime } from "../../../../utils/date-utils";
+import type { Assignment } from "../../../../types/base";
 
 interface OrderAssignmentSectionProps {
-    assignment: OrderAssignment | null;
+    assignment: Assignment | null;
     canAssign: boolean;
     canReassign: boolean;
     onAssign: () => void;
