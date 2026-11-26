@@ -5,6 +5,7 @@ namespace RahilCore.Application.Features.Inspections
 {
     public interface IInspectionService
     {
+        Task<InspectionDetailDto?> GetDetail(long id, CancellationToken ct = default);
         Task<InspectionFilterOptions?> GetFilterOptionsAsync(CancellationToken ct = default);
         Task<(IReadOnlyList<InspectionListDto> items, int totalItems)> GetPagedAsync(InspectionListQuery query, CancellationToken ct=default);
     }

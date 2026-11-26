@@ -196,6 +196,7 @@ namespace RahilCore.Application.Features.Orders
             }
 
             InspectionOrderEn? order = await orderRepo.GetOrderDetail(id, ct);
+            
             if (order is null || order.Customer is null)
             {
                 return null;
@@ -209,24 +210,10 @@ namespace RahilCore.Application.Features.Orders
             }
 
             OrderPaymentDto? payment = await orderRepo.GetOrderPayment(id, ct);
-            OrderAssignmentDto? assignment = await orderRepo.GetOrderAssignment(id, ct);
-            IReadOnlyList<OrderActivityDto> activities = await activityRepo.GetByOrderIdAsync(id, ct);
-
-            if (order.Customer is null) return null;
-            if (orderItems.Count == 0) return null;
+            BaseAssignmentDto? assignment = await orderRepo.GetOrderAssignment(id, ct);
+            IReadOnlyList<BaseActivityDto> activities = await activityRepo.GetByOrderIdAsync(id, ct);
 
             var canReassign = assignment != null && !await orderRepo.HasSubmittedInspectionAsync(id, ct);
-
-            var customer = new OrderCustomerDto
-            {
-                CustomerCode = order.Customer.CustCode,
-                CustomerName = order.Customer.CustName,
-                customerTypeId = order.Customer.CustTypeId,
-                CustomerType = order.Customer.CustType?.ParamName ?? string.Empty,
-                Email = order.Customer.Email,
-                Phone = order.Customer.Phone,
-                Address = order.Customer.Address
-            };
 
             var inspectionForm = orderItems
                 .Select(x => x.InspectionForm)
@@ -276,7 +263,16 @@ namespace RahilCore.Application.Features.Orders
                 CanAssign = canAssign,
                 CanReassign = canReassign,
 
-                Customer = customer,
+                Customer = new BaseCustomerDto
+                {
+                    CustomerCode = order.Customer.CustCode,
+                    CustomerName = order.Customer.CustName,
+                    CustomerTypeId = order.Customer.CustTypeId,
+                    CustomerType = order.Customer.CustType?.ParamName ?? string.Empty,
+                    Email = order.Customer.Email,
+                    Phone = order.Customer.Phone,
+                    Address = order.Customer.Address
+                },
                 Vehicles = vehicles,
                 Payment = payment,
                 Assignment = assignment,

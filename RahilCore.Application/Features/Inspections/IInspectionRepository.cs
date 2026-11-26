@@ -14,5 +14,6 @@ namespace RahilCore.Application.Features.Inspections
         void Delete(InspectionEn inspection);
         Task DeleteByOrderItemId(long orderItemId, CancellationToken ct = default);
         Task<(IReadOnlyList<InspectionListDto> items, int totalItems)> GetPagedAsync(InspectionListQuery query, CancellationToken ct=default);
+        Task<InspectionEn?> GetDetail(long id, CancellationToken ct = default);
     }
 }

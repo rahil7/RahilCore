@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RahilCore.Application.Common.Constants;
+using RahilCore.Application.Common.DTOs;
 using RahilCore.Application.Common.Exceptions;
 using RahilCore.Application.Common.Helpers;
 using RahilCore.Application.Features.Orders;
@@ -331,12 +332,12 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 .FirstOrDefaultAsync(ct);
         }
 
-        public async Task<OrderAssignmentDto?> GetOrderAssignment(long orderId, CancellationToken ct = default)
+        public async Task<BaseAssignmentDto?> GetOrderAssignment(long orderId, CancellationToken ct = default)
         {
             return await context.InspectionOrderAssignments
                 .AsNoTracking()
                 .Where(x => x.OrderId == orderId)
-                .Select(x => new OrderAssignmentDto
+                .Select(x => new BaseAssignmentDto
                 {
                     InspectorUsername = x.Inspector!.Username,
                     InspectorName = x.Inspector!.DisplayName,

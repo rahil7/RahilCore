@@ -33,6 +33,28 @@ namespace RahilCore.Server.Controllers
             return Ok(response);
         }
 
+        [HttpGet("{id:long}")]
+        public async Task<ActionResult<ApiResponse<InspectionDetailDto>>> GetById(long id, CancellationToken ct)
+        {
+            var data = await inspectionService.GetDetail(id, ct);
+
+            if (data is null)
+            {
+                return NotFound(
+                    new ApiResponse<InspectionDetailDto>(
+                        Success: false,
+                        Message: "Inspection tidak ditemukan.",
+                        Data: null));
+            }
+
+            return Ok(
+                new ApiResponse<InspectionDetailDto>(
+                    Success: true,
+                    Message: "Inspection retrieved successfully.",
+                    Data: data));
+        }
+
+
         [HttpGet("filter-options")]
         public async Task<ActionResult<ApiResponse<InspectionFilterOptions>>> GetFilterOptions(CancellationToken ct)
         {

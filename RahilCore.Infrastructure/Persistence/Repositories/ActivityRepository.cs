@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RahilCore.Application.Common.Constants;
+using RahilCore.Application.Common.DTOs;
 using RahilCore.Application.Features;
 using RahilCore.Application.Features.Orders.DTOs;
 using RahilCore.Domain.Entities;
@@ -14,12 +15,12 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
             context.ActivityLogs.Add(activity);
         }
 
-        public async Task<IReadOnlyList<OrderActivityDto>> GetByOrderIdAsync(long orderId, CancellationToken ct)
+        public async Task<IReadOnlyList<BaseActivityDto>> GetByOrderIdAsync(long orderId, CancellationToken ct)
         {
            return await context.ActivityLogs
                 .AsNoTracking()
                 .Where(x => x.OrderId == orderId)
-                .Select(x => new OrderActivityDto
+                .Select(x => new BaseActivityDto
                 {
                     Id = x.Id,
                     Action = x.ActionCode!.ParamName!,

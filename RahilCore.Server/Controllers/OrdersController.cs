@@ -53,7 +53,7 @@ namespace RahilCore.Server.Controllers
             return Ok(
                 new ApiResponse<OrderDetailDto>(
                     Success: true,
-                    Message: "Customer retrieved successfully.",
+                    Message: "Order retrieved successfully.",
                     Data: order));
         }
 

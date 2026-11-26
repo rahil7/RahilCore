@@ -33,6 +33,26 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
                 .ExecuteDeleteAsync(ct);
         }
 
+        public async Task<InspectionEn?> GetDetail(long id, CancellationToken ct = default)
+        {
+            return await context.Inspections
+                .Include(x => x.OrderItem!)
+                    .ThenInclude(x => x.Vehicle)
+                .Include(x => x.OrderItem!)
+                    .ThenInclude(x => x.InspectionForm)
+                .Include(x => x.OrderItem!)
+                    .ThenInclude(x => x.Order!)
+                    .ThenInclude(x => x.Customer)
+                .Include(x => x.OrderItem!)
+                    .ThenInclude(x => x.Order!)
+                    .ThenInclude(x => x.Customer!)
+                    .ThenInclude(x => x.CustType)
+                .Include(x => x.OrderItem!)
+                    .ThenInclude(x => x.Order!)
+                    .ThenInclude(x => x.Status)
+                .FirstOrDefaultAsync(x => x.Id == id, ct);
+        }
+
         public async Task<InspectionEn?> GetByOrderItemId(long orderItemId, CancellationToken ct = default)
         {
             return await context.Inspections.FirstOrDefaultAsync(x=> x.OrderItemId == orderItemId, ct);

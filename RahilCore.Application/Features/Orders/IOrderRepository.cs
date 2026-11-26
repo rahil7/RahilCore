@@ -1,4 +1,5 @@
-﻿using RahilCore.Application.Features.Orders.DTOs;
+﻿using RahilCore.Application.Common.DTOs;
+using RahilCore.Application.Features.Orders.DTOs;
 using RahilCore.Application.Features.Orders.Queries;
 using RahilCore.Domain.Entities.Orders;
 
@@ -24,7 +25,7 @@ namespace RahilCore.Application.Features.Orders
         Task<string> GenerateInspectionNo(long custType, CancellationToken ct = default);
         Task<IReadOnlyList<InspectionOrderItemEn>> GetOrderDetailItems(long orderId, CancellationToken ct = default);
         Task<OrderPaymentDto?> GetOrderPayment(long orderId, CancellationToken ct = default);
-        Task<OrderAssignmentDto?> GetOrderAssignment(long orderId, CancellationToken ct = default);
+        Task<BaseAssignmentDto?> GetOrderAssignment(long orderId, CancellationToken ct = default);
         Task<InspectionOrderEn?> GetOrderDetail(long id, CancellationToken ct = default);
         Task<InspectionOrderPaymentEn?> GetPayment(long orderId, long paymentId, CancellationToken ct = default);
         Task<InspectionOrderItemEn?> GetOrderItem(long orderId, long itemId, CancellationToken ct = default);
