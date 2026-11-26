@@ -161,8 +161,8 @@ export default function DealerSection({
             <div className="grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr]">
                 <FormSelect
                     label="Showroom"
-                    placeholder="Pilih showroom"
-                    searchPlaceholder="Cari showroom..."
+                    placeholder="Select showroom"
+                    searchPlaceholder="Search showroom..."
                     searchable
                     options={dealerOptions}
                     value={selectedDealer ? String(selectedDealer.id) : ""}
@@ -242,19 +242,17 @@ export default function DealerSection({
 
             {/* PIC Information */}
             <div className="space-y-4 border-t pt-4">
-                <h4 className="text-sm font-semibold">PIC Information</h4>
-
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <FormInput
-                        label="Nama PIC"
-                        placeholder="Masukkan nama PIC"
+                        label="Contact Person"
+                        placeholder="Enter contact person"
                         value={picName}
                         onChange={(e) => onPicNameChange(e.target.value)}
                         disabled={isSubmitting}
                     />
 
                     <PhoneInput
-                        label="Phone PIC"
+                        label="Contact Phone"
                         value={picPhone}
                         onChange={onPicPhoneChange}
                         disabled={isSubmitting}

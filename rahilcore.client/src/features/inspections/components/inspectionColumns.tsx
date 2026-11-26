@@ -42,7 +42,7 @@ export const inspectionColumns: DataTableColumn<InspectionListItem>[] = [
     },
     {
         id: "scheduleAt",
-        header: "Tanggal Inspeksi",
+        header: "Inspection Date",
         align: "center",
         cell: (row) => (formatDateTime(row.scheduleAt))
     },
@@ -59,7 +59,7 @@ export const inspectionColumns: DataTableColumn<InspectionListItem>[] = [
     },
     {
         id: "vehicle",
-        header: "Unit",
+        header: "Vehicle",
         cell: (row) => (
             <VehicleCell
                 plateNo={row.plateNo}

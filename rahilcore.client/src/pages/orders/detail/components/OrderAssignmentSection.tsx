@@ -1,4 +1,4 @@
-import { UserRoundSearch, UserRound, Pencil } from "lucide-react";
+import { UserRoundSearch, UserRound, Pencil, CalendarDays, Clock3, UserRoundCheck, MessageSquareText } from "lucide-react";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
 import { formatDateTime } from "../../../../utils/date-utils";
@@ -24,7 +24,7 @@ export default function OrderAssignmentSection({
             {/* Header */}
             <div className="mb-5 flex items-center justify-between">
                 <h3 className="font-semibold">
-                    Inspector Assignment
+                    Inspection Assignment
                 </h3>
 
                 <Badge
@@ -56,47 +56,62 @@ export default function OrderAssignmentSection({
                     {canAssign && (
                         <Button size="sm" onClick={onAssign}>
                             <UserRound className="mr-2 h-4 w-4" />
-                            Assign Inspector
+                            Assign
                         </Button>
                     )}
                 </div>
             ) : (
                 <div className="space-y-5">
                     {/* Assignment Information */}
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
                         {/* Inspector */}
-                        <div>
-                            <p className="text-sm text-muted-foreground">Inspector</p>
-                            <p className="mt-1 text-sm font-medium">
+                        <div className="min-w-0 space-y-1.5">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <UserRound className="h-4 w-4 shrink-0" />
+                                <span className="text-sm">Inspector</span>
+                            </div>
+
+                            <p className="break-words text-sm font-medium">
                                 {assignment.inspectorName}
                             </p>
+
                             <p className="text-sm text-muted-foreground">
                                 @{assignment.inspectorUsername}
                             </p>
                         </div>
 
                         {/* Inspection Schedule */}
-                        <div>
-                            <p className="text-sm text-muted-foreground">
-                                Inspection Schedule
-                            </p>
-                            <p className="mt-1 text-sm font-medium">
+                        <div className="min-w-0 space-y-1.5">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <CalendarDays className="h-4 w-4 shrink-0" />
+                                <span className="text-sm">Inspection Date</span>
+                            </div>
+
+                            <p className="break-words text-sm font-medium">
                                 {formatDateTime(assignment.scheduleAt)}
                             </p>
                         </div>
 
                         {/* Assigned Date */}
-                        <div>
-                            <p className="text-sm text-muted-foreground">Assigned Date</p>
-                            <p className="mt-1 text-sm font-medium">
+                        <div className="min-w-0 space-y-1.5">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <Clock3 className="h-4 w-4 shrink-0" />
+                                <span className="text-sm">Tanggal Penugasan</span>
+                            </div>
+
+                            <p className="break-words text-sm font-medium">
                                 {formatDateTime(assignment.assignedAt)}
                             </p>
                         </div>
 
                         {/* Assigned By */}
-                        <div>
-                            <p className="text-sm text-muted-foreground">Assigned By</p>
-                            <p className="mt-1 text-sm font-medium">
+                        <div className="min-w-0 space-y-1.5">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <UserRoundCheck className="h-4 w-4 shrink-0" />
+                                <span className="text-sm">Assigned Date</span>
+                            </div>
+
+                            <p className="break-words text-sm font-medium">
                                 {assignment.assignedBy || "-"}
                             </p>
                         </div>
@@ -104,11 +119,13 @@ export default function OrderAssignmentSection({
 
                     {/* Assignment Note */}
                     {assignment.assignedNote && (
-                        <div className="mt-4">
-                            <p className="text-sm text-muted-foreground">
-                                Assignment Note
-                            </p>
-                            <p className="mt-1 whitespace-pre-wrap text-sm">
+                        <div className="space-y-1.5">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <MessageSquareText className="h-4 w-4 shrink-0" />
+                                <span className="text-sm">Notes</span>
+                            </div>
+
+                            <p className="whitespace-pre-wrap break-words text-sm font-medium">
                                 {assignment.assignedNote}
                             </p>
                         </div>

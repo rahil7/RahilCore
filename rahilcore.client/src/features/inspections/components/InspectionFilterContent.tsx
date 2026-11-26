@@ -64,7 +64,7 @@ export default function InspectionFilterContent({
                     <span>
                         {value
                             ? format(parseISO(value), "dd/MM/yyyy", { locale: id })
-                            : "Pilih tanggal"}
+                            : "Select date"}
                     </span>
 
                     <CalendarIcon className="h-4 w-4 text-muted-foreground" />
@@ -122,7 +122,7 @@ export default function InspectionFilterContent({
 
             {/* Customer Type */}
             <div className="space-y-3 pt-1">
-                <h3 className="text-sm font-medium">Tipe Customer</h3>
+                <h3 className="text-sm font-medium">Customer Type</h3>
 
                 <div className="space-y-3">
                     {options.customerTypes.map((item) => (
@@ -172,7 +172,7 @@ export default function InspectionFilterContent({
 
             {/* Inspector */}
             <div className="space-y-3">
-                <h3 className="text-sm font-medium">Inspektor</h3>
+                <h3 className="text-sm font-medium">Inspector</h3>
 
                 <div className="space-y-3">
                     {options.inspectors.map((item) => (

@@ -1,94 +1,82 @@
+import {
+    UserRound,
+    Hash,
+    Tags,
+    Mail,
+    Phone,
+    MapPinned,
+} from "lucide-react";
+
 import type { Customer } from "../../../../types/base";
 
 interface OrderCustomerSectionProps {
     customer: Customer;
-    picName?: string | null;
-    picPhone?: string | null;
 }
 
 export default function OrderCustomerSection({
     customer,
-    picName,
-    picPhone,
 }: OrderCustomerSectionProps) {
+    const items = [
+        {
+            label: "Name",
+            value: customer.customerName,
+            icon: UserRound,
+        },
+        {
+            label: "Code",
+            value: customer.customerCode,
+            icon: Hash,
+        },
+        {
+            label: "Type",
+            value: customer.customerType,
+            icon: Tags,
+        },
+        {
+            label: "Email",
+            value: customer.email || "-",
+            icon: Mail,
+        },
+        {
+            label: "Phone",
+            value: customer.phone || "-",
+            icon: Phone,
+        },
+        {
+            label: "Address",
+            value: customer.address || "-",
+            icon: MapPinned,
+            fullWidth: true,
+        },
+    ];
+
     return (
         <section className="rounded-xl border bg-card p-5">
-            <h3 className="mb-4 font-semibold">
-                Informasi Customer
-            </h3>
+            <h3 className="font-semibold">Customer Information</h3>
 
-            <div className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-                <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                        Name
-                    </p>
-                    <p className="text-sm font-medium">
-                        {customer.customerName}
-                    </p>
-                </div>
+            <div className="grid gap-x-8 gap-y-5 pt-5 sm:grid-cols-2">
+                {items.map((item) => {
+                    const Icon = item.icon;
 
-                <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                        Code
-                    </p>
-                    <p className="text-sm font-medium">
-                        {customer.customerCode}
-                    </p>
-                </div>
+                    return (
+                        <div
+                            key={item.label}
+                            className={`min-w-0 space-y-1.5 ${item.fullWidth ? "sm:col-span-2" : ""
+                                }`}
+                        >
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <Icon className="h-4 w-4 shrink-0" />
+                                <span className="text-sm">
+                                    {item.label}
+                                </span>
+                            </div>
 
-                <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                        Tipe
-                    </p>
-                    <p className="text-sm font-medium">
-                        {customer.customerType}
-                    </p>
-                </div>
-
-                <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                        Email
-                    </p>
-                    <p className="text-sm font-medium">
-                        {customer.email || "-"}
-                    </p>
-                </div>
-
-                <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                        Phone
-                    </p>
-                    <p className="text-sm font-medium">
-                        {customer.phone || "-"}
-                    </p>
-                </div>
-
-                <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                        Nama PIC
-                    </p>
-                    <p className="text-sm font-medium">
-                        {picName || "-"}
-                    </p>
-                </div>
-
-                <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                        Phone PIC
-                    </p>
-                    <p className="text-sm font-medium">
-                        {picPhone || "-"}
-                    </p>
-                </div>
-
-                <div className="space-y-1 sm:col-span-2">
-                    <p className="text-sm text-muted-foreground">
-                        Alamat
-                    </p>
-                    <p className="text-sm font-medium">
-                        {customer.address || "-"}
-                    </p>
-                </div>
+                            <p className="break-words text-sm font-medium">
+                                {item.value || "-"}
+                            </p>
+                        </div>
+                    );
+                })}
             </div>
         </section>
     );

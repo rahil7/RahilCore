@@ -15,7 +15,6 @@ import OrderInformationSection from "./components/OrderInformationSection";
 import OrderVehicleSection from "./components/OrderVehicleSection";
 import OrderPaymentSection from "./components/OrderPaymentSection";
 import OrderAssignmentSection from "./components/OrderAssignmentSection";
-import OrderActivitySection from "./components/OrderActivitySection";
 import { orderService } from "../../../services/order-service";
 import type { CachedFileAccess } from "../../../types/file";
 import OrderPaymentDialog from "./dialogs/OrderPaymentDialog";
@@ -23,6 +22,7 @@ import OrderAssignmentDialog from "./dialogs/OrderAssignmentDialog";
 import { useOrderContext } from "../../../contexts/orders/useOrderContext";
 import OrderEditDialog from "./dialogs/OrderEditDialog";
 import OrderCancelDialog from "./dialogs/OrderCancelDialog";
+import ActivityHistorySection from "../../../components/shared/ActivityHistorySection";
 
 export default function OrderDetail() {
     const { id } = useParams<{ id: string }>();
@@ -243,13 +243,13 @@ export default function OrderDetail() {
             <div className="grid gap-4 lg:grid-cols-2">
                 <OrderCustomerSection
                     customer={order.customer}
-                    picName={order.picName}
-                    picPhone={order.picPhone}
                 />
 
                 <OrderInformationSection
                     inspectionForm={order.inspectionFormName}
                     scheduleAt={order.scheduleAt}
+                    picName={order.picName}
+                    picPhone={order.picPhone}
                     note={order.note}
                 />
             </div>
@@ -319,7 +319,7 @@ export default function OrderDetail() {
                 }
             />
 
-            <OrderActivitySection activities={order.activities} />
+            <ActivityHistorySection activities={order.activities} />
 
         </div>
     );

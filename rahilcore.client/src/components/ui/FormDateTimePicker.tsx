@@ -38,7 +38,7 @@ export function FormDateTimePicker({
     error,
     disabled = false,
     required = false,
-    placeholder = "Pilih tanggal dan waktu",
+    placeholder = "Select Date",
     info,
 }: FormDateTimePickerProps) {
     const selectedDate = useMemo(() => {

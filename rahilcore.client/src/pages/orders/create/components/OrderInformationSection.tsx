@@ -48,7 +48,7 @@ export default function OrderInformationSection({
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <FormSelect
                         label="Inspection Form"
-                        placeholder="Pilih inspection form"
+                        placeholder="Select inspection form"
                         options={inspectionFormOptions}
                         value={
                             inspectionFormId
@@ -67,7 +67,7 @@ export default function OrderInformationSection({
                     />
 
                     <FormDateTimePicker
-                        label="Jadwal Inspeksi"
+                        label="Inspection Date"
                         value={scheduleAt || null}
                         onChange={(value) => {
                             onScheduleAtChange(value ?? "");
@@ -80,8 +80,8 @@ export default function OrderInformationSection({
                 </div>
 
                 <FormTextarea
-                    label="Note"
-                    placeholder="Masukkan catatan order..."
+                    label="Notes"
+                    placeholder="Enter notes..."
                     value={note}
                     onChange={(e) => {
                         onNoteChange(e.target.value);
@@ -95,7 +95,7 @@ export default function OrderInformationSection({
                 />
 
                 <div className="text-right text-xs text-muted-foreground">
-                    {note.length}/500 karakter
+                    {note.length}/500 character
                 </div>
             </div>
         </section>

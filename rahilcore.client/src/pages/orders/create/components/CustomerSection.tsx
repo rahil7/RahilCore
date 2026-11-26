@@ -249,8 +249,8 @@ export default function CustomerSection({
                 <div className="space-y-3">
                     <FormSelect
                         label="Customer"
-                        placeholder="Pilih customer"
-                        searchPlaceholder="Cari customer..."
+                        placeholder="Select customer"
+                        searchPlaceholder="Search customer"
                         searchable
                         options={customerOptions}
                         value={
@@ -330,7 +330,7 @@ export default function CustomerSection({
                         Customer Attendance
                     </h4>
                     <p className="mt-1 text-xs text-muted-foreground">
-                        Apakah customer ikut saat proses inspeksi?
+                        Is the customer present during the inspection?
                     </p>
                 </div>
 
@@ -344,7 +344,7 @@ export default function CustomerSection({
                                 : "hover:bg-muted/50"
                             }`}
                     >
-                        <div className="text-sm font-medium">Ikut</div>
+                        <div className="text-sm font-medium">Present</div>
                     </button>
 
                     <button
@@ -356,21 +356,21 @@ export default function CustomerSection({
                                 : "hover:bg-muted/50"
                             }`}
                     >
-                        <div className="text-sm font-medium">Tidak Ikut</div>
+                        <div className="text-sm font-medium">Not Present</div>
                     </button>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <FormInput
-                        label="Nama PIC"
-                        placeholder="Masukkan nama PIC"
+                        label="Contact Person"
+                        placeholder="Enter contact person"
                         value={picName}
                         onChange={(e) => onPicNameChange(e.target.value)}
                         disabled={isSubmitting}
                     />
 
                     <PhoneInput
-                        label="Phone PIC"
+                        label="Contact Phone"
                         value={picPhone}
                         onChange={onPicPhoneChange}
                         disabled={isSubmitting}

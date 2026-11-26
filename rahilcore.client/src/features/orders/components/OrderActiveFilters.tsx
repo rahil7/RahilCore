@@ -36,7 +36,7 @@ export default function OrderActiveFilters({
                 <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                     {/* Created From */}
                     <ActiveFilterChip
-                        label={`Tanggal : ${formatDate(createdFrom)} - ${formatDate(createdTo)}`}
+                        label={`Created Date : ${formatDate(createdFrom)} - ${formatDate(createdTo)}`}
                         onRemove={() => { } }
                     />
 

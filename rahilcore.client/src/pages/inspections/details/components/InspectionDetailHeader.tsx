@@ -1,11 +1,19 @@
 import { Link } from "react-router-dom";
-import { CalendarDays, UserRound } from "lucide-react";
+import {
+    CalendarDays,
+    UserRound,
+    Clock3,
+    Activity,
+} from "lucide-react";
+import { inspectionStatusConfig } from "../../../../config/status-config";
+import StatusBadge from "../../../../components/shared/StatusBadge";
+import { formatDateTime } from "../../../../utils/date-utils";
 
 interface InspectionDetailHeaderProps {
-    inspectionId: number;
     inspectionNo: string;
     orderId: number;
     orderNo: string;
+    statusId: number;
     statusName: string;
     scheduleAt: string | null;
     inspectorName: string | null;
@@ -15,23 +23,11 @@ interface InspectionDetailHeaderProps {
     lastActivityBy: string | null;
 }
 
-function formatDateTime(value: string | null) {
-    if (!value) return "—";
-
-    return new Date(value).toLocaleString("id-ID", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
-}
-
 export default function InspectionDetailHeader({
-    inspectionId,
     orderId,
     inspectionNo,
     orderNo,
+    statusId,
     statusName,
     scheduleAt,
     inspectorName,
@@ -41,10 +37,10 @@ export default function InspectionDetailHeader({
     lastActivityBy,
 }: InspectionDetailHeaderProps) {
     return (
-        <div className="rounded-lg border bg-card p-4 shadow-sm space-y-4">
-            {/* Title */}
+        <div className="rounded-xl border bg-card p-5 space-y-5">
+            {/* Header */}
             <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="space-y-1 min-w-0">
+                <div className="min-w-0 space-y-1">
                     <h2 className="text-lg font-semibold tracking-tight">
                         {inspectionNo}
                     </h2>
@@ -60,16 +56,18 @@ export default function InspectionDetailHeader({
                     </div>
                 </div>
 
-                <span className="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium">
-                    {statusName}
-                </span>
+                <StatusBadge
+                    statusId={statusId}
+                    label={statusName}
+                    config={inspectionStatusConfig}
+                />
             </div>
 
             {/* Main Information */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid gap-x-8 gap-y-5 pt-2 sm:grid-cols-2">
                 <InfoItem
                     icon={<CalendarDays className="h-4 w-4" />}
-                    label="Inspection Schedule"
+                    label="Inspection Date"
                     value={formatDateTime(scheduleAt)}
                 />
 
@@ -80,26 +78,21 @@ export default function InspectionDetailHeader({
                 />
             </div>
 
-            <div className="border-t pt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Created</p>
-                    <p className="text-sm">
-                        {formatDateTime(createdAt)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                        by {createdBy || "—"}
-                    </p>
-                </div>
+            {/* Activity Information */}
+            <div className="grid gap-x-8 gap-y-5 border-t pt-5 sm:grid-cols-2">
+                <InfoItem
+                    icon={<Clock3 className="h-4 w-4" />}
+                    label="Created"
+                    value={formatDateTime(createdAt)}
+                    description={`by ${createdBy || "—"}`}
+                />
 
-                <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Last Activity</p>
-                    <p className="text-sm">
-                        {formatDateTime(lastActivityAt)}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                        by {lastActivityBy || "—"}
-                    </p>
-                </div>
+                <InfoItem
+                    icon={<Activity className="h-4 w-4" />}
+                    label="Last Activity"
+                    value={formatDateTime(lastActivityAt)}
+                    description={`by ${lastActivityBy || "—"}`}
+                />
             </div>
         </div>
     );
@@ -109,18 +102,29 @@ interface InfoItemProps {
     icon: React.ReactNode;
     label: string;
     value: string;
+    description?: string;
 }
 
-function InfoItem({ icon, label, value }: InfoItemProps) {
+function InfoItem({
+    icon,
+    label,
+    value,
+    description,
+}: InfoItemProps) {
     return (
-        <div className="flex items-start gap-3">
-            <div className="mt-0.5 text-muted-foreground">
+        <div className="min-w-0 space-y-1.5">
+            <div className="flex items-center gap-2 text-muted-foreground">
                 {icon}
+                <span className="text-sm">{label}</span>
             </div>
-            <div className="min-w-0 space-y-1">
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="text-sm font-medium">{value}</p>
-            </div>
+
+            <p className="break-words text-sm font-medium">{value}</p>
+
+            {description && (
+                <p className="text-xs text-muted-foreground">
+                    {description}
+                </p>
+            )}
         </div>
-    );
+    )
 }

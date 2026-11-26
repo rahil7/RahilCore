@@ -171,13 +171,13 @@ export default function VehicleSection({
     return (
         <div className="rounded-lg border bg-card p-5 space-y-4">
             <div>
-                <h3 className="font-semibold">Data Kendaraan</h3>
+                <h3 className="font-semibold">Vehicle Information</h3>
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {/* License Plate */}
                 <FormInput
-                    label="Pelat No"
+                    label="Plate No."
                     placeholder="e.g. B 1234 ABC"
                     value={value.plateNo}
                     onChange={(e) => {
@@ -196,8 +196,8 @@ export default function VehicleSection({
                 {/* Brand */}
                 <FormSelect
                     label="Brand"
-                    placeholder="Pilih brand"
-                    searchPlaceholder="Cari brand..."
+                    placeholder="Select brand"
+                    searchPlaceholder="Search brand..."
                     searchable
                     options={brandOptions}
                     value={value.brandId ? String(value.brandId) : ""}
@@ -211,9 +211,9 @@ export default function VehicleSection({
                 <FormSelect
                     label="Model"
                     placeholder={
-                        loadingModels ? "Memuat model..." : "Pilih model"
+                        loadingModels ? "Loading model..." : "Select model"
                     }
-                    searchPlaceholder="Cari model..."
+                    searchPlaceholder="Search model..."
                     searchable
                     options={modelOptions}
                     value={value.modelId ? String(value.modelId) : ""}
@@ -232,10 +232,10 @@ export default function VehicleSection({
                     label="Variant"
                     placeholder={
                         loadingVariants
-                            ? "Memuat variant..."
-                            : "Pilih variant"
+                            ? "Loading variant..."
+                            : "Select variant"
                     }
-                    searchPlaceholder="Cari variant..."
+                    searchPlaceholder="Select variant..."
                     searchable
                     options={variantOptions}
                     value={value.variantId ? String(value.variantId) : ""}
@@ -254,7 +254,7 @@ export default function VehicleSection({
 
                 {/* Year of Manufacture */}
                 <FormInput
-                    label="Tahun Pembuatan"
+                    label="Year of Manufacture"
                     type="number"
                     placeholder="e.g. 2024"
                     value={value.yearOfManufacture || ""}
@@ -272,9 +272,9 @@ export default function VehicleSection({
 
                 {/* Exterior Color */}
                 <FormSelect
-                    label="Warna Exterior"
-                    placeholder="Pilih warna kendaraan"
-                    searchPlaceholder="Cari warna..."
+                    label="Exterior Color"
+                    placeholder="Select color"
+                    searchPlaceholder="search color..."
                     searchable
                     options={exteriorColorOptions}
                     value={

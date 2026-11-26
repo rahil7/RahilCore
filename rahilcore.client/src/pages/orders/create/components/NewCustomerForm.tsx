@@ -50,8 +50,8 @@ export default function NewCustomerForm({
         <div className="space-y-5">
             {/* Customer Name */}
             <FormInput
-                label="Nama Customer"
-                placeholder="Masukkan nama customer"
+                label="Customer Name"
+                placeholder="Enter customer name"
                 value={value.custName}
                 onChange={(e) => {
                     updateField("custName", e.target.value);
@@ -91,9 +91,9 @@ export default function NewCustomerForm({
 
             {/* City */}
             <FormSelect
-                label="Kota"
-                placeholder="Pilih kota"
-                searchPlaceholder="Cari kota..."
+                label="City"
+                placeholder="Select City"
+                searchPlaceholder="Search city..."
                 searchable
                 options={cityOptions}
                 error={errors?.cityId}
@@ -107,8 +107,8 @@ export default function NewCustomerForm({
 
             {/* Address */}
             <FormTextarea
-                label="Alamat"
-                placeholder="Masukkan alamat customer"
+                label="Address"
+                placeholder="Enter address"
                 value={value?.address}
                 onChange={(e) => {
                     updateField("address", e.target.value);

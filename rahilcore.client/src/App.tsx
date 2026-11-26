@@ -21,6 +21,7 @@ import Profile from "./pages/profile/Profile";
 import CreateOrder from "./pages/orders/OrderCreate";
 import OrderDetail from "./pages/orders/detail/OrderDetail";
 import InspectionDetail from "./pages/inspections/InspectionDetail";
+import InspectionScoringPage from "./pages/inspections/scoring/InspectionScoringPage";
 
 export default function App() {
     return (
@@ -48,7 +49,8 @@ export default function App() {
 
                         <Route element={<InspectionProvider />}>
                             <Route path="/inspections" element={<InspectionList />} />
-                            <Route path="/inspections/:id" element={<InspectionDetail />}/>
+                            <Route path="/inspections/:id" element={<InspectionDetail />} />
+                            <Route path="/inspections/:id/scoring" element={<InspectionScoringPage />} />
                         </Route>
 
                         <Route path="/reports" element={<Reports />} />

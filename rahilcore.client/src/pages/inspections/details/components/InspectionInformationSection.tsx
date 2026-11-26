@@ -1,21 +1,23 @@
+import {
+    ClipboardList,
+    CalendarDays,
+    UserRound,
+    Clock3,
+    CheckCircle2,
+    Contact,
+    Phone,
+} from "lucide-react";
+
+import { formatDateTime } from "../../../../utils/date-utils";
+
 interface InspectionInformationSectionProps {
     inspectionFormName: string | null;
     scheduleAt: string | null;
     inspectorName: string | null;
     assignedAt: string | null;
     submittedAt: string | null;
-}
-
-function formatDateTime(value: string | null) {
-    if (!value) return "—";
-
-    return new Date(value).toLocaleString("id-ID", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+    contactPerson: string | null;
+    contactPhone: string | null;
 }
 
 export default function InspectionInformationSection({
@@ -24,36 +26,74 @@ export default function InspectionInformationSection({
     inspectorName,
     assignedAt,
     submittedAt,
+    contactPerson,
+    contactPhone,
 }: InspectionInformationSectionProps) {
-    const fields = [
-        { label: "Inspection Form", value: inspectionFormName },
-        { label: "Schedule", value: formatDateTime(scheduleAt) },
-        { label: "Inspector", value: inspectorName },
-        { label: "Assigned At", value: formatDateTime(assignedAt) },
-        { label: "Submitted At", value: formatDateTime(submittedAt) },
+    const items = [
+        {
+            label: "Inspection Form",
+            value: inspectionFormName || "-",
+            icon: ClipboardList,
+        },
+        {
+            label: "Inspection Date",
+            value: scheduleAt ? formatDateTime(scheduleAt) : "-",
+            icon: CalendarDays,
+        },
+        {
+            label: "Inspector",
+            value: inspectorName || "-",
+            icon: UserRound,
+        },
+        {
+            label: "Contact Person",
+            value: contactPerson || "-",
+            icon: Contact,
+        },
+        {
+            label: "Contact Phone",
+            value: contactPhone || "-",
+            icon: Phone,
+        },
+        {
+            label: "Assigned At",
+            value: assignedAt ? formatDateTime(assignedAt) : "-",
+            icon: Clock3,
+        },
+        {
+            label: "Submitted At",
+            value: submittedAt ? formatDateTime(submittedAt) : "-",
+            icon: CheckCircle2,
+        },
     ];
 
     return (
-        <div className="rounded-lg border bg-card p-4 shadow-sm space-y-4">
-            <div>
-                <h3 className="font-semibold">Inspection Information</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                    Assignment and inspection schedule
-                </p>
-            </div>
+        <section className="rounded-xl border bg-card p-5">
+            <h3 className="font-semibold">Inspection Information</h3>
 
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {fields.map((field) => (
-                    <div key={field.label} className="min-w-0 space-y-1">
-                        <p className="text-xs text-muted-foreground">
-                            {field.label}
-                        </p>
-                        <p className="text-sm font-medium break-words">
-                            {field.value || "—"}
-                        </p>
-                    </div>
-                ))}
+            <div className="grid gap-x-8 gap-y-5 pt-4 sm:grid-cols-2">
+                {items.map((item) => {
+                    const Icon = item.icon;
+
+                    return (
+                        <div
+                            key={item.label}
+                            className="min-w-0 space-y-1.5"
+                        >
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <Icon className="h-4 w-4 shrink-0" />
+                                <span className="text-sm">
+                                    {item.label}
+                                </span>
+                            </div>
+
+                            <p className="break-words text-sm font-medium">
+                                {item.value}
+                            </p>
+                        </div>
+                    );
+                })}
             </div>
-        </div>
+        </section>
     );
 }

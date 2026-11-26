@@ -87,7 +87,7 @@ export default function OrderVehicleSection({
                 {/* Header */}
                 <div className="mb-4 flex items-center justify-between">
                     <h3 className="font-semibold">
-                        Informasi Kendaraan (Unit)
+                        Vehicle Information (Units)
                     </h3>
 
                     <span className="text-sm text-muted-foreground">

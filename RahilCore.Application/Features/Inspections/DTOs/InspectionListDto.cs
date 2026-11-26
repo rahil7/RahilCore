@@ -14,6 +14,8 @@
         public string? InspectorName { get; set; }
 
         public DateTime? ScheduleAt { get; set; }
+        public DateTime? SubmittedAt { get; set; }
+        public string? SubmittedBy { get; set; }
 
         public string? CustomerCode { get; set; }
         public string? CustomerName { get; set; }

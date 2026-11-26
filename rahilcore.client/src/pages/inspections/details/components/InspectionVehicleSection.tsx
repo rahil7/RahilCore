@@ -1,14 +1,32 @@
-import { CarFront } from "lucide-react";
+import {
+    CarFront,
+    CalendarDays,
+    Palette,
+    Fingerprint,
+    Cog,
+    Gauge,
+    CalendarClock,
+    UserRoundCheck,
+    Pencil,
+} from "lucide-react";
+import { format, parseISO } from "date-fns";
+import type { InspectionVehicle } from "../../../../types/inspection";
+import { Button } from "../../../../components/ui/button";
 
 interface InspectionVehicleSectionProps {
-    vehicle: {
-        plateNo: string | null;
-        brand: string | null;
-        model: string | null;
-        variant: string | null;
-        year: number | null;
-        exteriorColor: string | null;
-    };
+    vehicle: InspectionVehicle;
+}
+
+function formatDate(value: string | null) {
+    if (!value) return "—";
+
+    return format(parseISO(value), "dd MMM yyyy");
+}
+
+function formatNumber(value: number | null) {
+    if (value === null) return "—";
+
+    return new Intl.NumberFormat("id-ID").format(value);
 }
 
 export default function InspectionVehicleSection({
@@ -18,23 +36,69 @@ export default function InspectionVehicleSection({
         .filter(Boolean)
         .join(" ");
 
-    const vehicleDescription = [
-        vehicleName,
-        vehicle.variant,
-    ]
+    const vehicleDescription = [vehicleName, vehicle.variant]
         .filter(Boolean)
         .join(" · ");
 
+    const items = [
+        {
+            label: "Year of Manufacture",
+            value: vehicle.yearOfManufacture?.toString() ?? "—",
+            icon: CalendarDays,
+        },
+        {
+            label: "Exterior Color",
+            value: vehicle.exteriorColor || "—",
+            icon: Palette,
+        },
+        {
+            label: "VIN",
+            value: vehicle.vin || "—",
+            icon: Fingerprint,
+        },
+        {
+            label: "Engine No.",
+            value: vehicle.engineNo || "—",
+            icon: Cog,
+        },
+        {
+            label: "Odometer",
+            value: vehicle.odometer !== null
+                ? `${formatNumber(vehicle.odometer)} km`
+                : "—",
+            icon: Gauge,
+        },
+        {
+            label: "Tax Expiry Date",
+            value: formatDate(vehicle.taxExpiryDate),
+            icon: CalendarClock,
+        },
+        {
+            label: "First Ownership",
+            value:
+                vehicle.firstOwnership === null
+                    ? "—"
+                    : vehicle.firstOwnership
+                        ? "Yes"
+                        : "No",
+            icon: UserRoundCheck,
+        },
+    ];
+
     return (
-        <div className="rounded-lg border bg-card p-4 shadow-sm space-y-4">
-            <div>
+        <section className="rounded-xl border bg-card p-5">
+            {/* Header */}
+            <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Vehicle Information</h3>
-                <p className="text-xs text-muted-foreground mt-1">
-                    Inspected vehicle
-                </p>
+
+                <Button variant="outline" size="sm">
+                    <Pencil className="h-4 w-4" />
+                    Edit
+                </Button>
             </div>
 
-            <div className="flex items-center gap-3">
+            {/* Vehicle Identity */}
+            <div className="flex items-center gap-3 pt-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted">
                     <CarFront className="h-6 w-6 text-muted-foreground" />
                 </div>
@@ -44,31 +108,36 @@ export default function InspectionVehicleSection({
                         {vehicle.plateNo || "—"}
                     </p>
 
-                    <p className="text-sm font-medium truncate">
+                    <p className="break-words text-sm text-muted-foreground">
                         {vehicleDescription || "—"}
                     </p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 border-t pt-3 sm:grid-cols-3">
-                <VehicleField label="Year" value={vehicle.year?.toString()} />
-                <VehicleField label="Exterior Color" value={vehicle.exteriorColor} />
-            </div>
-        </div>
-    );
-}
+            {/* Vehicle Details */}
+            <div className="grid gap-x-8 gap-y-5 border-t mt-5 pt-5 sm:grid-cols-2">
+                {items.map((item) => {
+                    const Icon = item.icon;
 
-function VehicleField({
-    label,
-    value,
-}: {
-    label: string;
-    value: string | undefined | null;
-}) {
-    return (
-        <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className="text-sm font-medium">{value || "—"}</p>
-        </div>
+                    return (
+                        <div
+                            key={item.label}
+                            className="min-w-0 space-y-1.5"
+                        >
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <Icon className="h-4 w-4 shrink-0" />
+                                <span className="text-sm">
+                                    {item.label}
+                                </span>
+                            </div>
+
+                            <p className="break-words text-sm font-medium">
+                                {item.value}
+                            </p>
+                        </div>
+                    );
+                })}
+            </div>
+        </section>
     );
 }

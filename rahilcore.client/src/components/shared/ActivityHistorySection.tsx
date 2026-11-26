@@ -6,10 +6,10 @@ import {
     CircleDot,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { format, parseISO } from "date-fns";
-import type { Activity } from "../../../../types/activity";
+import type { Activity } from "../../types/activity";
+import { formatDateTime } from "../../utils/date-utils";
 
-interface OrderActivitySectionProps {
+interface ActivityHistorySectionProps {
     activities: Activity[];
 }
 
@@ -20,16 +20,14 @@ const activityIcons: Record<string, LucideIcon> = {
     INSPECTION: ClipboardCheck,
 };
 
-export default function OrderActivitySection({
+export default function ActivityHistorySection({
     activities,
-}: OrderActivitySectionProps) {
+}: ActivityHistorySectionProps) {
     return (
         <section className="rounded-xl border bg-card p-5">
             {/* Header */}
             <div className="mb-5 flex items-center justify-between">
-                <h3 className="font-semibold">
-                    Activity History
-                </h3>
+                <h3 className="font-semibold">Activity History</h3>
 
                 <span className="text-sm text-muted-foreground">
                     {activities.length} Activities
@@ -77,10 +75,7 @@ export default function OrderActivitySection({
                                         </p>
 
                                         <p className="mt-2 text-xs text-muted-foreground">
-                                            {format(
-                                                parseISO(activity.createdAt),
-                                                "dd MMM yyyy, HH:mm"
-                                            )}
+                                            {formatDateTime(activity.createdAt)}
                                             {" · "}
                                             {activity.createdBy}
                                         </p>

@@ -56,7 +56,7 @@ export interface GetInspectionsParams extends ListQueryParams {
 }
 
 export interface InspectionDetailResponse {
-    inspectionid: number;
+    inspectionId: number;
     inspectionNo: string;
     orderId: number;
     orderNo: string;
@@ -73,12 +73,12 @@ export interface InspectionDetailResponse {
     createdNote: string;
 
     lastActivityAt: string;
-    LastActivityBy: string;
+    lastActivityBy: string;
     lastActivityNote: string;
 
     customer: Customer;
 
-    vehicles: InspectionVehicle[];
+    vehicle: InspectionVehicle;
 
     assignment: Assignment | null;
 
@@ -87,7 +87,7 @@ export interface InspectionDetailResponse {
 
 export interface InspectionVehicle extends Vehicle {
     plateNo: string | null,
-    vind: string | null,
+    vin: string | null,
     engineNo: string | null,
     taxExpiryDate: string | null,
     odometer: number | null,

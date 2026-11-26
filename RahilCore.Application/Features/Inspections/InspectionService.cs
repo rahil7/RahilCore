@@ -1,6 +1,7 @@
 ﻿using RahilCore.Application.Common.DTOs;
 using RahilCore.Application.Common.Exceptions;
 using RahilCore.Application.Features.Customers;
+using RahilCore.Application.Features.Inspections.DTOs;
 using RahilCore.Application.Features.Inspections.Queries;
 using RahilCore.Application.Features.MasterParameters;
 using RahilCore.Application.Features.Orders;
@@ -9,7 +10,7 @@ using RahilCore.Application.Features.Vehicles;
 using RahilCore.Domain.Entities;
 using RahilCore.Domain.Entities.Inspections;
 
-namespace RahilCore.Application.Features.Inspections.DTOs
+namespace RahilCore.Application.Features.Inspections
 {
     public class InspectionService(
             IInspectionRepository inspectionRepo,

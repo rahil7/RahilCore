@@ -36,7 +36,7 @@ export default function InspectionActiveFilters({
                 {/* Filter Chips */}
                 <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                     <ActiveFilterChip
-                        label={`Tanggal Inspeksi : ${formatDate(scheduleFrom)} - ${formatDate(scheduleTo)}`}
+                        label={`Inspection Date : ${formatDate(scheduleFrom)} - ${formatDate(scheduleTo)}`}
                         onRemove={() => { } }
                     />
 
@@ -49,7 +49,7 @@ export default function InspectionActiveFilters({
 
                     {activeCustomerTypes.length > 0 && (
                         <ActiveFilterChip
-                            label={`Tipe Customer: ${activeCustomerTypes.join(", ")}`}
+                            label={`Customer Type: ${activeCustomerTypes.join(", ")}`}
                             onRemove={onRemoveCustomerType}
                         />
                     )}

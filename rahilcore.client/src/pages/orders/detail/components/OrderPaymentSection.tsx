@@ -1,4 +1,4 @@
-import { FileText, Plus, Pencil } from "lucide-react";
+import { FileText, Plus, Pencil, Wallet, CalendarDays, Hash, MessageSquareText } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
 import type { OrderPayment } from "../../../../types/order";
 import StatusBadge from "../../../../components/shared/StatusBadge";
@@ -69,33 +69,39 @@ export default function OrderPaymentSection({
             ) : (
                 <div className="space-y-5">
                     {/* Transaction Information */}
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        <div>
-                            <p className="text-sm text-muted-foreground">
-                                Payment Via
-                            </p>
-                            <p className="mt-1 text-sm font-medium">
-                                {payment.paymentMethodName || "-"}
-                            </p>
-                        </div>
+                    <div className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+                        {[
+                            {
+                                label: "Payment Via",
+                                value: payment.paymentMethodName || "-",
+                                icon: Wallet,
+                            },
+                            {
+                                label: "Payment Date",
+                                value: formatDateTime(payment.paymentDate),
+                                icon: CalendarDays,
+                            },
+                            {
+                                label: "Reference No.",
+                                value: payment.referenceNo || "-",
+                                icon: Hash,
+                            },
+                        ].map((item) => {
+                            const Icon = item.icon;
 
-                        <div>
-                            <p className="text-sm text-muted-foreground">
-                                Payment Date
-                            </p>
-                            <p className="mt-1 text-sm font-medium">
-                                {formatDateTime(payment.paymentDate)}
-                            </p>
-                        </div>
+                            return (
+                                <div key={item.label} className="min-w-0 space-y-1.5">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <Icon className="h-4 w-4 shrink-0" />
+                                        <span className="text-sm">{item.label}</span>
+                                    </div>
 
-                        <div>
-                            <p className="text-sm text-muted-foreground">
-                                Reference No.
-                            </p>
-                            <p className="mt-1 break-all text-sm font-medium">
-                                {payment.referenceNo || "-"}
-                            </p>
-                        </div>
+                                    <p className="break-words text-sm font-medium">
+                                        {item.value}
+                                    </p>
+                                </div>
+                            );
+                        })}
                     </div>
 
                     {/* Amount Breakdown */}
@@ -134,11 +140,13 @@ export default function OrderPaymentSection({
 
                     {/* Payment Note */}
                     {payment.lastActivityNote && (
-                        <div className="mb-3">
-                            <p className="text-sm text-muted-foreground">
-                                Note
-                            </p>
-                            <p className="mt-1 whitespace-pre-wrap text-sm">
+                        <div className="space-y-1.5">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <MessageSquareText className="h-4 w-4 shrink-0" />
+                                <span className="text-sm">Note</span>
+                            </div>
+
+                            <p className="whitespace-pre-wrap break-words text-sm font-medium">
                                 {payment.lastActivityNote}
                             </p>
                         </div>
@@ -147,9 +155,10 @@ export default function OrderPaymentSection({
                     {/* Payment Proof */}
                     <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
                         <div>
-                            <p className="text-sm text-muted-foreground">
-                                Payment Proof
-                            </p>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                                <FileText className="h-4 w-4 shrink-0" />
+                                <span className="text-sm">Payment Proof</span>
+                            </div>
 
                             {payment.hasPaymentProof ? (
                                 <button
