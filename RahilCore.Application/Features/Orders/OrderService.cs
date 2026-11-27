@@ -57,7 +57,7 @@ namespace RahilCore.Application.Features.Orders
                 .GetFilterOptionsAsync(MasterParameterTypes.CUST_TYPE, ct);
 
             var inspectionStatus = await masterParameterRepo
-                .GetFilterOptionsAsync(MasterParameterTypes.INSP_STATUS, ct);
+                .GetFilterOptionsAsync(MasterParameterTypes.ORDER_STATUS, ct);
 
             var paymentStatus = await masterParameterRepo
                 .GetFilterOptionsAsync(MasterParameterTypes.PAYMENT_STATUS, ct);
@@ -239,9 +239,9 @@ namespace RahilCore.Application.Features.Orders
 
             var canAssign = order.Customer.CustTypeId == 1 || (order.Customer.CustTypeId == 2 && order.PaymentStatusId == 15);
 
-            bool canEdit = InspectionStatus.ALLOWED_ORDER_EDIT.Contains(order.StatusId);
-            bool canEditSchedule = InspectionStatus.ALLOWED_ORDER_EDIT_SCHEDULE.Contains(order.StatusId);
-            bool canCancel = InspectionStatus.CANCELLED != order.StatusId;
+            bool canEdit = OrderStatus.ALLOWED_ORDER_EDIT.Contains(order.StatusId);
+            bool canEditSchedule = OrderStatus.ALLOWED_ORDER_EDIT_SCHEDULE.Contains(order.StatusId);
+            bool canCancel = OrderStatus.CANCELLED != order.StatusId;
 
             return new OrderDetailDto
             {
@@ -412,7 +412,7 @@ namespace RahilCore.Application.Features.Orders
                     OrderNo = orderCode,
                     CustomerId = customerId,
                     ScheduleAt = DateTimeHelper.JakartaToUtc(request.ScheduleAt),
-                    StatusId = InspectionStatus.ORDER_CREATED,
+                    StatusId = OrderStatus.ORDER_CREATED,
                     PaymentStatusId = PaymentStatus.UNPAID,
                     TotalUnit = 1,
                     PicName = request.PicName,
@@ -524,7 +524,7 @@ namespace RahilCore.Application.Features.Orders
                     OrderNo = orderCode,
                     CustomerId = request.CustomerId,
                     ScheduleAt = DateTimeHelper.JakartaToUtc(request.ScheduleAt),
-                    StatusId = InspectionStatus.ORDER_CREATED,
+                    StatusId = OrderStatus.ORDER_CREATED,
                     PaymentStatusId = PaymentStatus.UNPAID,
                     TotalUnit = request.TotalUnit,
                     PicName = request.PicName,
@@ -682,7 +682,7 @@ namespace RahilCore.Application.Features.Orders
 
             try
             {
-                order.StatusId = InspectionStatus.AWAITING_ASSIGNMENT;
+                order.StatusId = OrderStatus.AWAITING_ASSIGNMENT;
                 order.PaymentStatusId = PaymentStatus.PAID;
                 order.DiscountAmount = request.DiscountAmount;
                 order.SubtotalAmount = request.SubtotalAmount;
@@ -1004,7 +1004,7 @@ namespace RahilCore.Application.Features.Orders
                 throw new BusinessException(400, "Total unit pada order tidak valid.");
             }
 
-            if (!InspectionStatus.ALLOWED_ORDER_ASSIGNED.Contains(order.StatusId))
+            if (!OrderStatus.ALLOWED_ORDER_ASSIGNED.Contains(order.StatusId))
             {
                 throw new BusinessException(409, "Order tidak dapat di-assign karena status order tidak valid.");
             }
@@ -1015,7 +1015,7 @@ namespace RahilCore.Application.Features.Orders
             }
 
             if (order.Customer.CustTypeId == CustomerType.CUSTOMER &&
-                order.StatusId == InspectionStatus.ORDER_CREATED)
+                order.StatusId == OrderStatus.ORDER_CREATED)
             {
                 throw new BusinessException(409,"Silakan lakukan pembayaran sebelum melakukan assignment.");
             }
@@ -1126,7 +1126,7 @@ namespace RahilCore.Application.Features.Orders
                 }
 
                 // 4. Update Order.
-                order.StatusId = InspectionStatus.INSPECTOR_ASSIGNED;
+                order.StatusId = OrderStatus.INSPECTOR_ASSIGNED;
                 order.ScheduleAt = DateTimeHelper.JakartaToUtc(request.ScheduleAt);
                 order.UpdatedAt = now;
                 order.UpdatedBy = username;
@@ -1190,7 +1190,7 @@ namespace RahilCore.Application.Features.Orders
                 throw new BusinessException(404, $"Order tidak ditemukan.");
             }
 
-            if (!InspectionStatus.ALLOWED_DELETE_ITEM.Contains(order.StatusId))
+            if (!OrderStatus.ALLOWED_DELETE_ITEM.Contains(order.StatusId))
             {
                 throw new BusinessException(400, "Order tidak dapat dihapus pada status ini.");
             }
@@ -1300,7 +1300,7 @@ namespace RahilCore.Application.Features.Orders
                 order.PicPhone = phone;
             }
 
-            if (request.ScheduleAt.HasValue && (InspectionStatus.ALLOWED_ORDER_EDIT_SCHEDULE.Contains(order.StatusId)))
+            if (request.ScheduleAt.HasValue && (OrderStatus.ALLOWED_ORDER_EDIT_SCHEDULE.Contains(order.StatusId)))
             {
                 order.ScheduleAt= DateTimeHelper.JakartaToUtc(request.ScheduleAt.Value);
             }
@@ -1350,7 +1350,7 @@ namespace RahilCore.Application.Features.Orders
                 throw new BusinessException(404, $"Order tidak ditemukan.");
             }
 
-            if (!InspectionStatus.ALLOWED_CANCEL_ORDER.Contains(order.StatusId))
+            if (!OrderStatus.ALLOWED_CANCEL_ORDER.Contains(order.StatusId))
             {
                 throw new BusinessException(409, "Order tidak dapat di cancel karena status order tidak valid.");
             }
@@ -1361,7 +1361,7 @@ namespace RahilCore.Application.Features.Orders
 
             try
             {
-                order.StatusId = InspectionStatus.CANCELLED;
+                order.StatusId = OrderStatus.CANCELLED;
                 order.UpdatedAt = now;
                 order.UpdatedBy = username;
                 order.UpdatedNote = request.Note.Trim();

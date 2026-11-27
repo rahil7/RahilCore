@@ -43,33 +43,12 @@ namespace RahilCore.Application.Features.Inspections.DTOs
         public long? ModelId { get; set; }
         public long? VariantId { get; set; }
         public long? ExteriorColorId { get; set; }
-
         public long? BodyTypeId { get; set; }
-        public string? BodyType { get; set; }
-
         public long? InteriorColorId { get; set; }
-        public string? InteriorColor { get; set; }
-
         public long? InteriorMaterialId { get; set; }
-        public string? InteriorMaterial { get; set; }
-
-        public string? Vin { get; set; }
-        public string? EngineNo { get; set; }
-        public DateOnly? TaxExpiryDate { get; set; }
-        public decimal? Odometer { get; set; }
-
         public long? FuelTypeId { get; set; }
-        public string? FuelType { get; set; }
-
         public long? TransmissionId { get; set; }
-        public string? Transmission { get; set; }
-
-        public decimal? EngineCapacity { get; set; }
-
         public long? OwnershipTypeId { get; set; }
-        public string? OwnershipType { get; set; }
-
-        public bool? FirstOwnership { get; set; }
 
     }
 }

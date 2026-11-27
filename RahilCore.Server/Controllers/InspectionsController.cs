@@ -33,6 +33,18 @@ namespace RahilCore.Server.Controllers
             return Ok(response);
         }
 
+        [HttpGet("filter-options")]
+        public async Task<ActionResult<ApiResponse<InspectionFilterOptions>>> GetFilterOptions(CancellationToken ct)
+        {
+            var options = await inspectionService.GetFilterOptionsAsync(ct);
+
+            return Ok(
+                new ApiResponse<InspectionFilterOptions>(
+                    Success: true,
+                    Message: "Inspection filter options retrieved successfully.",
+                    Data: options));
+        }
+
         [HttpGet("{id:long}")]
         public async Task<ActionResult<ApiResponse<InspectionDetailDto>>> GetById(long id, CancellationToken ct)
         {
@@ -54,17 +66,25 @@ namespace RahilCore.Server.Controllers
                     Data: data));
         }
 
-
-        [HttpGet("filter-options")]
-        public async Task<ActionResult<ApiResponse<InspectionFilterOptions>>> GetFilterOptions(CancellationToken ct)
+        [HttpGet("{id:long}/scoring")]
+        public async Task<ActionResult<ApiResponse<InspectionScroingDetailDto>>> GetScoringById(long id, CancellationToken ct)
         {
-            var options = await inspectionService.GetFilterOptionsAsync(ct);
+            var data = await inspectionService.GetScoring(id, ct);
+
+            if (data is null)
+            {
+                return NotFound(
+                    new ApiResponse<InspectionScroingDetailDto>(
+                        Success: false,
+                        Message: "Inspection scroing not found.",
+                        Data: null));
+            }
 
             return Ok(
-                new ApiResponse<InspectionFilterOptions>(
+                new ApiResponse<InspectionScroingDetailDto>(
                     Success: true,
-                    Message: "Inspection filter options retrieved successfully.",
-                    Data: options));
+                    Message: "Inspection scoring successfully.",
+                    Data: data));
         }
 
     }

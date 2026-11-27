@@ -4,6 +4,7 @@ using RahilCore.Domain.Entities.Customers;
 using RahilCore.Domain.Entities.Inspections;
 using RahilCore.Domain.Entities.MasterData;
 using RahilCore.Domain.Entities.Orders;
+using RahilCore.Infrastructure.Persistence.Configurations.MasterData;
 
 namespace RahilCore.Infrastructure.Persistence.DbContext
 {
@@ -29,6 +30,11 @@ namespace RahilCore.Infrastructure.Persistence.DbContext
         public DbSet<MasterVariantEn> MasterVariants => Set<MasterVariantEn>();
         public DbSet<MasterColorEn> MasterColors => Set<MasterColorEn>();
         public DbSet<MasterInspectionFormEn> MasterInspectionForms => Set<MasterInspectionFormEn>();
+        public DbSet<MasterInspectionItemEn> MasterInspectionItems => Set<MasterInspectionItemEn>();
+        public DbSet<MasterInspectionGroupEn> MasterInspectionGroups => Set<MasterInspectionGroupEn>();
+        public DbSet<MasterInspectionSubsectionEn> MasterInspectionSections => Set<MasterInspectionSubsectionEn>();
+        public DbSet<MasterInspectionSubsectionEn> MasterInspectionSubsections => Set<MasterInspectionSubsectionEn>();
+        public DbSet<MasterInspectionFormItemEn> MasterInspectionFormItems=> Set<MasterInspectionFormItemEn>();
 
         public DbSet<ActivityLogEn> ActivityLogs => Set<ActivityLogEn>();
 

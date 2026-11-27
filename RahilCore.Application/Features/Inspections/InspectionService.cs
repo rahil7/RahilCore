@@ -28,7 +28,7 @@ namespace RahilCore.Application.Features.Inspections
                 .GetFilterOptionsAsync(MasterParameterTypes.CUST_TYPE, ct);
 
             var inspectionStatus = await masterParameterRepo
-                .GetFilterOptionsAsync(MasterParameterTypes.INSP_STATUS, ct);
+                .GetFilterOptionsAsync(MasterParameterTypes.ORDER_STATUS, ct);
 
             var inspectorLookup = await userRepo.GetInspectorLookup(ct);
 
@@ -224,6 +224,16 @@ namespace RahilCore.Application.Features.Inspections
                 Customer = inspectionCustomer,
                 Vehicle = inspectionVehicle
             };
+        }
+
+        public async Task<InspectionScroingDetailDto?> GetScoring(long id, CancellationToken ct = default)
+        {
+            if (id <= 0)
+            {
+                return null;
+            }
+
+            InspectionEn? inspection = await inspectionRepo.GetScoring(id, ct);
         }
     }
 }
