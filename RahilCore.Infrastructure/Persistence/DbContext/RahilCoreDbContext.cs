@@ -4,6 +4,7 @@ using RahilCore.Domain.Entities.Customers;
 using RahilCore.Domain.Entities.Inspections;
 using RahilCore.Domain.Entities.MasterData;
 using RahilCore.Domain.Entities.Orders;
+using RahilCore.Infrastructure.Persistence.Configurations.Inspections;
 using RahilCore.Infrastructure.Persistence.Configurations.MasterData;
 
 namespace RahilCore.Infrastructure.Persistence.DbContext
@@ -22,6 +23,8 @@ namespace RahilCore.Infrastructure.Persistence.DbContext
         public DbSet<InspectionOrderPaymentEn> InspectionOrderPayments => Set<InspectionOrderPaymentEn>();
         public DbSet<InspectionOrderAssignmentEn> InspectionOrderAssignments=> Set<InspectionOrderAssignmentEn>();
         public DbSet<InspectionEn> Inspections => Set<InspectionEn>();
+        public DbSet<InspectionScoringEn> InspectionScorings => Set<InspectionScoringEn>();
+        public DbSet<InspectionStatusHistoryEn> InspectionStatusHistories => Set<InspectionStatusHistoryEn>();
 
         public DbSet<CityEn> Cities => Set<CityEn>();
         public DbSet<MasterParameterEn> MasterParameters => Set<MasterParameterEn>();

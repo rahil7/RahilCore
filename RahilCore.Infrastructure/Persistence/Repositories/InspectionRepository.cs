@@ -265,5 +265,10 @@ namespace RahilCore.Infrastructure.Persistence.Repositories
 
             return (items, totalItems);
         }
+
+        public async Task<InspectionEn?> GetScoring(long id, CancellationToken ct)
+        {
+            //return await context.Inspections
+        }
     }
 }

@@ -15,7 +15,7 @@ namespace RahilCore.Application.Features.Inspections.DTOs
 
         public BaseVehicleDto? Vehicle { get; set; }
 
-        public IReadOnlyList<InspectionScoringGroupDto>? InspectionGroup { set; get }
+        public IReadOnlyList<InspectionScoringGroupDto>? InspectionGroup { set; get; }
     }
 
     public sealed class InspectionScoringGroupDto : BaseInspectionSectionDto
